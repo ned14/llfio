@@ -36,6 +36,8 @@ var NAVTREEINDEX25 =
 "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a518ac00acb0c63b819cd9f54c1dceda6":[4,0,2,7,2,0,2],
 "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a95ddf626b1a1bcf4bbe7d81d240a0f4b":[4,0,2,7,2,0,1],
 "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a95ddf626b1a1bcf4bbe7d81d240a0f4b":[3,0,1,8,2,0,1],
+"unionllfio__v2__xxx_1_1handle_1_1alignas.html":[4,0,2,33,0],
+"unionllfio__v2__xxx_1_1handle_1_1alignas.html":[3,0,1,34,0],
 "utils_8hpp.html":[5,0,0,1,0,27],
 "utils_8hpp.html#a06dc4d96bd914f5ae3295eb516bb4d88":[5,0,0,1,0,27,18],
 "utils_8hpp.html#a07697dcb1fbe4a8757d7d1952efbe294":[5,0,0,1,0,27,6],

@@ -1,5 +1,6 @@
 var classllfio__v2__xxx_1_1handle =
 [
+    [ "alignas", "unionllfio__v2__xxx_1_1handle_1_1alignas.html", null ],
     [ "extent_type", "classllfio__v2__xxx_1_1handle.html#a4ee58f1b6a24af5e64d850d1e3eed07f", null ],
     [ "path_type", "classllfio__v2__xxx_1_1handle.html#a33481bae57d9ccd0c97946416f9682f3", null ],
     [ "size_type", "classllfio__v2__xxx_1_1handle.html#aed9587571c3fb932adadddc1beeeed58", null ],

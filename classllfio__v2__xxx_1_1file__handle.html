@@ -204,10 +204,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8f754fdbf69fbb9b989c5aab409f2cb2" id="r_a8f754fdbf69fbb9b989c5aab409f2cb2"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a8f754fdbf69fbb9b989c5aab409f2cb2">file_handle</a> ()</td></tr>
 <tr class="memdesc:a8f754fdbf69fbb9b989c5aab409f2cb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor.  <br /></td></tr>
 <tr class="separator:a8f754fdbf69fbb9b989c5aab409f2cb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a654e04f019bbaf130c685041b846625a" id="r_a654e04f019bbaf130c685041b846625a"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a654e04f019bbaf130c685041b846625a">file_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, flag flags, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
+<tr class="memitem:a654e04f019bbaf130c685041b846625a" id="r_a654e04f019bbaf130c685041b846625a"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a654e04f019bbaf130c685041b846625a">file_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, dev_t devid, ino_t inode, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
 <tr class="memdesc:a654e04f019bbaf130c685041b846625a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle.  <br /></td></tr>
 <tr class="separator:a654e04f019bbaf130c685041b846625a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ce878101f8dd1ccb20320702f8fa3e8" id="r_a1ce878101f8dd1ccb20320702f8fa3e8"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a1ce878101f8dd1ccb20320702f8fa3e8">file_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, flag flags, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
+<tr class="memitem:a1ce878101f8dd1ccb20320702f8fa3e8" id="r_a1ce878101f8dd1ccb20320702f8fa3e8"><td class="memItemLeft" align="right" valign="top">constexpr&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a1ce878101f8dd1ccb20320702f8fa3e8">file_handle</a> (<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a> h, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *ctx)</td></tr>
 <tr class="memdesc:a1ce878101f8dd1ccb20320702f8fa3e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a handle from a supplied native handle.  <br /></td></tr>
 <tr class="separator:a1ce878101f8dd1ccb20320702f8fa3e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9cb49b1828d6a0cf4a7ea6668c38ca42" id="r_a9cb49b1828d6a0cf4a7ea6668c38ca42"><td class="memItemLeft" align="right" valign="top"><a id="a9cb49b1828d6a0cf4a7ea6668c38ca42" name="a9cb49b1828d6a0cf4a7ea6668c38ca42"></a>
@@ -400,9 +400,6 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock_file_s
 <tr class="memitem:a75278c9c2990bcf8471189556a6e2c96" id="r_a75278c9c2990bcf8471189556a6e2c96"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1awaitable.html">awaitable</a>&lt; <a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__result.html">io_result</a>&lt; const_buffers_type &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#a75278c9c2990bcf8471189556a6e2c96">co_barrier</a> (<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt; reqs=<a class="el" href="structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__request.html">io_request</a>&lt; const_buffers_type &gt;(), <a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a2a7e52ff0c192a5edf67ceee4c7195d3">barrier_kind</a> kind=barrier_kind::nowait_data_only, <a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a> d=<a class="el" href="structllfio__v2__xxx_1_1deadline.html">deadline</a>()) noexcept</td></tr>
 <tr class="memdesc:a75278c9c2990bcf8471189556a6e2c96"><td class="mdescLeft">&#160;</td><td class="mdescRight">A coroutinised equivalent to <code>.barrier()</code> which suspends the coroutine until the i/o finishes. <b>Blocks execution</b> i.e is equivalent to <code>.barrier()</code> if no i/o multiplexer has been set on this handle!  <br /></td></tr>
 <tr class="separator:a75278c9c2990bcf8471189556a6e2c96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a013936bc1254b1a47567fe29698d1b1c" id="r_a013936bc1254b1a47567fe29698d1b1c"><td class="memItemLeft" align="right" valign="top">flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a> () const noexcept</td></tr>
-<tr class="memdesc:a013936bc1254b1a47567fe29698d1b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The flags this handle was opened with.  <br /></td></tr>
-<tr class="separator:a013936bc1254b1a47567fe29698d1b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6ae214241d075f68c3df8cfb377f135" id="r_af6ae214241d075f68c3df8cfb377f135"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#af6ae214241d075f68c3df8cfb377f135">QUICKCPPLIB_BITFIELD_BEGIN_T</a> (flag, uint16_t)</td></tr>
 <tr class="memdesc:af6ae214241d075f68c3df8cfb377f135"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitwise flags which can be specified.  <br /></td></tr>
 <tr class="separator:af6ae214241d075f68c3df8cfb377f135"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -494,6 +491,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock_file_s
 <tr class="memitem:a0a2a5896f5e373fa032cdae1c1fff2c1" id="r_a0a2a5896f5e373fa032cdae1c1fff2c1"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1">are_safety_barriers_issued</a> () const noexcept</td></tr>
 <tr class="memdesc:a0a2a5896f5e373fa032cdae1c1fff2c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if issuing safety fsyncs is on.  <br /></td></tr>
 <tr class="separator:a0a2a5896f5e373fa032cdae1c1fff2c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a013936bc1254b1a47567fe29698d1b1c" id="r_a013936bc1254b1a47567fe29698d1b1c"><td class="memItemLeft" align="right" valign="top">flag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a> () const noexcept</td></tr>
+<tr class="memdesc:a013936bc1254b1a47567fe29698d1b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The flags this handle was opened with.  <br /></td></tr>
+<tr class="separator:a013936bc1254b1a47567fe29698d1b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a942b0d276c9f20fe41baab679b88fe72" id="r_a942b0d276c9f20fe41baab679b88fe72"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a> () const noexcept</td></tr>
 <tr class="memdesc:a942b0d276c9f20fe41baab679b88fe72"><td class="mdescLeft">&#160;</td><td class="mdescRight">The native handle used by this handle.  <br /></td></tr>
 <tr class="separator:a942b0d276c9f20fe41baab679b88fe72"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -572,13 +572,13 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>unlock_file_s
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a550d9252db3c099fb149b3e6f5b702b0" id="r_a550d9252db3c099fb149b3e6f5b702b0"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#af059edd6f3f0aac8e118bf371907ecf6">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::read, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation=creation::open_existing, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::all, flag flags=flag::none) noexcept</td></tr>
+<tr class="memitem:a550d9252db3c099fb149b3e6f5b702b0" id="r_a550d9252db3c099fb149b3e6f5b702b0"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;base, <a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a> <a class="el" href="namespacellfio__v2__xxx.html#af059edd6f3f0aac8e118bf371907ecf6">path</a>, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::read, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation=creation::open_existing, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::all, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:a550d9252db3c099fb149b3e6f5b702b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cc96276fb1e7788bd4a222e91d9bfed" id="r_a2cc96276fb1e7788bd4a222e91d9bfed"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a2cc96276fb1e7788bd4a222e91d9bfed">uniquely_named_file</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag flags=flag::none) noexcept</td></tr>
+<tr class="memitem:a2cc96276fb1e7788bd4a222e91d9bfed" id="r_a2cc96276fb1e7788bd4a222e91d9bfed"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#a2cc96276fb1e7788bd4a222e91d9bfed">uniquely_named_file</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirpath, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:a2cc96276fb1e7788bd4a222e91d9bfed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab85f8394f057ed3a3dd117532574bfda" id="r_ab85f8394f057ed3a3dd117532574bfda"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#ab85f8394f057ed3a3dd117532574bfda">temp_file</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a> name=<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation=creation::if_needed, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag flags=flag::unlink_on_first_close) noexcept</td></tr>
+<tr class="memitem:ab85f8394f057ed3a3dd117532574bfda" id="r_ab85f8394f057ed3a3dd117532574bfda"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#ab85f8394f057ed3a3dd117532574bfda">temp_file</a> (<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a> name=<a class="el" href="classllfio__v2__xxx_1_1path__view.html">path_view_type</a>(), <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#af0b352d0f273ba6fa70c178b2c2fee42">creation</a> _creation=creation::if_needed, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::unlink_on_first_close) noexcept</td></tr>
 <tr class="separator:ab85f8394f057ed3a3dd117532574bfda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3b3a68354ad5bf299581423a97bfb7a" id="r_ad3b3a68354ad5bf299581423a97bfb7a"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#ad3b3a68354ad5bf299581423a97bfb7a">temp_inode</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">path_discovery::storage_backed_temporary_files_directory</a>(), <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag flags=flag::none) noexcept</td></tr>
+<tr class="memitem:ad3b3a68354ad5bf299581423a97bfb7a" id="r_ad3b3a68354ad5bf299581423a97bfb7a"><td class="memItemLeft" align="right" valign="top">static result&lt; <a class="el" href="classllfio__v2__xxx_1_1file__handle.html">file_handle</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1file__handle.html#ad3b3a68354ad5bf299581423a97bfb7a">temp_inode</a> (const <a class="el" href="classllfio__v2__xxx_1_1path__handle.html">path_handle</a> &amp;dirh=<a class="el" href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">path_discovery::storage_backed_temporary_files_directory</a>(), <a class="el" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dca">mode</a> _mode=mode::write, <a class="el" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852">caching</a> _caching=caching::temporary, flag <a class="el" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>=flag::none) noexcept</td></tr>
 <tr class="separator:ad3b3a68354ad5bf299581423a97bfb7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
@@ -619,31 +619,6 @@ result&lt; void &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>_fetc
 Protected Attributes</h2></td></tr>
 <tr class="memitem:aa4b79ba6b413f45da50c9c418d592d97" id="r_aa4b79ba6b413f45da50c9c418d592d97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classllfio__v2__xxx_1_1byte__io__multiplexer.html">byte_io_multiplexer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1byte__io__handle.html#aa4b79ba6b413f45da50c9c418d592d97">_ctx</a> {nullptr}</td></tr>
 <tr class="separator:aa4b79ba6b413f45da50c9c418d592d97"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a992cb6f2a59d0be4bd7ef0c162c1a99b" id="r_a992cb6f2a59d0be4bd7ef0c162c1a99b"><td class="memItemLeft" ><a id="a992cb6f2a59d0be4bd7ef0c162c1a99b" name="a992cb6f2a59d0be4bd7ef0c162c1a99b"></a>
-union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a13a29fe0bc4fbbe493851881d9dcbfee" id="r_a13a29fe0bc4fbbe493851881d9dcbfee"><td class="memItemLeft" >
-&#160;&#160;&#160;<a class="el" href="structllfio__v2__xxx_1_1native__handle__type.html">native_handle_type</a>&#160;&#160;&#160;<b>_v</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a13a29fe0bc4fbbe493851881d9dcbfee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ea711b11e7caae4a45c83655da013ec" id="r_a6ea711b11e7caae4a45c83655da013ec"><td class="memItemLeft" >
-&#160;&#160;&#160;struct {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:ac06f9b0d4b04c14e1effa2f72b53b087"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff92830a34fd1490b54813120d98b6b7" id="r_aff92830a34fd1490b54813120d98b6b7"><td class="memItemLeft" >
-&#160;&#160;&#160;&#160;&#160;&#160;intptr_t&#160;&#160;&#160;<b>_padding0_</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:aff92830a34fd1490b54813120d98b6b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acae5673792dfdb0081eceda162411e6c" id="r_acae5673792dfdb0081eceda162411e6c"><td class="memItemLeft" >
-&#160;&#160;&#160;&#160;&#160;&#160;uint32_t&#160;&#160;&#160;<b>_padding1_</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:acae5673792dfdb0081eceda162411e6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a846dec1cea5b300b79c013226ae300df" id="r_a846dec1cea5b300b79c013226ae300df"><td class="memItemLeft" >
-&#160;&#160;&#160;&#160;&#160;&#160;flag&#160;&#160;&#160;<b>flags</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a846dec1cea5b300b79c013226ae300df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b6f5c06268c7bcc40c61f3bb8943336" id="r_a3b6f5c06268c7bcc40c61f3bb8943336"><td class="memItemLeft" >
-&#160;&#160;&#160;&#160;&#160;&#160;uint16_t&#160;&#160;&#160;<b>_padding2_</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a3b6f5c06268c7bcc40c61f3bb8943336"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ea711b11e7caae4a45c83655da013ec" id="r_a6ea711b11e7caae4a45c83655da013ec"><td class="memItemLeft" valign="top">&#160;&#160;&#160;}&#160;&#160;&#160;<b>_</b>&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a6ea711b11e7caae4a45c83655da013ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a992cb6f2a59d0be4bd7ef0c162c1a99b" id="r_a992cb6f2a59d0be4bd7ef0c162c1a99b"><td class="memItemLeft" valign="top">};&#160;</td><td class="memItemRight" valign="bottom">&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
-<tr class="separator:a992cb6f2a59d0be4bd7ef0c162c1a99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d20a64cf182162a49962ed25d2126b3" id="r_a4d20a64cf182162a49962ed25d2126b3"><td class="memItemLeft" align="right" valign="top">dev_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a4d20a64cf182162a49962ed25d2126b3">_devid</a> {0}</td></tr>
 <tr class="separator:a4d20a64cf182162a49962ed25d2126b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8454764db3cd47e65ec7853b9cb0b3fa" id="r_a8454764db3cd47e65ec7853b9cb0b3fa"><td class="memItemLeft" align="right" valign="top">ino_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classllfio__v2__xxx_1_1fs__handle.html#a8454764db3cd47e65ec7853b9cb0b3fa">_inode</a> {0}</td></tr>
@@ -741,11 +716,12 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a handle from a supplied native handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">   91</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#ae7d693928c5371a82d87bc88b162dcc6">lockable_byte_io_handle</a>(std::move(h), flags, ctx)</div>
+<div class="fragment"><div class="line"><span class="lineno">   91</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#ae7d693928c5371a82d87bc88b162dcc6">lockable_byte_io_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, ctx)</div>
 <div class="line"><span class="lineno">   92</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(devid, inode)</div>
 <div class="line"><span class="lineno">   93</span>  {</div>
 <div class="line"><span class="lineno">   94</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a1d2070f6019c86e19de3707bf59ffa97"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">llfio_v2_xxx::fs_handle::fs_handle</a></div><div class="ttdeci">constexpr fs_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> fs_handle.hpp:174</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition</b> handle.hpp:423</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1lockable__byte__io__handle_html_ae7d693928c5371a82d87bc88b162dcc6"><div class="ttname"><a href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#ae7d693928c5371a82d87bc88b162dcc6">llfio_v2_xxx::lockable_byte_io_handle::lockable_byte_io_handle</a></div><div class="ttdeci">constexpr lockable_byte_io_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> lockable_byte_io_handle.hpp:76</div></div>
 </div><!-- fragment -->
 </div>
@@ -791,7 +767,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a handle from a supplied native handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">   97</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#ae7d693928c5371a82d87bc88b162dcc6">lockable_byte_io_handle</a>(std::move(h), flags, ctx)</div>
+<div class="fragment"><div class="line"><span class="lineno">   97</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1lockable__byte__io__handle.html#ae7d693928c5371a82d87bc88b162dcc6">lockable_byte_io_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>, ctx)</div>
 <div class="line"><span class="lineno">   98</span>  {</div>
 <div class="line"><span class="lineno">   99</span>  }</div>
 </div><!-- fragment -->
@@ -1557,10 +1533,9 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 <div class="line"><span class="lineno">   61</span>    {</div>
 <div class="line"><span class="lineno">   62</span>      <span class="keywordflow">return</span> errc::invalid_argument;</div>
 <div class="line"><span class="lineno">   63</span>    }</div>
-<div class="line"><span class="lineno">   64</span>    _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#abc96c9f96b0bf877af2cd9092bd3255e">swap</a>(o._v);</div>
+<div class="line"><span class="lineno">   64</span>    _v.swap(o._v);</div>
 <div class="line"><span class="lineno">   65</span>    <span class="keywordflow">return</span> success();</div>
 <div class="line"><span class="lineno">   66</span>  }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_abc96c9f96b0bf877af2cd9092bd3255e"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#abc96c9f96b0bf877af2cd9092bd3255e">llfio_v2_xxx::native_handle_type::swap</a></div><div class="ttdeci">void swap(native_handle_type &amp;o) noexcept</div><div class="ttdoc">Swaps with another instance.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:157</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1634,7 +1609,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 
 <p>True if the handle uses the kernel page cache for reads. </p>
-<div class="fragment"><div class="line"><span class="lineno">  410</span>{ <span class="keywordflow">return</span> !!(_v.behaviour &amp; native_handle_type::disposition::cache_reads); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  416</span>{ <span class="keywordflow">return</span> !!(_v.behaviour &amp; native_handle_type::disposition::cache_reads); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1662,7 +1637,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 
 <p>True if issuing safety fsyncs is on. </p>
-<div class="fragment"><div class="line"><span class="lineno">  414</span>{ <span class="keywordflow">return</span> !!(_v.behaviour &amp; native_handle_type::disposition::safety_barriers); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  420</span>{ <span class="keywordflow">return</span> !!(_v.behaviour &amp; native_handle_type::disposition::safety_barriers); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1690,7 +1665,7 @@ union {&#160;</td><td class="memItemRight" valign="bottom"></td></tr>
 </div><div class="memdoc">
 
 <p>True if writes are safely on storage on completion. </p>
-<div class="fragment"><div class="line"><span class="lineno">  412</span>{ <span class="keywordflow">return</span> !(_v.behaviour &amp; native_handle_type::disposition::cache_writes); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  418</span>{ <span class="keywordflow">return</span> !(_v.behaviour &amp; native_handle_type::disposition::cache_writes); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2499,7 +2474,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>The flags this handle was opened with. </p>
-<div class="fragment"><div class="line"><span class="lineno">  417</span>{ <span class="keywordflow">return</span> _.flags; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  423</span>{ <span class="keywordflow">return</span> _.flags; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2566,8 +2541,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a memory allocation. </p>
-<div class="fragment"><div class="line"><span class="lineno">  371</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a390f2bbc4b0485179fa56ef275f97763">is_allocation</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a390f2bbc4b0485179fa56ef275f97763"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a390f2bbc4b0485179fa56ef275f97763">llfio_v2_xxx::native_handle_type::is_allocation</a></div><div class="ttdeci">constexpr bool is_allocation() const noexcept</div><div class="ttdoc">True if a memory allocation.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:209</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  377</span>{ <span class="keywordflow">return</span> _v.is_allocation(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2595,8 +2569,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if the handle is append only. </p>
-<div class="fragment"><div class="line"><span class="lineno">  330</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d">is_append_only</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a38054fed025ad3deec2b5a5494e7e57d"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a38054fed025ad3deec2b5a5494e7e57d">llfio_v2_xxx::native_handle_type::is_append_only</a></div><div class="ttdeci">constexpr bool is_append_only() const noexcept</div><div class="ttdoc">True if the handle is append only.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:181</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  336</span>{ <span class="keywordflow">return</span> _v.is_append_only(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2624,8 +2597,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a directory. </p>
-<div class="fragment"><div class="line"><span class="lineno">  357</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#af4d88dcf57bbfcc2f5c30210225c5fbd">is_directory</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_af4d88dcf57bbfcc2f5c30210225c5fbd"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#af4d88dcf57bbfcc2f5c30210225c5fbd">llfio_v2_xxx::native_handle_type::is_directory</a></div><div class="ttdeci">constexpr bool is_directory() const noexcept</div><div class="ttdoc">True if a directory.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:195</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  363</span>{ <span class="keywordflow">return</span> _v.is_directory(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2653,8 +2625,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a HTTP socket. </p>
-<div class="fragment"><div class="line"><span class="lineno">  377</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a3a575695b8655f9a6fdcfebf0e9ef8e5">is_http_socket</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a3a575695b8655f9a6fdcfebf0e9ef8e5"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a3a575695b8655f9a6fdcfebf0e9ef8e5">llfio_v2_xxx::native_handle_type::is_http_socket</a></div><div class="ttdeci">constexpr bool is_http_socket() const noexcept</div><div class="ttdoc">True if a HTTP socket.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:215</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  383</span>{ <span class="keywordflow">return</span> _v.is_http_socket(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2682,8 +2653,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if <code>native_handle()</code> is a valid kernel handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  352</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a71706e7dd621ec11e855aa97df0812cd">is_kernel_handle</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a71706e7dd621ec11e855aa97df0812cd"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a71706e7dd621ec11e855aa97df0812cd">llfio_v2_xxx::native_handle_type::is_kernel_handle</a></div><div class="ttdeci">constexpr bool is_kernel_handle() const noexcept</div><div class="ttdoc">True if handle is a valid kernel handle.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:190</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  358</span>{ <span class="keywordflow">return</span> _v.is_kernel_handle(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2711,7 +2681,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if multiplexable. </p>
-<div class="fragment"><div class="line"><span class="lineno">  344</span>{ <span class="keywordflow">return</span> !!(_.flags &amp; flag::multiplexable); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  350</span>{ <span class="keywordflow">return</span> !!(_.flags &amp; flag::multiplexable); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2739,8 +2709,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a multiplexer like BSD kqueues, Linux epoll or Windows IOCP. </p>
-<div class="fragment"><div class="line"><span class="lineno">  365</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#aa9773fae5d91f769e281cc05df1f0e6c">is_multiplexer</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_aa9773fae5d91f769e281cc05df1f0e6c"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#aa9773fae5d91f769e281cc05df1f0e6c">llfio_v2_xxx::native_handle_type::is_multiplexer</a></div><div class="ttdeci">constexpr bool is_multiplexer() const noexcept</div><div class="ttdoc">True if a multiplexer like BSD kqueues, Linux epoll or Windows IOCP.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:203</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  371</span>{ <span class="keywordflow">return</span> _v.is_multiplexer(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2768,8 +2737,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if nonblocking. </p>
-<div class="fragment"><div class="line"><span class="lineno">  346</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#ae5b2862752c1af2b4419a5fefa4938aa">is_nonblocking</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_ae5b2862752c1af2b4419a5fefa4938aa"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#ae5b2862752c1af2b4419a5fefa4938aa">llfio_v2_xxx::native_handle_type::is_nonblocking</a></div><div class="ttdeci">constexpr bool is_nonblocking() const noexcept</div><div class="ttdoc">True if nonblocking.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:184</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  352</span>{ <span class="keywordflow">return</span> _v.is_nonblocking(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2797,8 +2765,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a path or a directory. </p>
-<div class="fragment"><div class="line"><span class="lineno">  373</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a32fc1a1881a45034b4f5bef972b3eb22">is_path</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a32fc1a1881a45034b4f5bef972b3eb22"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a32fc1a1881a45034b4f5bef972b3eb22">llfio_v2_xxx::native_handle_type::is_path</a></div><div class="ttdeci">constexpr bool is_path() const noexcept</div><div class="ttdoc">True if a path or a directory.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:211</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  379</span>{ <span class="keywordflow">return</span> _v.is_path(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2826,8 +2793,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a pipe. </p>
-<div class="fragment"><div class="line"><span class="lineno">  361</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a6624b7cdc2d9bd750de87485b9a1555e">is_pipe</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a6624b7cdc2d9bd750de87485b9a1555e"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a6624b7cdc2d9bd750de87485b9a1555e">llfio_v2_xxx::native_handle_type::is_pipe</a></div><div class="ttdeci">constexpr bool is_pipe() const noexcept</div><div class="ttdoc">True if a pipe.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:199</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  367</span>{ <span class="keywordflow">return</span> _v.is_pipe(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2855,8 +2821,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a process. </p>
-<div class="fragment"><div class="line"><span class="lineno">  367</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a891f8248afda36a4999f6a09ab139b45">is_process</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a891f8248afda36a4999f6a09ab139b45"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a891f8248afda36a4999f6a09ab139b45">llfio_v2_xxx::native_handle_type::is_process</a></div><div class="ttdeci">constexpr bool is_process() const noexcept</div><div class="ttdoc">True if a process.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:205</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  373</span>{ <span class="keywordflow">return</span> _v.is_process(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2884,8 +2849,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if the handle is readable. </p>
-<div class="fragment"><div class="line"><span class="lineno">  326</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a0ab82c7a29033fef50d914173694e672">is_readable</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a0ab82c7a29033fef50d914173694e672"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a0ab82c7a29033fef50d914173694e672">llfio_v2_xxx::native_handle_type::is_readable</a></div><div class="ttdeci">constexpr bool is_readable() const noexcept</div><div class="ttdoc">True if the handle is readable.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:177</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  332</span>{ <span class="keywordflow">return</span> _v.is_readable(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2913,8 +2877,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a regular file or device. </p>
-<div class="fragment"><div class="line"><span class="lineno">  355</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a01c13e76854f03aa1656cde5622646dd">is_regular</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a01c13e76854f03aa1656cde5622646dd"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a01c13e76854f03aa1656cde5622646dd">llfio_v2_xxx::native_handle_type::is_regular</a></div><div class="ttdeci">constexpr bool is_regular() const noexcept</div><div class="ttdoc">True if a regular file or device.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:193</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  361</span>{ <span class="keywordflow">return</span> _v.is_regular(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2942,8 +2905,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a memory section. </p>
-<div class="fragment"><div class="line"><span class="lineno">  369</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a06a72a1c1d822c05aa040e7bc06dc2a8">is_section</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a06a72a1c1d822c05aa040e7bc06dc2a8"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a06a72a1c1d822c05aa040e7bc06dc2a8">llfio_v2_xxx::native_handle_type::is_section</a></div><div class="ttdeci">constexpr bool is_section() const noexcept</div><div class="ttdoc">True if a memory section.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:207</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  375</span>{ <span class="keywordflow">return</span> _v.is_section(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2971,8 +2933,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if seekable. </p>
-<div class="fragment"><div class="line"><span class="lineno">  348</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#aeb3c171595f7024ce75223b9f866caca">is_seekable</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_aeb3c171595f7024ce75223b9f866caca"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#aeb3c171595f7024ce75223b9f866caca">llfio_v2_xxx::native_handle_type::is_seekable</a></div><div class="ttdeci">constexpr bool is_seekable() const noexcept</div><div class="ttdoc">True if seekable.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:186</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  354</span>{ <span class="keywordflow">return</span> _v.is_seekable(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3000,8 +2961,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a socket. </p>
-<div class="fragment"><div class="line"><span class="lineno">  363</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a7ee5e453d67fadc701bdd6971cd85450">is_socket</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a7ee5e453d67fadc701bdd6971cd85450"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a7ee5e453d67fadc701bdd6971cd85450">llfio_v2_xxx::native_handle_type::is_socket</a></div><div class="ttdeci">constexpr bool is_socket() const noexcept</div><div class="ttdoc">True if a socket.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:201</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  369</span>{ <span class="keywordflow">return</span> _v.is_socket(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3029,8 +2989,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a symlink. </p>
-<div class="fragment"><div class="line"><span class="lineno">  359</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#ad6992242c9715661a4b737a21e860f32">is_symlink</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_ad6992242c9715661a4b737a21e860f32"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#ad6992242c9715661a4b737a21e860f32">llfio_v2_xxx::native_handle_type::is_symlink</a></div><div class="ttdeci">constexpr bool is_symlink() const noexcept</div><div class="ttdoc">True if a symlink.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:197</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  365</span>{ <span class="keywordflow">return</span> _v.is_symlink(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3058,8 +3017,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if a TLS socket. </p>
-<div class="fragment"><div class="line"><span class="lineno">  375</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a043f6564ae06fb18ce2f72fcc96b0436">is_tls_socket</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a043f6564ae06fb18ce2f72fcc96b0436"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a043f6564ae06fb18ce2f72fcc96b0436">llfio_v2_xxx::native_handle_type::is_tls_socket</a></div><div class="ttdeci">constexpr bool is_tls_socket() const noexcept</div><div class="ttdoc">True if a TLS socket.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:213</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  381</span>{ <span class="keywordflow">return</span> _v.is_tls_socket(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3087,8 +3045,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if the handle is valid (and usually open) </p>
-<div class="fragment"><div class="line"><span class="lineno">  323</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#aa179d5ae7c29ddec6b3d043d83c48444">is_valid</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_aa179d5ae7c29ddec6b3d043d83c48444"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#aa179d5ae7c29ddec6b3d043d83c48444">llfio_v2_xxx::native_handle_type::is_valid</a></div><div class="ttdeci">constexpr bool is_valid() const noexcept</div><div class="ttdoc">True if the handle is valid.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:174</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  329</span>{ <span class="keywordflow">return</span> _v.is_valid(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3116,8 +3073,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if the handle is writable. </p>
-<div class="fragment"><div class="line"><span class="lineno">  328</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a5a1c5bb213a216200958daff3d4dc078">is_writable</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a5a1c5bb213a216200958daff3d4dc078"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a5a1c5bb213a216200958daff3d4dc078">llfio_v2_xxx::native_handle_type::is_writable</a></div><div class="ttdeci">constexpr bool is_writable() const noexcept</div><div class="ttdoc">True if the handle is writable.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:179</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  334</span>{ <span class="keywordflow">return</span> _v.is_writable(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3145,34 +3101,34 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>Kernel cache strategy used by this handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  381</span>  {</div>
-<div class="line"><span class="lineno">  382</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">safety_barriers</a> = !!(_v.behaviour &amp; native_handle_type::disposition::safety_barriers);</div>
-<div class="line"><span class="lineno">  383</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_metadata = !!(_v.behaviour &amp; native_handle_type::disposition::cache_metadata);</div>
-<div class="line"><span class="lineno">  384</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_reads = !!(_v.behaviour &amp; native_handle_type::disposition::cache_reads);</div>
-<div class="line"><span class="lineno">  385</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_writes = !!(_v.behaviour &amp; native_handle_type::disposition::cache_writes);</div>
-<div class="line"><span class="lineno">  386</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_temporary = !!(_v.behaviour &amp; native_handle_type::disposition::cache_temporary);</div>
-<div class="line"><span class="lineno">  387</span>    <span class="keywordflow">if</span>(cache_temporary)</div>
-<div class="line"><span class="lineno">  388</span>    {</div>
-<div class="line"><span class="lineno">  389</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>;</div>
-<div class="line"><span class="lineno">  390</span>    }</div>
-<div class="line"><span class="lineno">  391</span>    <span class="keywordflow">if</span>(cache_metadata &amp;&amp; cache_reads &amp;&amp; cache_writes)</div>
-<div class="line"><span class="lineno">  392</span>    {</div>
-<div class="line"><span class="lineno">  393</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">safety_barriers</a> ? <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">caching::safety_barriers</a> : <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>;</div>
-<div class="line"><span class="lineno">  394</span>    }</div>
-<div class="line"><span class="lineno">  395</span>    <span class="keywordflow">if</span>(cache_metadata &amp;&amp; cache_reads)</div>
-<div class="line"><span class="lineno">  396</span>    {</div>
-<div class="line"><span class="lineno">  397</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693">caching::reads_and_metadata</a>;</div>
-<div class="line"><span class="lineno">  398</span>    }</div>
-<div class="line"><span class="lineno">  399</span>    <span class="keywordflow">if</span>(cache_reads)</div>
-<div class="line"><span class="lineno">  400</span>    {</div>
-<div class="line"><span class="lineno">  401</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1">caching::reads</a>;</div>
-<div class="line"><span class="lineno">  402</span>    }</div>
-<div class="line"><span class="lineno">  403</span>    <span class="keywordflow">if</span>(cache_metadata)</div>
-<div class="line"><span class="lineno">  404</span>    {</div>
-<div class="line"><span class="lineno">  405</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98">caching::only_metadata</a>;</div>
-<div class="line"><span class="lineno">  406</span>    }</div>
-<div class="line"><span class="lineno">  407</span>    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>;</div>
-<div class="line"><span class="lineno">  408</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  387</span>  {</div>
+<div class="line"><span class="lineno">  388</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">safety_barriers</a> = !!(_v.behaviour &amp; native_handle_type::disposition::safety_barriers);</div>
+<div class="line"><span class="lineno">  389</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_metadata = !!(_v.behaviour &amp; native_handle_type::disposition::cache_metadata);</div>
+<div class="line"><span class="lineno">  390</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_reads = !!(_v.behaviour &amp; native_handle_type::disposition::cache_reads);</div>
+<div class="line"><span class="lineno">  391</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_writes = !!(_v.behaviour &amp; native_handle_type::disposition::cache_writes);</div>
+<div class="line"><span class="lineno">  392</span>    <span class="keyword">const</span> <span class="keywordtype">bool</span> cache_temporary = !!(_v.behaviour &amp; native_handle_type::disposition::cache_temporary);</div>
+<div class="line"><span class="lineno">  393</span>    <span class="keywordflow">if</span>(cache_temporary)</div>
+<div class="line"><span class="lineno">  394</span>    {</div>
+<div class="line"><span class="lineno">  395</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ad5197d93c063a2b1e22d1630a39b7aef">caching::temporary</a>;</div>
+<div class="line"><span class="lineno">  396</span>    }</div>
+<div class="line"><span class="lineno">  397</span>    <span class="keywordflow">if</span>(cache_metadata &amp;&amp; cache_reads &amp;&amp; cache_writes)</div>
+<div class="line"><span class="lineno">  398</span>    {</div>
+<div class="line"><span class="lineno">  399</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">safety_barriers</a> ? <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">caching::safety_barriers</a> : <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852aa181a603769c1f98ad927e7367c7aa51">caching::all</a>;</div>
+<div class="line"><span class="lineno">  400</span>    }</div>
+<div class="line"><span class="lineno">  401</span>    <span class="keywordflow">if</span>(cache_metadata &amp;&amp; cache_reads)</div>
+<div class="line"><span class="lineno">  402</span>    {</div>
+<div class="line"><span class="lineno">  403</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852adec4ecca8ae1593f84eea4656599a693">caching::reads_and_metadata</a>;</div>
+<div class="line"><span class="lineno">  404</span>    }</div>
+<div class="line"><span class="lineno">  405</span>    <span class="keywordflow">if</span>(cache_reads)</div>
+<div class="line"><span class="lineno">  406</span>    {</div>
+<div class="line"><span class="lineno">  407</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1">caching::reads</a>;</div>
+<div class="line"><span class="lineno">  408</span>    }</div>
+<div class="line"><span class="lineno">  409</span>    <span class="keywordflow">if</span>(cache_metadata)</div>
+<div class="line"><span class="lineno">  410</span>    {</div>
+<div class="line"><span class="lineno">  411</span>      <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98">caching::only_metadata</a>;</div>
+<div class="line"><span class="lineno">  412</span>    }</div>
+<div class="line"><span class="lineno">  413</span>    <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">caching::none</a>;</div>
+<div class="line"><span class="lineno">  414</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1">llfio_v2_xxx::handle::caching::reads</a></div><div class="ttdeci">@ reads</div><div class="ttdoc">Cache reads only. Writes of data and metadata do not complete until reaching storage (O_SYNC)....</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8">llfio_v2_xxx::handle::caching::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No caching whatsoever, all reads and writes come from storage (i.e. O_DIRECT|O_SYNC)....</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a9cd65f46f55fb6a4b198fcee6f0a63c1">llfio_v2_xxx::handle::caching::safety_barriers</a></div><div class="ttdeci">@ safety_barriers</div><div class="ttdoc">Cache reads and writes of data and metadata so they complete immediately, but issue safety barriers a...</div></div>
@@ -3622,7 +3578,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>The native handle used by this handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  419</span>{ <span class="keywordflow">return</span> _v; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  425</span>{ <span class="keywordflow">return</span> _v; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3747,102 +3703,102 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Create the handle in a way where i/o upon it can be multiplexed with other i/o on the same initiating thread of execution i.e. you can perform more than one read concurrently, without using threads. The blocking operations <code>.read()</code> and <code>.write()</code> may have to use a less efficient, but cancellable, blocking implementation for handles created in this way. On Microsoft Windows, this creates handles with <code>OVERLAPPED</code> semantics. On POSIX, this creates handles with nonblocking semantics for non-file handles such as pipes and sockets, however for file, directory and symlink handles it does not set nonblocking, as it is non-portable.</p>
 <p>&lt; Using insane POSIX byte range locks</p>
 <p>&lt; This is an inode created with no representation on the filing system</p>
-<div class="fragment"><div class="line"><span class="lineno">  110</span>                                            {</div>
-<div class="line"><span class="lineno">  111</span><a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span><span class="comment"></span></div>
-<div class="line"><span class="lineno">  112</span><span class="comment">/*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
-<div class="line"><span class="lineno">  113</span><span class="comment">to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
-<div class="line"><span class="lineno">  114</span><span class="comment">if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
-<div class="line"><span class="lineno">  115</span><span class="comment">editions of Windows, the file entry does not disappears but becomes unavailable for</span></div>
-<div class="line"><span class="lineno">  116</span><span class="comment">anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the</span></div>
-<div class="line"><span class="lineno">  117</span><span class="comment">`win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is</span></div>
-<div class="line"><span class="lineno">  118</span><span class="comment">somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`</span></div>
-<div class="line"><span class="lineno">  119</span><span class="comment">causing it to appear to have been unlinked immediately.</span></div>
-<div class="line"><span class="lineno">  120</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  121</span>unlink_on_first_close = uint16_t(1U &lt;&lt; 0U),</div>
-<div class="line"><span class="lineno">  122</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  123</span><span class="comment">/*! Some kernel caching modes have unhelpfully inconsistent behaviours</span></div>
-<div class="line"><span class="lineno">  124</span><span class="comment">in getting your data onto storage, so by default unless this flag is</span></div>
-<div class="line"><span class="lineno">  125</span><span class="comment">specified LLFIO adds extra fsyncs to the following operations for the</span></div>
-<div class="line"><span class="lineno">  126</span><span class="comment">caching modes specified below:</span></div>
-<div class="line"><span class="lineno">  127</span><span class="comment">* truncation of file length either explicitly or during file open.</span></div>
-<div class="line"><span class="lineno">  128</span><span class="comment">* closing of the handle either explicitly or in the destructor.</span></div>
-<div class="line"><span class="lineno">  129</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  130</span><span class="comment">Additionally on Linux only to prevent loss of file metadata:</span></div>
-<div class="line"><span class="lineno">  131</span><span class="comment">* On the parent directory whenever a file might have been created.</span></div>
-<div class="line"><span class="lineno">  132</span><span class="comment">* On the parent directory on file close.</span></div>
-<div class="line"><span class="lineno">  133</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  134</span><span class="comment">This only occurs for these kernel caching modes:</span></div>
-<div class="line"><span class="lineno">  135</span><span class="comment">* caching::none</span></div>
-<div class="line"><span class="lineno">  136</span><span class="comment">* caching::reads</span></div>
-<div class="line"><span class="lineno">  137</span><span class="comment">* caching::reads_and_metadata</span></div>
-<div class="line"><span class="lineno">  138</span><span class="comment">* caching::safety_barriers</span></div>
-<div class="line"><span class="lineno">  139</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  140</span>disable_safety_barriers = uint16_t(1U &lt;&lt; 2U),<span class="comment"></span></div>
-<div class="line"><span class="lineno">  141</span><span class="comment">/*! `file_handle::unlink()` could accidentally delete the wrong file if someone has</span></div>
-<div class="line"><span class="lineno">  142</span><span class="comment">renamed the open file handle since the time it was opened. To prevent this occuring,</span></div>
-<div class="line"><span class="lineno">  143</span><span class="comment">where the OS doesn&#39;t provide race free unlink-by-open-handle we compare the inode of</span></div>
-<div class="line"><span class="lineno">  144</span><span class="comment">the path we are about to unlink with that of the open handle before unlinking.</span></div>
-<div class="line"><span class="lineno">  145</span><span class="comment">\warning This does not prevent races where in between the time of checking the inode</span></div>
-<div class="line"><span class="lineno">  146</span><span class="comment">and executing the unlink a third party changes the item about to be unlinked. Only</span></div>
-<div class="line"><span class="lineno">  147</span><span class="comment">operating systems with a true race-free unlink syscall are race free.</span></div>
-<div class="line"><span class="lineno">  148</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  149</span>disable_safety_unlinks = uint16_t(1U &lt;&lt; 3U),<span class="comment"></span></div>
-<div class="line"><span class="lineno">  150</span><span class="comment">/*! Ask the OS to disable prefetching of data. This can improve random</span></div>
-<div class="line"><span class="lineno">  151</span><span class="comment">i/o performance.</span></div>
-<div class="line"><span class="lineno">  152</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  153</span>disable_prefetching = uint16_t(1U &lt;&lt; 4U),<span class="comment"></span></div>
-<div class="line"><span class="lineno">  154</span><span class="comment">/*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file</span></div>
-<div class="line"><span class="lineno">  155</span><span class="comment">into kernel cache. This can improve sequential i/o performance.</span></div>
-<div class="line"><span class="lineno">  156</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  157</span>maximum_prefetching = uint16_t(1U &lt;&lt; 5U),</div>
-<div class="line"><span class="lineno">  158</span> </div>
-<div class="line"><span class="lineno">  159</span>win_disable_unlink_emulation = uint16_t(1U &lt;&lt; 9U),  <span class="comment">//!&lt; See the documentation for `unlink_on_first_close`</span><span class="comment"></span></div>
-<div class="line"><span class="lineno">  160</span><span class="comment">/*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally</span></div>
-<div class="line"><span class="lineno">  161</span><span class="comment">implement extents-based storage and thus could only represent sparse files via</span></div>
-<div class="line"><span class="lineno">  162</span><span class="comment">efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),</span></div>
-<div class="line"><span class="lineno">  163</span><span class="comment">a proper extents-based on-storage representation was added, thus allowing only 64Kb</span></div>
-<div class="line"><span class="lineno">  164</span><span class="comment">extent chunks written to be stored irrespective of whatever the maximum file extent</span></div>
-<div class="line"><span class="lineno">  165</span><span class="comment">was set to.</span></div>
-<div class="line"><span class="lineno">  166</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  167</span><span class="comment">For various historical reasons, extents-based storage is disabled by default in newly</span></div>
-<div class="line"><span class="lineno">  168</span><span class="comment">created files on NTFS, unlike in almost every other major filing system. You have to</span></div>
-<div class="line"><span class="lineno">  169</span><span class="comment">explicitly &quot;opt in&quot; to extents-based storage.</span></div>
-<div class="line"><span class="lineno">  170</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  171</span><span class="comment">As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to</span></div>
-<div class="line"><span class="lineno">  172</span><span class="comment">extents-based storage for any empty file it creates. If you don&#39;t want this, you</span></div>
-<div class="line"><span class="lineno">  173</span><span class="comment">can specify this flag to prevent that happening.</span></div>
-<div class="line"><span class="lineno">  174</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  175</span>win_disable_sparse_file_creation = uint16_t(1U &lt;&lt; 10U),<span class="comment"></span></div>
-<div class="line"><span class="lineno">  176</span><span class="comment">/*! Filesystems tend to be embarrassingly parallel for operations performed to different</span></div>
-<div class="line"><span class="lineno">  177</span><span class="comment">inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or</span></div>
-<div class="line"><span class="lineno">  178</span><span class="comment">the Parallelism or Concurrency standard library extensions to usually complete the</span></div>
-<div class="line"><span class="lineno">  179</span><span class="comment">operation in constant rather than linear time. If you don&#39;t want this default, you can</span></div>
-<div class="line"><span class="lineno">  180</span><span class="comment">disable default using this flag.</span></div>
-<div class="line"><span class="lineno">  181</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  182</span>disable_parallelism = uint16_t(1U &lt;&lt; 11U),<span class="comment"></span></div>
-<div class="line"><span class="lineno">  183</span><span class="comment">/*! Microsoft Windows NTFS has the option, when creating a directory, to set whether</span></div>
-<div class="line"><span class="lineno">  184</span><span class="comment">leafname lookup will be case sensitive. This is the only way of getting exact POSIX</span></div>
-<div class="line"><span class="lineno">  185</span><span class="comment">semantics on Windows without resorting to editing the system registry, however it also</span></div>
-<div class="line"><span class="lineno">  186</span><span class="comment">affects all code doing lookups within that directory, so we must default it to off.</span></div>
+<div class="fragment"><div class="line"><span class="lineno">  116</span>                                            {</div>
+<div class="line"><span class="lineno">  117</span><a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = uint16_t(0),  <span class="comment">//!&lt; No flags</span><span class="comment"></span></div>
+<div class="line"><span class="lineno">  118</span><span class="comment">/*! Unlinks the file on handle close. On POSIX, this simply unlinks whatever is pointed</span></div>
+<div class="line"><span class="lineno">  119</span><span class="comment">to by `path()` upon the call of `close()` if and only if the inode matches. On Windows,</span></div>
+<div class="line"><span class="lineno">  120</span><span class="comment">if you are on Windows 10 1709 or later, exactly the same thing occurs. If on previous</span></div>
+<div class="line"><span class="lineno">  121</span><span class="comment">editions of Windows, the file entry does not disappears but becomes unavailable for</span></div>
+<div class="line"><span class="lineno">  122</span><span class="comment">anyone else to open with an `errc::resource_unavailable_try_again` error return. Because this is confusing, unless the</span></div>
+<div class="line"><span class="lineno">  123</span><span class="comment">`win_disable_unlink_emulation` flag is also specified, this POSIX behaviour is</span></div>
+<div class="line"><span class="lineno">  124</span><span class="comment">somewhat emulated by LLFIO on older Windows by renaming the file to a random name on `close()`</span></div>
+<div class="line"><span class="lineno">  125</span><span class="comment">causing it to appear to have been unlinked immediately.</span></div>
+<div class="line"><span class="lineno">  126</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  127</span>unlink_on_first_close = uint16_t(1U &lt;&lt; 0U),</div>
+<div class="line"><span class="lineno">  128</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  129</span><span class="comment">/*! Some kernel caching modes have unhelpfully inconsistent behaviours</span></div>
+<div class="line"><span class="lineno">  130</span><span class="comment">in getting your data onto storage, so by default unless this flag is</span></div>
+<div class="line"><span class="lineno">  131</span><span class="comment">specified LLFIO adds extra fsyncs to the following operations for the</span></div>
+<div class="line"><span class="lineno">  132</span><span class="comment">caching modes specified below:</span></div>
+<div class="line"><span class="lineno">  133</span><span class="comment">* truncation of file length either explicitly or during file open.</span></div>
+<div class="line"><span class="lineno">  134</span><span class="comment">* closing of the handle either explicitly or in the destructor.</span></div>
+<div class="line"><span class="lineno">  135</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  136</span><span class="comment">Additionally on Linux only to prevent loss of file metadata:</span></div>
+<div class="line"><span class="lineno">  137</span><span class="comment">* On the parent directory whenever a file might have been created.</span></div>
+<div class="line"><span class="lineno">  138</span><span class="comment">* On the parent directory on file close.</span></div>
+<div class="line"><span class="lineno">  139</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  140</span><span class="comment">This only occurs for these kernel caching modes:</span></div>
+<div class="line"><span class="lineno">  141</span><span class="comment">* caching::none</span></div>
+<div class="line"><span class="lineno">  142</span><span class="comment">* caching::reads</span></div>
+<div class="line"><span class="lineno">  143</span><span class="comment">* caching::reads_and_metadata</span></div>
+<div class="line"><span class="lineno">  144</span><span class="comment">* caching::safety_barriers</span></div>
+<div class="line"><span class="lineno">  145</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  146</span>disable_safety_barriers = uint16_t(1U &lt;&lt; 2U),<span class="comment"></span></div>
+<div class="line"><span class="lineno">  147</span><span class="comment">/*! `file_handle::unlink()` could accidentally delete the wrong file if someone has</span></div>
+<div class="line"><span class="lineno">  148</span><span class="comment">renamed the open file handle since the time it was opened. To prevent this occuring,</span></div>
+<div class="line"><span class="lineno">  149</span><span class="comment">where the OS doesn&#39;t provide race free unlink-by-open-handle we compare the inode of</span></div>
+<div class="line"><span class="lineno">  150</span><span class="comment">the path we are about to unlink with that of the open handle before unlinking.</span></div>
+<div class="line"><span class="lineno">  151</span><span class="comment">\warning This does not prevent races where in between the time of checking the inode</span></div>
+<div class="line"><span class="lineno">  152</span><span class="comment">and executing the unlink a third party changes the item about to be unlinked. Only</span></div>
+<div class="line"><span class="lineno">  153</span><span class="comment">operating systems with a true race-free unlink syscall are race free.</span></div>
+<div class="line"><span class="lineno">  154</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  155</span>disable_safety_unlinks = uint16_t(1U &lt;&lt; 3U),<span class="comment"></span></div>
+<div class="line"><span class="lineno">  156</span><span class="comment">/*! Ask the OS to disable prefetching of data. This can improve random</span></div>
+<div class="line"><span class="lineno">  157</span><span class="comment">i/o performance.</span></div>
+<div class="line"><span class="lineno">  158</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  159</span>disable_prefetching = uint16_t(1U &lt;&lt; 4U),<span class="comment"></span></div>
+<div class="line"><span class="lineno">  160</span><span class="comment">/*! Ask the OS to maximise prefetching of data, possibly prefetching the entire file</span></div>
+<div class="line"><span class="lineno">  161</span><span class="comment">into kernel cache. This can improve sequential i/o performance.</span></div>
+<div class="line"><span class="lineno">  162</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  163</span>maximum_prefetching = uint16_t(1U &lt;&lt; 5U),</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>win_disable_unlink_emulation = uint16_t(1U &lt;&lt; 9U),  <span class="comment">//!&lt; See the documentation for `unlink_on_first_close`</span><span class="comment"></span></div>
+<div class="line"><span class="lineno">  166</span><span class="comment">/*! Microsoft Windows NTFS, having been created in the late 1980s, did not originally</span></div>
+<div class="line"><span class="lineno">  167</span><span class="comment">implement extents-based storage and thus could only represent sparse files via</span></div>
+<div class="line"><span class="lineno">  168</span><span class="comment">efficient compression of intermediate zeros. With NTFS v3.0 (Microsoft Windows 2000),</span></div>
+<div class="line"><span class="lineno">  169</span><span class="comment">a proper extents-based on-storage representation was added, thus allowing only 64Kb</span></div>
+<div class="line"><span class="lineno">  170</span><span class="comment">extent chunks written to be stored irrespective of whatever the maximum file extent</span></div>
+<div class="line"><span class="lineno">  171</span><span class="comment">was set to.</span></div>
+<div class="line"><span class="lineno">  172</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  173</span><span class="comment">For various historical reasons, extents-based storage is disabled by default in newly</span></div>
+<div class="line"><span class="lineno">  174</span><span class="comment">created files on NTFS, unlike in almost every other major filing system. You have to</span></div>
+<div class="line"><span class="lineno">  175</span><span class="comment">explicitly &quot;opt in&quot; to extents-based storage.</span></div>
+<div class="line"><span class="lineno">  176</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  177</span><span class="comment">As extents-based storage is nearly cost free on NTFS, LLFIO by default opts in to</span></div>
+<div class="line"><span class="lineno">  178</span><span class="comment">extents-based storage for any empty file it creates. If you don&#39;t want this, you</span></div>
+<div class="line"><span class="lineno">  179</span><span class="comment">can specify this flag to prevent that happening.</span></div>
+<div class="line"><span class="lineno">  180</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  181</span>win_disable_sparse_file_creation = uint16_t(1U &lt;&lt; 10U),<span class="comment"></span></div>
+<div class="line"><span class="lineno">  182</span><span class="comment">/*! Filesystems tend to be embarrassingly parallel for operations performed to different</span></div>
+<div class="line"><span class="lineno">  183</span><span class="comment">inodes. Where LLFIO performs i/o to multiple inodes at a time, it will use OpenMP or</span></div>
+<div class="line"><span class="lineno">  184</span><span class="comment">the Parallelism or Concurrency standard library extensions to usually complete the</span></div>
+<div class="line"><span class="lineno">  185</span><span class="comment">operation in constant rather than linear time. If you don&#39;t want this default, you can</span></div>
+<div class="line"><span class="lineno">  186</span><span class="comment">disable default using this flag.</span></div>
 <div class="line"><span class="lineno">  187</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  188</span>win_create_case_sensitive_directory = uint16_t(1U &lt;&lt; 12U),</div>
-<div class="line"><span class="lineno">  189</span><span class="comment"></span> </div>
-<div class="line"><span class="lineno">  190</span><span class="comment">/*! Create the handle in a way where i/o upon it can be multiplexed with other i/o</span></div>
-<div class="line"><span class="lineno">  191</span><span class="comment">on the same initiating thread of execution i.e. you can perform more than one read</span></div>
-<div class="line"><span class="lineno">  192</span><span class="comment">concurrently, without using threads. The blocking operations `.read()` and `.write()`</span></div>
-<div class="line"><span class="lineno">  193</span><span class="comment">may have to use a less efficient, but cancellable, blocking implementation for handles created</span></div>
-<div class="line"><span class="lineno">  194</span><span class="comment">in this way. On Microsoft Windows, this creates handles with `OVERLAPPED` semantics.</span></div>
-<div class="line"><span class="lineno">  195</span><span class="comment">On POSIX, this creates handles with nonblocking semantics for non-file handles such</span></div>
-<div class="line"><span class="lineno">  196</span><span class="comment">as pipes and sockets, however for file, directory and symlink handles it does not set</span></div>
-<div class="line"><span class="lineno">  197</span><span class="comment">nonblocking, as it is non-portable.</span></div>
-<div class="line"><span class="lineno">  198</span><span class="comment">*/</span></div>
-<div class="line"><span class="lineno">  199</span>multiplexable = uint16_t(1U &lt;&lt; 13U),</div>
-<div class="line"><span class="lineno">  200</span> </div>
-<div class="line"><span class="lineno">  201</span><span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
-<div class="line"><span class="lineno">  202</span> </div>
-<div class="line"><span class="lineno">  203</span>byte_lock_insanity = uint16_t(1U &lt;&lt; 14U),  <span class="comment">//!&lt; Using insane POSIX byte range locks</span></div>
-<div class="line"><span class="lineno">  204</span>anonymous_inode = uint16_t(1U &lt;&lt; 15U)      <span class="comment">//!&lt; This is an inode created with no representation on the filing system</span></div>
-<div class="line"><span class="lineno">  205</span>} QUICKCPPLIB_BITFIELD_END(flag)</div>
+<div class="line"><span class="lineno">  188</span>disable_parallelism = uint16_t(1U &lt;&lt; 11U),<span class="comment"></span></div>
+<div class="line"><span class="lineno">  189</span><span class="comment">/*! Microsoft Windows NTFS has the option, when creating a directory, to set whether</span></div>
+<div class="line"><span class="lineno">  190</span><span class="comment">leafname lookup will be case sensitive. This is the only way of getting exact POSIX</span></div>
+<div class="line"><span class="lineno">  191</span><span class="comment">semantics on Windows without resorting to editing the system registry, however it also</span></div>
+<div class="line"><span class="lineno">  192</span><span class="comment">affects all code doing lookups within that directory, so we must default it to off.</span></div>
+<div class="line"><span class="lineno">  193</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  194</span>win_create_case_sensitive_directory = uint16_t(1U &lt;&lt; 12U),</div>
+<div class="line"><span class="lineno">  195</span><span class="comment"></span> </div>
+<div class="line"><span class="lineno">  196</span><span class="comment">/*! Create the handle in a way where i/o upon it can be multiplexed with other i/o</span></div>
+<div class="line"><span class="lineno">  197</span><span class="comment">on the same initiating thread of execution i.e. you can perform more than one read</span></div>
+<div class="line"><span class="lineno">  198</span><span class="comment">concurrently, without using threads. The blocking operations `.read()` and `.write()`</span></div>
+<div class="line"><span class="lineno">  199</span><span class="comment">may have to use a less efficient, but cancellable, blocking implementation for handles created</span></div>
+<div class="line"><span class="lineno">  200</span><span class="comment">in this way. On Microsoft Windows, this creates handles with `OVERLAPPED` semantics.</span></div>
+<div class="line"><span class="lineno">  201</span><span class="comment">On POSIX, this creates handles with nonblocking semantics for non-file handles such</span></div>
+<div class="line"><span class="lineno">  202</span><span class="comment">as pipes and sockets, however for file, directory and symlink handles it does not set</span></div>
+<div class="line"><span class="lineno">  203</span><span class="comment">nonblocking, as it is non-portable.</span></div>
+<div class="line"><span class="lineno">  204</span><span class="comment">*/</span></div>
+<div class="line"><span class="lineno">  205</span>multiplexable = uint16_t(1U &lt;&lt; 13U),</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span><span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><span class="lineno">  208</span> </div>
+<div class="line"><span class="lineno">  209</span>byte_lock_insanity = uint16_t(1U &lt;&lt; 14U),  <span class="comment">//!&lt; Using insane POSIX byte range locks</span></div>
+<div class="line"><span class="lineno">  210</span>anonymous_inode = uint16_t(1U &lt;&lt; 15U)      <span class="comment">//!&lt; This is an inode created with no representation on the filing system</span></div>
+<div class="line"><span class="lineno">  211</span>} QUICKCPPLIB_BITFIELD_END(flag)</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8">llfio_v2_xxx::handle::mode::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">No ability to read or write anything, but can synchronise (SYNCHRONIZE or 0)</div></div>
 </div><!-- fragment -->
 </div>
@@ -4027,10 +3983,10 @@ For portability, you can only assume that barriers write order for a single hand
 <p>Release the native handle type managed by this handle. </p>
 
 <p>Reimplemented in <a class="el" href="classllfio__v2__xxx_1_1map__handle.html#a06cfd3521ff08782a848821951510f11">llfio_v2_xxx::map_handle</a>, and <a class="el" href="classllfio__v2__xxx_1_1mapped__file__handle.html#a4072a4f2448ef3b8c7075fa8734acf71">llfio_v2_xxx::mapped_file_handle</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  317</span>  {</div>
-<div class="line"><span class="lineno">  318</span>    native_handle_type ret(std::move(_v));</div>
-<div class="line"><span class="lineno">  319</span>    <span class="keywordflow">return</span> ret;</div>
-<div class="line"><span class="lineno">  320</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  323</span>  {</div>
+<div class="line"><span class="lineno">  324</span>    native_handle_type ret(std::move(_v));</div>
+<div class="line"><span class="lineno">  325</span>    <span class="keywordflow">return</span> ret;</div>
+<div class="line"><span class="lineno">  326</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4198,8 +4154,7 @@ For portability, you can only assume that barriers write order for a single hand
 </div><div class="memdoc">
 
 <p>True if requires aligned i/o. </p>
-<div class="fragment"><div class="line"><span class="lineno">  350</span>{ <span class="keywordflow">return</span> _v.<a class="code hl_function" href="structllfio__v2__xxx_1_1native__handle__type.html#a45431e8a673c8a7d204136cd2ae612ed">requires_aligned_io</a>(); }</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1native__handle__type_html_a45431e8a673c8a7d204136cd2ae612ed"><div class="ttname"><a href="structllfio__v2__xxx_1_1native__handle__type.html#a45431e8a673c8a7d204136cd2ae612ed">llfio_v2_xxx::native_handle_type::requires_aligned_io</a></div><div class="ttdeci">constexpr bool requires_aligned_io() const noexcept</div><div class="ttdoc">True if requires aligned i/o.</div><div class="ttdef"><b>Definition</b> native_handle_type.hpp:188</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  356</span>{ <span class="keywordflow">return</span> _v.requires_aligned_io(); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4346,7 +4301,7 @@ Windows only</h3>
 <div class="line"><span class="lineno">  530</span>  <span class="keywordflow">return</span> success();</div>
 <div class="line"><span class="lineno">  531</span>}</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1byte__io__multiplexer_html_a1fa7c843f9fca51017963a7fcc56f41a"><div class="ttname"><a href="classllfio__v2__xxx_1_1byte__io__multiplexer.html#a1fa7c843f9fca51017963a7fcc56f41a">llfio_v2_xxx::byte_io_multiplexer::do_byte_io_handle_deregister</a></div><div class="ttdeci">virtual result&lt; void &gt; do_byte_io_handle_deregister(byte_io_handle *) noexcept</div><div class="ttdoc">Implements byte_io_handle deregistration.</div><div class="ttdef"><b>Definition</b> byte_io_multiplexer.hpp:542</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition</b> handle.hpp:344</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_ade2416b9154d1e56937c99cd514324f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#ade2416b9154d1e56937c99cd514324f8">llfio_v2_xxx::handle::is_multiplexable</a></div><div class="ttdeci">bool is_multiplexable() const noexcept</div><div class="ttdoc">True if multiplexable.</div><div class="ttdef"><b>Definition</b> handle.hpp:350</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4477,12 +4432,12 @@ Windows only</h3>
 </div><div class="memdoc">
 
 <p>Swap with another instance. </p>
-<div class="fragment"><div class="line"><span class="lineno">  257</span>  {</div>
-<div class="line"><span class="lineno">  258</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
-<div class="line"><span class="lineno">  259</span>    *<span class="keyword">this</span> = std::move(o);</div>
-<div class="line"><span class="lineno">  260</span>    o = std::move(temp);</div>
-<div class="line"><span class="lineno">  261</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aea43917ff5cc28f3da3c622c0b3382c4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">llfio_v2_xxx::handle::handle</a></div><div class="ttdeci">constexpr handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> handle.hpp:223</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  263</span>  {</div>
+<div class="line"><span class="lineno">  264</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
+<div class="line"><span class="lineno">  265</span>    *<span class="keyword">this</span> = std::move(o);</div>
+<div class="line"><span class="lineno">  266</span>    o = std::move(temp);</div>
+<div class="line"><span class="lineno">  267</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aea43917ff5cc28f3da3c622c0b3382c4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">llfio_v2_xxx::handle::handle</a></div><div class="ttdeci">constexpr handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> handle.hpp:229</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4542,7 +4497,7 @@ Windows only</h3>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">  214</span>  {</div>
 <div class="line"><span class="lineno">  215</span>    <span class="keyword">auto</span> &amp;tempdirh = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">path_discovery::storage_backed_temporary_files_directory</a>();</div>
-<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">return</span> name.empty() ? <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a2cc96276fb1e7788bd4a222e91d9bfed">uniquely_named_file</a>(tempdirh, _mode, _caching, flags) : <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a>(tempdirh, name, _mode, _creation, _caching, flags);</div>
+<div class="line"><span class="lineno">  216</span>    <span class="keywordflow">return</span> name.empty() ? <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a2cc96276fb1e7788bd4a222e91d9bfed">uniquely_named_file</a>(tempdirh, _mode, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a>(tempdirh, name, _mode, _creation, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
 <div class="line"><span class="lineno">  217</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a2cc96276fb1e7788bd4a222e91d9bfed"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a2cc96276fb1e7788bd4a222e91d9bfed">llfio_v2_xxx::file_handle::uniquely_named_file</a></div><div class="ttdeci">static result&lt; file_handle &gt; uniquely_named_file(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition</b> file_handle.hpp:175</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1file__handle_html_a550d9252db3c099fb149b3e6f5b702b0"><div class="ttname"><a href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">llfio_v2_xxx::file_handle::file</a></div><div class="ttdeci">static result&lt; file_handle &gt; file(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
@@ -5827,7 +5782,7 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
 <div class="line"><span class="lineno">  181</span>      {</div>
 <div class="line"><span class="lineno">  182</span>        <span class="keyword">auto</span> randomname = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
 <div class="line"><span class="lineno">  183</span>        randomname.append(<span class="stringliteral">&quot;.random&quot;</span>);</div>
-<div class="line"><span class="lineno">  184</span>        result&lt;file_handle&gt; ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, flags);</div>
+<div class="line"><span class="lineno">  184</span>        result&lt;file_handle&gt; ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1file__handle.html#a550d9252db3c099fb149b3e6f5b702b0">file</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
 <div class="line"><span class="lineno">  185</span>        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
 <div class="line"><span class="lineno">  186</span>        {</div>
 <div class="line"><span class="lineno">  187</span>          <span class="keywordflow">return</span> ret;</div>

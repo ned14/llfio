@@ -891,9 +891,9 @@ result&lt; <a class="el" href="namespacellfio__v2__xxx.html#a1cebefd1c4caade9a0a
 </div><div class="memdoc">
 
 <p>Immediately close the native handle type managed by this handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  681</span>{</div>
-<div class="line"><span class="lineno">  682</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a2768674b562829ac20f968f121e1e0bb">close</a>();</div>
-<div class="line"><span class="lineno">  683</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  687</span>{</div>
+<div class="line"><span class="lineno">  688</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a2768674b562829ac20f968f121e1e0bb">close</a>();</div>
+<div class="line"><span class="lineno">  689</span>}</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a2768674b562829ac20f968f121e1e0bb"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a2768674b562829ac20f968f121e1e0bb">llfio_v2_xxx::handle::close</a></div><div class="ttdeci">virtual result&lt; void &gt; close() noexcept</div><div class="ttdoc">Immediately close the native handle type managed by this handle.</div></div>
 </div><!-- fragment -->
 </div>
@@ -3111,17 +3111,17 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  427</span>{</div>
-<div class="line"><span class="lineno">  428</span>  <span class="keywordflow">if</span>(v.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2">is_valid</a>())</div>
-<div class="line"><span class="lineno">  429</span>  {</div>
-<div class="line"><span class="lineno">  430</span>    <span class="keyword">auto</span> _currentpath = v.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a36e8acf23f721dbd26d56cfd0c133406">current_path</a>();</div>
-<div class="line"><span class="lineno">  431</span>    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().string();</div>
-<div class="line"><span class="lineno">  432</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle(&quot;</span> &lt;&lt; v._v._init &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; currentpath &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><span class="lineno">  433</span>  }</div>
-<div class="line"><span class="lineno">  434</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle(closed)&quot;</span>;</div>
-<div class="line"><span class="lineno">  435</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  433</span>{</div>
+<div class="line"><span class="lineno">  434</span>  <span class="keywordflow">if</span>(v.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2">is_valid</a>())</div>
+<div class="line"><span class="lineno">  435</span>  {</div>
+<div class="line"><span class="lineno">  436</span>    <span class="keyword">auto</span> _currentpath = v.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a36e8acf23f721dbd26d56cfd0c133406">current_path</a>();</div>
+<div class="line"><span class="lineno">  437</span>    std::string currentpath = !_currentpath ? std::string(_currentpath.error().message().c_str()) : _currentpath.value().string();</div>
+<div class="line"><span class="lineno">  438</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle(&quot;</span> &lt;&lt; v._v._init &lt;&lt; <span class="stringliteral">&quot;, &quot;</span> &lt;&lt; currentpath &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">  439</span>  }</div>
+<div class="line"><span class="lineno">  440</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle(closed)&quot;</span>;</div>
+<div class="line"><span class="lineno">  441</span>}</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a36e8acf23f721dbd26d56cfd0c133406"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a36e8acf23f721dbd26d56cfd0c133406">llfio_v2_xxx::handle::current_path</a></div><div class="ttdeci">virtual result&lt; path_type &gt; current_path() const noexcept</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a5c7f6a0a8ffdea22763c75a9319ba0c2"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2">llfio_v2_xxx::handle::is_valid</a></div><div class="ttdeci">bool is_valid() const noexcept</div><div class="ttdoc">True if the handle is valid (and usually open)</div><div class="ttdef"><b>Definition</b> handle.hpp:323</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a5c7f6a0a8ffdea22763c75a9319ba0c2"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a5c7f6a0a8ffdea22763c75a9319ba0c2">llfio_v2_xxx::handle::is_valid</a></div><div class="ttdeci">bool is_valid() const noexcept</div><div class="ttdoc">True if the handle is valid (and usually open)</div><div class="ttdef"><b>Definition</b> handle.hpp:329</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3158,14 +3158,14 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  455</span>{</div>
-<div class="line"><span class="lineno">  456</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;unchanged&quot;</span>, <span class="stringliteral">&quot;none&quot;</span>, <span class="stringliteral">&quot;only_metadata&quot;</span>, <span class="stringliteral">&quot;reads&quot;</span>, <span class="stringliteral">&quot;all&quot;</span>, <span class="stringliteral">&quot;reads_and_metadata&quot;</span>, <span class="stringliteral">&quot;temporary&quot;</span>, <span class="stringliteral">&quot;safety_fsyncs&quot;</span>};</div>
-<div class="line"><span class="lineno">  457</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  458</span>  {</div>
-<div class="line"><span class="lineno">  459</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::caching::&lt;unknown&gt;&quot;</span>;</div>
-<div class="line"><span class="lineno">  460</span>  }</div>
-<div class="line"><span class="lineno">  461</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::caching::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  462</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  461</span>{</div>
+<div class="line"><span class="lineno">  462</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;unchanged&quot;</span>, <span class="stringliteral">&quot;none&quot;</span>, <span class="stringliteral">&quot;only_metadata&quot;</span>, <span class="stringliteral">&quot;reads&quot;</span>, <span class="stringliteral">&quot;all&quot;</span>, <span class="stringliteral">&quot;reads_and_metadata&quot;</span>, <span class="stringliteral">&quot;temporary&quot;</span>, <span class="stringliteral">&quot;safety_fsyncs&quot;</span>};</div>
+<div class="line"><span class="lineno">  463</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  464</span>  {</div>
+<div class="line"><span class="lineno">  465</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::caching::&lt;unknown&gt;&quot;</span>;</div>
+<div class="line"><span class="lineno">  466</span>  }</div>
+<div class="line"><span class="lineno">  467</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::caching::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  468</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3202,14 +3202,14 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  446</span>{</div>
-<div class="line"><span class="lineno">  447</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;open_existing&quot;</span>, <span class="stringliteral">&quot;only_if_not_exist&quot;</span>, <span class="stringliteral">&quot;if_needed&quot;</span>, <span class="stringliteral">&quot;truncate_existing&quot;</span>, <span class="stringliteral">&quot;always_new&quot;</span>};</div>
-<div class="line"><span class="lineno">  448</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  449</span>  {</div>
-<div class="line"><span class="lineno">  450</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::creation::&lt;unknown&gt;&quot;</span>;</div>
-<div class="line"><span class="lineno">  451</span>  }</div>
-<div class="line"><span class="lineno">  452</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::creation::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  453</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  452</span>{</div>
+<div class="line"><span class="lineno">  453</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;open_existing&quot;</span>, <span class="stringliteral">&quot;only_if_not_exist&quot;</span>, <span class="stringliteral">&quot;if_needed&quot;</span>, <span class="stringliteral">&quot;truncate_existing&quot;</span>, <span class="stringliteral">&quot;always_new&quot;</span>};</div>
+<div class="line"><span class="lineno">  454</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  455</span>  {</div>
+<div class="line"><span class="lineno">  456</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::creation::&lt;unknown&gt;&quot;</span>;</div>
+<div class="line"><span class="lineno">  457</span>  }</div>
+<div class="line"><span class="lineno">  458</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::creation::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  459</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3246,66 +3246,66 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  464</span>{</div>
-<div class="line"><span class="lineno">  465</span>  std::string temp;</div>
-<div class="line"><span class="lineno">  466</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::unlink_on_first_close))</div>
-<div class="line"><span class="lineno">  467</span>  {</div>
-<div class="line"><span class="lineno">  468</span>    temp.append(<span class="stringliteral">&quot;unlink_on_first_close|&quot;</span>);</div>
-<div class="line"><span class="lineno">  469</span>  }</div>
-<div class="line"><span class="lineno">  470</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_safety_barriers))</div>
-<div class="line"><span class="lineno">  471</span>  {</div>
-<div class="line"><span class="lineno">  472</span>    temp.append(<span class="stringliteral">&quot;disable_safety_barriers|&quot;</span>);</div>
-<div class="line"><span class="lineno">  473</span>  }</div>
-<div class="line"><span class="lineno">  474</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_prefetching))</div>
-<div class="line"><span class="lineno">  475</span>  {</div>
-<div class="line"><span class="lineno">  476</span>    temp.append(<span class="stringliteral">&quot;disable_prefetching|&quot;</span>);</div>
-<div class="line"><span class="lineno">  477</span>  }</div>
-<div class="line"><span class="lineno">  478</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::maximum_prefetching))</div>
-<div class="line"><span class="lineno">  479</span>  {</div>
-<div class="line"><span class="lineno">  480</span>    temp.append(<span class="stringliteral">&quot;maximum_prefetching|&quot;</span>);</div>
-<div class="line"><span class="lineno">  481</span>  }</div>
-<div class="line"><span class="lineno">  482</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_disable_unlink_emulation))</div>
-<div class="line"><span class="lineno">  483</span>  {</div>
-<div class="line"><span class="lineno">  484</span>    temp.append(<span class="stringliteral">&quot;win_disable_unlink_emulation|&quot;</span>);</div>
-<div class="line"><span class="lineno">  485</span>  }</div>
-<div class="line"><span class="lineno">  486</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_disable_sparse_file_creation))</div>
-<div class="line"><span class="lineno">  487</span>  {</div>
-<div class="line"><span class="lineno">  488</span>    temp.append(<span class="stringliteral">&quot;win_disable_sparse_file_creation|&quot;</span>);</div>
-<div class="line"><span class="lineno">  489</span>  }</div>
-<div class="line"><span class="lineno">  490</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_parallelism))</div>
-<div class="line"><span class="lineno">  491</span>  {</div>
-<div class="line"><span class="lineno">  492</span>    temp.append(<span class="stringliteral">&quot;disable_parallelism|&quot;</span>);</div>
-<div class="line"><span class="lineno">  493</span>  }</div>
-<div class="line"><span class="lineno">  494</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_create_case_sensitive_directory))</div>
-<div class="line"><span class="lineno">  495</span>  {</div>
-<div class="line"><span class="lineno">  496</span>    temp.append(<span class="stringliteral">&quot;win_create_case_sensitive_directory|&quot;</span>);</div>
-<div class="line"><span class="lineno">  497</span>  }</div>
-<div class="line"><span class="lineno">  498</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::multiplexable))</div>
-<div class="line"><span class="lineno">  499</span>  {</div>
-<div class="line"><span class="lineno">  500</span>    temp.append(<span class="stringliteral">&quot;multiplexable|&quot;</span>);</div>
-<div class="line"><span class="lineno">  501</span>  }</div>
-<div class="line"><span class="lineno">  502</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::byte_lock_insanity))</div>
-<div class="line"><span class="lineno">  503</span>  {</div>
-<div class="line"><span class="lineno">  504</span>    temp.append(<span class="stringliteral">&quot;byte_lock_insanity|&quot;</span>);</div>
-<div class="line"><span class="lineno">  505</span>  }</div>
-<div class="line"><span class="lineno">  506</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::anonymous_inode))</div>
-<div class="line"><span class="lineno">  507</span>  {</div>
-<div class="line"><span class="lineno">  508</span>    temp.append(<span class="stringliteral">&quot;anonymous_inode|&quot;</span>);</div>
-<div class="line"><span class="lineno">  509</span>  }</div>
-<div class="line"><span class="lineno">  510</span>  <span class="keywordflow">if</span>(!temp.empty())</div>
-<div class="line"><span class="lineno">  511</span>  {</div>
-<div class="line"><span class="lineno">  512</span>    temp.resize(temp.size() - 1);</div>
-<div class="line"><span class="lineno">  513</span>    <span class="keywordflow">if</span>(std::count(temp.cbegin(), temp.cend(), <span class="charliteral">&#39;|&#39;</span>) &gt; 0)</div>
-<div class="line"><span class="lineno">  514</span>    {</div>
-<div class="line"><span class="lineno">  515</span>      temp = <span class="stringliteral">&quot;(&quot;</span> + temp + <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><span class="lineno">  516</span>    }</div>
-<div class="line"><span class="lineno">  517</span>  }</div>
-<div class="line"><span class="lineno">  518</span>  <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  519</span>  {</div>
-<div class="line"><span class="lineno">  520</span>    temp = <span class="stringliteral">&quot;none&quot;</span>;</div>
-<div class="line"><span class="lineno">  521</span>  }</div>
-<div class="line"><span class="lineno">  522</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::flag::&quot;</span> &lt;&lt; temp;</div>
-<div class="line"><span class="lineno">  523</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  470</span>{</div>
+<div class="line"><span class="lineno">  471</span>  std::string temp;</div>
+<div class="line"><span class="lineno">  472</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::unlink_on_first_close))</div>
+<div class="line"><span class="lineno">  473</span>  {</div>
+<div class="line"><span class="lineno">  474</span>    temp.append(<span class="stringliteral">&quot;unlink_on_first_close|&quot;</span>);</div>
+<div class="line"><span class="lineno">  475</span>  }</div>
+<div class="line"><span class="lineno">  476</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_safety_barriers))</div>
+<div class="line"><span class="lineno">  477</span>  {</div>
+<div class="line"><span class="lineno">  478</span>    temp.append(<span class="stringliteral">&quot;disable_safety_barriers|&quot;</span>);</div>
+<div class="line"><span class="lineno">  479</span>  }</div>
+<div class="line"><span class="lineno">  480</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_prefetching))</div>
+<div class="line"><span class="lineno">  481</span>  {</div>
+<div class="line"><span class="lineno">  482</span>    temp.append(<span class="stringliteral">&quot;disable_prefetching|&quot;</span>);</div>
+<div class="line"><span class="lineno">  483</span>  }</div>
+<div class="line"><span class="lineno">  484</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::maximum_prefetching))</div>
+<div class="line"><span class="lineno">  485</span>  {</div>
+<div class="line"><span class="lineno">  486</span>    temp.append(<span class="stringliteral">&quot;maximum_prefetching|&quot;</span>);</div>
+<div class="line"><span class="lineno">  487</span>  }</div>
+<div class="line"><span class="lineno">  488</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_disable_unlink_emulation))</div>
+<div class="line"><span class="lineno">  489</span>  {</div>
+<div class="line"><span class="lineno">  490</span>    temp.append(<span class="stringliteral">&quot;win_disable_unlink_emulation|&quot;</span>);</div>
+<div class="line"><span class="lineno">  491</span>  }</div>
+<div class="line"><span class="lineno">  492</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_disable_sparse_file_creation))</div>
+<div class="line"><span class="lineno">  493</span>  {</div>
+<div class="line"><span class="lineno">  494</span>    temp.append(<span class="stringliteral">&quot;win_disable_sparse_file_creation|&quot;</span>);</div>
+<div class="line"><span class="lineno">  495</span>  }</div>
+<div class="line"><span class="lineno">  496</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::disable_parallelism))</div>
+<div class="line"><span class="lineno">  497</span>  {</div>
+<div class="line"><span class="lineno">  498</span>    temp.append(<span class="stringliteral">&quot;disable_parallelism|&quot;</span>);</div>
+<div class="line"><span class="lineno">  499</span>  }</div>
+<div class="line"><span class="lineno">  500</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::win_create_case_sensitive_directory))</div>
+<div class="line"><span class="lineno">  501</span>  {</div>
+<div class="line"><span class="lineno">  502</span>    temp.append(<span class="stringliteral">&quot;win_create_case_sensitive_directory|&quot;</span>);</div>
+<div class="line"><span class="lineno">  503</span>  }</div>
+<div class="line"><span class="lineno">  504</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::multiplexable))</div>
+<div class="line"><span class="lineno">  505</span>  {</div>
+<div class="line"><span class="lineno">  506</span>    temp.append(<span class="stringliteral">&quot;multiplexable|&quot;</span>);</div>
+<div class="line"><span class="lineno">  507</span>  }</div>
+<div class="line"><span class="lineno">  508</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::byte_lock_insanity))</div>
+<div class="line"><span class="lineno">  509</span>  {</div>
+<div class="line"><span class="lineno">  510</span>    temp.append(<span class="stringliteral">&quot;byte_lock_insanity|&quot;</span>);</div>
+<div class="line"><span class="lineno">  511</span>  }</div>
+<div class="line"><span class="lineno">  512</span>  <span class="keywordflow">if</span>(!!(v &amp; handle::flag::anonymous_inode))</div>
+<div class="line"><span class="lineno">  513</span>  {</div>
+<div class="line"><span class="lineno">  514</span>    temp.append(<span class="stringliteral">&quot;anonymous_inode|&quot;</span>);</div>
+<div class="line"><span class="lineno">  515</span>  }</div>
+<div class="line"><span class="lineno">  516</span>  <span class="keywordflow">if</span>(!temp.empty())</div>
+<div class="line"><span class="lineno">  517</span>  {</div>
+<div class="line"><span class="lineno">  518</span>    temp.resize(temp.size() - 1);</div>
+<div class="line"><span class="lineno">  519</span>    <span class="keywordflow">if</span>(std::count(temp.cbegin(), temp.cend(), <span class="charliteral">&#39;|&#39;</span>) &gt; 0)</div>
+<div class="line"><span class="lineno">  520</span>    {</div>
+<div class="line"><span class="lineno">  521</span>      temp = <span class="stringliteral">&quot;(&quot;</span> + temp + <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">  522</span>    }</div>
+<div class="line"><span class="lineno">  523</span>  }</div>
+<div class="line"><span class="lineno">  524</span>  <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  525</span>  {</div>
+<div class="line"><span class="lineno">  526</span>    temp = <span class="stringliteral">&quot;none&quot;</span>;</div>
+<div class="line"><span class="lineno">  527</span>  }</div>
+<div class="line"><span class="lineno">  528</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::flag::&quot;</span> &lt;&lt; temp;</div>
+<div class="line"><span class="lineno">  529</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3342,14 +3342,14 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  437</span>{</div>
-<div class="line"><span class="lineno">  438</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;unchanged&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;none&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;attr_read&quot;</span>, <span class="stringliteral">&quot;attr_write&quot;</span>, <span class="stringliteral">&quot;read&quot;</span>, <span class="stringliteral">&quot;write&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;append&quot;</span>};</div>
-<div class="line"><span class="lineno">  439</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  440</span>  {</div>
-<div class="line"><span class="lineno">  441</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::mode::&lt;unknown&gt;&quot;</span>;</div>
-<div class="line"><span class="lineno">  442</span>  }</div>
-<div class="line"><span class="lineno">  443</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::mode::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
-<div class="line"><span class="lineno">  444</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  443</span>{</div>
+<div class="line"><span class="lineno">  444</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;unchanged&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;none&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;attr_read&quot;</span>, <span class="stringliteral">&quot;attr_write&quot;</span>, <span class="stringliteral">&quot;read&quot;</span>, <span class="stringliteral">&quot;write&quot;</span>, <span class="keyword">nullptr</span>, <span class="stringliteral">&quot;append&quot;</span>};</div>
+<div class="line"><span class="lineno">  445</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  446</span>  {</div>
+<div class="line"><span class="lineno">  447</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::mode::&lt;unknown&gt;&quot;</span>;</div>
+<div class="line"><span class="lineno">  448</span>  }</div>
+<div class="line"><span class="lineno">  449</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::handle::mode::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];  <span class="comment">// NOLINT</span></div>
+<div class="line"><span class="lineno">  450</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3615,9 +3615,9 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </table>
 </div><div class="memdoc">
 <div class="fragment"><div class="line"><span class="lineno">  470</span>{</div>
-<div class="line"><span class="lineno">  471</span>  <span class="keywordflow">return</span> s &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#af5ac42fa14988bbf2a71343d14596d5d">name</a> &lt;&lt; <span class="stringliteral">&quot;_v&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a4eafe5e13d3e540948c65d5e26413ce3">version</a>.major &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a4eafe5e13d3e540948c65d5e26413ce3">version</a>.minor &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a4eafe5e13d3e540948c65d5e26413ce3">version</a>.patch &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a5c3f68809b860a424f4eaebe2e3bfc1d">postfix</a>;</div>
+<div class="line"><span class="lineno">  471</span>  <span class="keywordflow">return</span> s &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#af5ac42fa14988bbf2a71343d14596d5d">name</a> &lt;&lt; <span class="stringliteral">&quot;_v&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a3d326791b0cef17cc359dd04c90c7230">version</a>.major &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a3d326791b0cef17cc359dd04c90c7230">version</a>.minor &lt;&lt; <span class="stringliteral">&quot;.&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a3d326791b0cef17cc359dd04c90c7230">version</a>.patch &lt;&lt; <span class="stringliteral">&quot;_&quot;</span> &lt;&lt; v.<a class="code hl_variable" href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a5c3f68809b860a424f4eaebe2e3bfc1d">postfix</a>;</div>
 <div class="line"><span class="lineno">  472</span>}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_a4eafe5e13d3e540948c65d5e26413ce3"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a4eafe5e13d3e540948c65d5e26413ce3">llfio_v2_xxx::tls_socket_source_implementation_information::version</a></div><div class="ttdeci">struct llfio_v2_xxx::tls_socket_source_implementation_information::@26 version</div><div class="ttdoc">Version of the underlying implementation. Could be a kernel version if appropriate.</div></div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_a3d326791b0cef17cc359dd04c90c7230"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a3d326791b0cef17cc359dd04c90c7230">llfio_v2_xxx::tls_socket_source_implementation_information::version</a></div><div class="ttdeci">struct llfio_v2_xxx::tls_socket_source_implementation_information::@24 version</div><div class="ttdoc">Version of the underlying implementation. Could be a kernel version if appropriate.</div></div>
 <div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_a5c3f68809b860a424f4eaebe2e3bfc1d"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#a5c3f68809b860a424f4eaebe2e3bfc1d">llfio_v2_xxx::tls_socket_source_implementation_information::postfix</a></div><div class="ttdeci">string_view postfix</div><div class="ttdoc">The build config or other disambiguator from others with the same name and version.</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:431</div></div>
 <div class="ttc" id="astructllfio__v2__xxx_1_1tls__socket__source__implementation__information_html_af5ac42fa14988bbf2a71343d14596d5d"><div class="ttname"><a href="structllfio__v2__xxx_1_1tls__socket__source__implementation__information.html#af5ac42fa14988bbf2a71343d14596d5d">llfio_v2_xxx::tls_socket_source_implementation_information::name</a></div><div class="ttdeci">string_view name</div><div class="ttdoc">The name of the underlying implementation e.g. &quot;openssl&quot;, &quot;schannel&quot; etc.</div><div class="ttdef"><b>Definition</b> tls_socket_handle.hpp:426</div></div>
 </div><!-- fragment -->
@@ -4808,10 +4808,10 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </div><div class="memdoc">
 
 <p>Swap with another instance. </p>
-<div class="fragment"><div class="line"><span class="lineno">  676</span>{</div>
-<div class="line"><span class="lineno">  677</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a>(std::forward&lt;<span class="keyword">decltype</span>(o)&gt;(o));</div>
-<div class="line"><span class="lineno">  678</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a4716696b8700953889006251e0678aa4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">llfio_v2_xxx::handle::swap</a></div><div class="ttdeci">void swap(handle &amp;o) noexcept</div><div class="ttdoc">Swap with another instance.</div><div class="ttdef"><b>Definition</b> handle.hpp:256</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  682</span>{</div>
+<div class="line"><span class="lineno">  683</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">swap</a>(std::forward&lt;<span class="keyword">decltype</span>(o)&gt;(o));</div>
+<div class="line"><span class="lineno">  684</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a4716696b8700953889006251e0678aa4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a4716696b8700953889006251e0678aa4">llfio_v2_xxx::handle::swap</a></div><div class="ttdeci">void swap(handle &amp;o) noexcept</div><div class="ttdoc">Swap with another instance.</div><div class="ttdef"><b>Definition</b> handle.hpp:262</div></div>
 </div><!-- fragment -->
 </div>
 </div>

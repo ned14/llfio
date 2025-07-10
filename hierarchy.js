@@ -7,6 +7,7 @@ var hierarchy =
       [ "llfio_v2_xxx::ip::address_v4", "classllfio__v2__xxx_1_1ip_1_1address__v4.html", null ],
       [ "llfio_v2_xxx::ip::address_v6", "classllfio__v2__xxx_1_1ip_1_1address__v6.html", null ]
     ] ],
+    [ "llfio_v2_xxx::handle::alignas", "unionllfio__v2__xxx_1_1handle_1_1alignas.html", null ],
     [ "llfio_v2_xxx::byte_io_multiplexer::_unsynchronised_io_operation_state::payload_t::noncompleted_t::params_t::barrier_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html", null ],
     [ "Base", null, [
       [ "llfio_v2_xxx::listening_socket_handle_buffer_types_injector< Base, SocketType >", "structllfio__v2__xxx_1_1listening__socket__handle__buffer__types__injector.html", null ]
