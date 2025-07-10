@@ -50,7 +50,13 @@ class io_context;
 /*! \class handle
 \brief A native_handle_type which is managed by the lifetime of this object instance.
 */
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 13
+// GCCs before 13 can't do alignas() __attribute__ in the same decl :(
+class alignas(sizeof(void *)) handle;
+class LLFIO_DECL handle
+#else
 class alignas(sizeof(void *)) LLFIO_DECL handle
+#endif
 {
   friend class fs_handle;
   friend inline std::ostream &operator<<(std::ostream &s, const handle &v);
@@ -206,7 +212,7 @@ anonymous_inode = uint16_t(1U << 15U)      //!< This is an inode created with no
 
 protected :
     // vptr takes 4 or 8 bytes
-    union
+    union alignas(sizeof(void *))
   {
     native_handle_type _v;  // +12 or +16: total 16 or 24 bytes
     struct
