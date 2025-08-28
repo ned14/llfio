@@ -26,16 +26,16 @@ var NAVTREE =
 [
   [ "LLFIO", "index.html", [
     [ "Build instructions", "md__build.html", [
-      [ "v2 architecture and design implemented:", "index.html#autotoc_md21", null ],
-      [ "Planned features implemented:", "index.html#autotoc_md22", null ],
-      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md24", null ],
-      [ "Prebuilt binaries", "md__build.html#autotoc_md25", null ],
-      [ "Get a copy of the source", "md__build.html#autotoc_md26", [
-        [ "If you already cloned before reading this", "md__build.html#autotoc_md27", null ]
+      [ "v2 architecture and design implemented:", "index.html#autotoc_md14", null ],
+      [ "Planned features implemented:", "index.html#autotoc_md15", null ],
+      [ "Install from the vcpkg package manager", "md__build.html#autotoc_md17", null ],
+      [ "Prebuilt binaries", "md__build.html#autotoc_md18", null ],
+      [ "Get a copy of the source", "md__build.html#autotoc_md19", [
+        [ "If you already cloned before reading this", "md__build.html#autotoc_md20", null ]
       ] ],
-      [ "Build static libraries from source", "md__build.html#autotoc_md28", null ],
-      [ "Build shared libraries from source", "md__build.html#autotoc_md29", null ],
-      [ "Installing libraries from source", "md__build.html#autotoc_md30", null ]
+      [ "Build static libraries from source", "md__build.html#autotoc_md21", null ],
+      [ "Build shared libraries from source", "md__build.html#autotoc_md22", null ],
+      [ "Installing libraries from source", "md__build.html#autotoc_md23", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Topics", "topics.html", "topics" ],
@@ -45,8 +45,7 @@ var NAVTREE =
         [ "All", "namespacemembers.html", null ],
         [ "Functions", "namespacemembers_func.html", null ],
         [ "Typedefs", "namespacemembers_type.html", null ],
-        [ "Enumerations", "namespacemembers_enum.html", null ],
-        [ "Enumerator", "namespacemembers_eval.html", null ]
+        [ "Enumerations", "namespacemembers_enum.html", null ]
       ] ]
     ] ],
     [ "Classes", "annotated.html", [
@@ -76,31 +75,25 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#a75263e7a463a37563ebdffc5cadbb469",
-"classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a01a933a3116abd41955118b607b47bfd",
-"classllfio__v2__xxx_1_1byte__io__handle.html#a0ad7e1d28d7dfcd08f2f0251c922f0e9",
-"classllfio__v2__xxx_1_1byte__io__multiplexer.html#ade2416b9154d1e56937c99cd514324f8",
-"classllfio__v2__xxx_1_1directory__handle.html#a8574050f1988a925322d5a60a84c714b",
-"classllfio__v2__xxx_1_1fast__random__file__handle.html#a9e90f1f03dd2841cf3ac45f5fbfd6cdd",
-"classllfio__v2__xxx_1_1file__handle.html#addf5e522e3dcf85b64b1eaba45e4b1ac",
-"classllfio__v2__xxx_1_1ip_1_1address__v4.html",
-"classllfio__v2__xxx_1_1listening__tls__socket__handle.html#a018de0f7c177e3cff239016d14582e9a",
-"classllfio__v2__xxx_1_1lockable__byte__io__handle.html#aba2d0f7dfc95dd1519fb351b5c983259",
-"classllfio__v2__xxx_1_1map__handle.html#ae5b696885f50f773ee9eea9675e17529",
-"classllfio__v2__xxx_1_1mapped__file__handle.html#adedda84eec2950c58f507266b79a3d2d",
-"classllfio__v2__xxx_1_1path__view.html#ace2d2fec2c49aff2a2536465b93e6639",
-"classllfio__v2__xxx_1_1pipe__handle.html#a695ce0ed1606d540cfa452790ea71632",
-"classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1",
-"classllfio__v2__xxx_1_1symlink__handle.html#a1908a242ca435cf1386fe96a86da4002a47a6c07b9ccfe0e2eb31469b3e3b1939",
-"classllfio__v2__xxx_1_1tls__socket__handle.html#ac9280ab1e6f2a65bc73ee0cba5a8deea",
-"kvstore_8hpp.html#a7bc2f2673bddc429b098b16e413deb5fadfa4eb2805883a2c1653229e6c18aa70",
-"path__discovery_8hpp.html",
-"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html#a739d6e32f2f04d6f14d17fcd4debd1de",
-"structllfio__v2__xxx_1_1algorithm_1_1traversal__summary.html#a73983721459dd16b1cf86ad5d0465f17",
-"structllfio__v2__xxx_1_1byte__io__multiplexer_1_1io__operation__state.html",
-"structllfio__v2__xxx_1_1native__handle__type.html#aa014dc4620266c5e79ff574eab95559c",
-"structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html#a973d0ca8c51f329587144682aff54879",
-"summarize_8hpp.html"
+"classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html#aad0467fd1862484409df72b9f23117ce",
+"classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html#a316f0f8773d00ba317e2ec83f767f48f",
+"classllfio__v2__xxx_1_1byte__io__handle.html#a4ca48bdcd6d6bf8b41d0cebb304fe9ce",
+"classllfio__v2__xxx_1_1fast__random__file__handle.html#a0a2a5896f5e373fa032cdae1c1fff2c1",
+"classllfio__v2__xxx_1_1file__handle.html#a730d89cf49839172bf15551139045112",
+"classllfio__v2__xxx_1_1handle.html#aa3930273a2d4cabbac309e0b75701dcaaecae13117d6f0584c25a9da6c8f8415e",
+"classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba55677e6eb6d6c52c6f69d98b1905903f",
+"classllfio__v2__xxx_1_1mapped__file__handle.html#a40b582d6e889b270830689e0b298efd6",
+"classllfio__v2__xxx_1_1path__handle.html#ae81c55923bdf4bfc78c75fa60c2badcc",
+"classllfio__v2__xxx_1_1path__view__component.html#aaddc29d3eb4bd29e2a676ad0eac864c0",
+"classllfio__v2__xxx_1_1process__handle.html#a211fee447a47bdeb5424a2a5ae1de852",
+"classllfio__v2__xxx_1_1section__handle.html#a695ce0ed1606d540cfa452790ea71632",
+"classllfio__v2__xxx_1_1unique__file__lock.html#ae8af367ca1475f4a3c415fd7fff18694",
+"namespacellfio__v2__xxx.html#a692613da87074e2ffa2a54e24e0cb083",
+"structllfio__v2__xxx_1_1algorithm_1_1comparison__summary_1_1__lr.html#a7ba41ce2ef1ecb93e764d7a60ad9a006",
+"structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html#a744356e0eff2be54460ce02b7397acfb",
+"structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html",
+"structllfio__v2__xxx_1_1stat__t.html#acff996a1858563643390725d298a9279a71a59f32deaca0d11f3ac66f8cd0b873",
+"structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html#a463abaa97ced312d1e981ea0f6042ab6"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

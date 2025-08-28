@@ -773,7 +773,7 @@ Friends</h2></td></tr>
 <p>The host OS and target filing system choose the limits on value size, and will fail accordingly. Some impose a maximum of 64Kb for all names and values per inode, others have a 4Kb maximum value size, there are lots of combinations. You are probably safest not setting many names, and keep the values short.</p>
 <dl class="section warning"><dt>Warning</dt><dd>Extended attributes are 'brittle' because they can get silently wiped at any moment. Never store anything in extended attributes which cannot be recalculated if missing. The ideal use case for extended attributes is as a cache of additional metadata about a file or directory e.g. "I last checked this directory at timestamp X", or "the MD5 hash at last modified
 timestamp X for this file was Y". Also remember that other processes can and do arbitrarily modify extended attributes concurrent to you.</dd></dl>
-<h3><a class="anchor" id="autotoc_md8"></a>
+<h3><a class="anchor" id="autotoc_md1"></a>
 Windows only</h3>
 <p>This API is implemented as file alternate data streams, rather than the Extended Attributes API as accessed via <code>NtSetEaFile()</code> and <code>NtQueryEaFile()</code> (which actually modify the file alternate data stream <code>::$EA</code> in any case).</p>
 <p>The reason why is that <code>NtSetEaFile()</code> can only <b>append</b> new records to EA storage. It cannot deallocate any existing EA records, if you try to do so you will get <code>STATUS_EA_CORRUPT_ERROR</code>. You can append setting the same name to a different value, which can include a null value which then appears as if the name is no longer there. But there is a cap of 64kB for the EA record, and once it is consumed, it is gone forever for that inode.</p>

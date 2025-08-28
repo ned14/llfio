@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mode_0',['mode',['../structkvstore__v1__xxx_1_1basic__key__value__store__info.html#a2c1743edd93e794407f21911c9f72483',1,'kvstore_v1_xxx::basic_key_value_store_info::mode'],['../classkvstore__v1__xxx_1_1basic__key__value__store.html#ad7d315f979abada8f65bb8ccfa19efe6',1,'kvstore_v1_xxx::basic_key_value_store::mode']]]
+  ['not_5fzero_5fterminated_5frendered_5fpath_0',['not_zero_terminated_rendered_path',['../classllfio__v2__xxx_1_1path__view__component.html#adbde77e0f0a6712a3da94a4fb9a12167',1,'llfio_v2_xxx::path_view_component']]]
 ];

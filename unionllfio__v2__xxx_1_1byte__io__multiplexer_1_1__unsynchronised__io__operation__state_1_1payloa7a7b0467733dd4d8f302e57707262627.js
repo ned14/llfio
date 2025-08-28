@@ -1,6 +1,0 @@
-var unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloa7a7b0467733dd4d8f302e57707262627 =
-[
-    [ "barrier_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1paylobe6936dde2cabbe8f7d748b023b68c21.html", null ],
-    [ "read_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloc9e18bbda84f717c8aae78e5df350ef8.html", null ],
-    [ "write_params_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payloa64e89ec8713adbd89b8b29af370c251.html", null ]
-];

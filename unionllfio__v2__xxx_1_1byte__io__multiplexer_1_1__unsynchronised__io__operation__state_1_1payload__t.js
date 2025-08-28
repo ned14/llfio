@@ -1,7 +1,0 @@
-var unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t =
-[
-    [ "noncompleted_t", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t.html", "structllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t_1_1noncompleted__t" ],
-    [ "completed_read", "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a95ddf626b1a1bcf4bbe7d81d240a0f4b", null ],
-    [ "completed_write_or_barrier", "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a518ac00acb0c63b819cd9f54c1dceda6", null ],
-    [ "empty", "unionllfio__v2__xxx_1_1byte__io__multiplexer_1_1__unsynchronised__io__operation__state_1_1payload__t.html#a489e72242ebfef2d1f373889d56b01cc", null ]
-];

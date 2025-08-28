@@ -410,32 +410,33 @@ Protected Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522" name="a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522"></a>page_sizes_3&#160;</td><td class="fielddoc"><p>Use <code>utils::page_sizes()[3]</code> sized pages, or fail. </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><span class="lineno">   58</span>                                  {</div>
-<div class="line"><span class="lineno">   59</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44">none</a> = 0U,           <span class="comment">//!&lt; No flags</span></div>
-<div class="line"><span class="lineno">   60</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> = 1U &lt;&lt; 0U,     <span class="comment">//!&lt; Memory views can be read</span></div>
-<div class="line"><span class="lineno">   61</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a> = 1U &lt;&lt; 1U,    <span class="comment">//!&lt; Memory views can be written</span></div>
-<div class="line"><span class="lineno">   62</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332">cow</a> = 1U &lt;&lt; 2U,      <span class="comment">//!&lt; Memory views can be copy on written</span></div>
-<div class="line"><span class="lineno">   63</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d">execute</a> = 1U &lt;&lt; 3U,  <span class="comment">//!&lt; Memory views can execute code</span></div>
+<div class="fragment"><div class="line"><span class="lineno">   58</span>                                   {</div>
+<div class="line"><span class="lineno">   59</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aaa630970737cad05cddc88036a638d44">none</a> = 0U,           <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><span class="lineno">   60</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> = 1U &lt;&lt; 0U,     <span class="comment">//!&lt; Memory views can be read</span></div>
+<div class="line"><span class="lineno">   61</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a> = 1U &lt;&lt; 1U,    <span class="comment">//!&lt; Memory views can be written</span></div>
+<div class="line"><span class="lineno">   62</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ac57346933aada59cff3ee2296cc70332">cow</a> = 1U &lt;&lt; 2U,      <span class="comment">//!&lt; Memory views can be copy on written</span></div>
+<div class="line"><span class="lineno">   63</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a631fef30d1e40f9d7ce6fa3a0ad4fa9d">execute</a> = 1U &lt;&lt; 3U,  <span class="comment">//!&lt; Memory views can execute code</span></div>
 <div class="line"><span class="lineno">   64</span> </div>
-<div class="line"><span class="lineno">   65</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f">nocommit</a> = 1U &lt;&lt; 8U,     <span class="comment">//!&lt; Don&#39;t allocate space for this memory in the system immediately</span></div>
-<div class="line"><span class="lineno">   66</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">prefault</a> = 1U &lt;&lt; 9U,     <span class="comment">//!&lt; Prefault, as if by reading every page, any views of memory upon creation.</span></div>
-<div class="line"><span class="lineno">   67</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756">executable</a> = 1U &lt;&lt; 10U,  <span class="comment">//!&lt; The backing storage is in fact an executable program binary.</span></div>
-<div class="line"><span class="lineno">   68</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108">singleton</a> = 1U &lt;&lt; 11U,   <span class="comment">//!&lt; A single instance of this section is to be shared by all processes using the same backing file.</span></div>
+<div class="line"><span class="lineno">   65</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a979d3bc3dccd10f67de00b228a12822f">nocommit</a> = 1U &lt;&lt; 8U,     <span class="comment">//!&lt; Don&#39;t allocate space for this memory in the system immediately</span></div>
+<div class="line"><span class="lineno">   66</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">prefault</a> = 1U &lt;&lt; 9U,     <span class="comment">//!&lt; Prefault, as if by reading every page, any views of memory upon creation.</span></div>
+<div class="line"><span class="lineno">   67</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549afde37a72636d74e28ce3553154341756">executable</a> = 1U &lt;&lt; 10U,  <span class="comment">//!&lt; The backing storage is in fact an executable program binary.</span></div>
+<div class="line"><span class="lineno">   68</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a41771be4e90788c06cc49f2d35538108">singleton</a> = 1U &lt;&lt; 11U,   <span class="comment">//!&lt; A single instance of this section is to be shared by all processes using the same backing file.</span></div>
 <div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">barrier_on_close</a> =</div>
-<div class="line"><span class="lineno">   71</span>  1U &lt;&lt; 16U,          <span class="comment">//!&lt; Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.</span></div>
-<div class="line"><span class="lineno">   72</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5">nvram</a> = 1U &lt;&lt; 17U,  <span class="comment">//!&lt; This section is of non-volatile RAM.</span></div>
-<div class="line"><span class="lineno">   73</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066">write_via_syscall</a> =</div>
-<div class="line"><span class="lineno">   74</span>  1U</div>
-<div class="line"><span class="lineno">   75</span>  &lt;&lt; 18U,  <span class="comment">//!&lt; For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.</span></div>
+<div class="line"><span class="lineno">   70</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">barrier_on_close</a> =</div>
+<div class="line"><span class="lineno">   71</span>    1U &lt;&lt; 16U,          <span class="comment">//!&lt; Maps of this section, if writable, issue a `barrier()` when destructed blocking until data (not metadata) reaches physical storage.</span></div>
+<div class="line"><span class="lineno">   72</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a2087205d797bb4de249c85cc8b87afc5">nvram</a> = 1U &lt;&lt; 17U,  <span class="comment">//!&lt; This section is of non-volatile RAM.</span></div>
+<div class="line"><span class="lineno">   73</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a43d3a52abad5e5c5e66c93ad1d684066">write_via_syscall</a> =</div>
+<div class="line"><span class="lineno">   74</span>    1U</div>
+<div class="line"><span class="lineno">   75</span>    &lt;&lt; 18U,  <span class="comment">//!&lt; For file backed maps, `map_handle::write()` is implemented as a `write()` syscall to the file descriptor. This causes the map to be mapped read-only.</span></div>
 <div class="line"><span class="lineno">   76</span> </div>
-<div class="line"><span class="lineno">   77</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1">page_sizes_1</a> = 1U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[1]` sized pages, or fail.</span></div>
-<div class="line"><span class="lineno">   78</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46">page_sizes_2</a> = 2U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[2]` sized pages, or fail.</span></div>
-<div class="line"><span class="lineno">   79</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">page_sizes_3</a> = 3U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[3]` sized pages, or fail.</span></div>
+<div class="line"><span class="lineno">   77</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a8d15253a30787fff812c9f254e26baf1">page_sizes_1</a> = 1U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[1]` sized pages, or fail.</span></div>
+<div class="line"><span class="lineno">   78</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549aa3a2b1b4beaa0a8f0e2658cb321f7c46">page_sizes_2</a> = 2U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[2]` sized pages, or fail.</span></div>
+<div class="line"><span class="lineno">   79</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">page_sizes_3</a> = 3U &lt;&lt; 24U,  <span class="comment">//!&lt; Use `utils::page_sizes()[3]` sized pages, or fail.</span></div>
 <div class="line"><span class="lineno">   80</span> </div>
-<div class="line"><span class="lineno">   81</span>  <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
+<div class="line"><span class="lineno">   81</span>    <span class="comment">// NOTE: IF UPDATING THIS UPDATE THE std::ostream PRINTER BELOW!!!</span></div>
 <div class="line"><span class="lineno">   82</span> </div>
-<div class="line"><span class="lineno">   83</span>  readwrite = (<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> | <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a>)};</div>
+<div class="line"><span class="lineno">   83</span>    readwrite = (<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a> | <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549ab61620219a89d4c133c6c6f4b781a9ba">write</a>)</div>
+<div class="line"><span class="lineno">   84</span>  };</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a06b41188d84f0fee5cff37c71b3d5877">llfio_v2_xxx::section_handle::barrier_on_close</a></div><div class="ttdeci">@ barrier_on_close</div><div class="ttdoc">Maps of this section, if writable, issue a barrier() when destructed blocking until data (not metadat...</div><div class="ttdef"><b>Definition</b> map_handle.hpp:70</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a0a225b6b1594a5540799b4c58c937522">llfio_v2_xxx::section_handle::page_sizes_3</a></div><div class="ttdeci">@ page_sizes_3</div><div class="ttdoc">Use utils::page_sizes()[3] sized pages, or fail.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:79</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a1e91d093711d9d800b8ddc2f6e5d1ca2">llfio_v2_xxx::section_handle::prefault</a></div><div class="ttdeci">@ prefault</div><div class="ttdoc">Prefault, as if by reading every page, any views of memory upon creation.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:66</div></div>
@@ -647,7 +648,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Default constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno">   95</span>{}  <span class="comment">// NOLINT</span></div>
+<div class="fragment"><div class="line"><span class="lineno">   96</span>{}  <span class="comment">// NOLINT</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -676,9 +677,9 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a section handle using the given flags. </p>
-<div class="fragment"><div class="line"><span class="lineno">   98</span>      : _flag(__flag)</div>
-<div class="line"><span class="lineno">   99</span>  {</div>
-<div class="line"><span class="lineno">  100</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">   99</span>      : _flag(__flag)</div>
+<div class="line"><span class="lineno">  100</span>  {</div>
+<div class="line"><span class="lineno">  101</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -729,14 +730,14 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a section handle using the given native handle type for the section and the given i/o handle for the backing storage. </p>
-<div class="fragment"><div class="line"><span class="lineno">  103</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a>(sectionh)</div>
-<div class="line"><span class="lineno">  104</span>      , _backing(<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>)</div>
-<div class="line"><span class="lineno">  105</span>      , _anonymous(std::move(anonymous))</div>
-<div class="line"><span class="lineno">  106</span>      , _flag(__flag)</div>
-<div class="line"><span class="lineno">  107</span>  {</div>
-<div class="line"><span class="lineno">  108</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  104</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a>(sectionh)</div>
+<div class="line"><span class="lineno">  105</span>      , _backing(<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>)</div>
+<div class="line"><span class="lineno">  106</span>      , _anonymous(std::move(anonymous))</div>
+<div class="line"><span class="lineno">  107</span>      , _flag(__flag)</div>
+<div class="line"><span class="lineno">  108</span>  {</div>
+<div class="line"><span class="lineno">  109</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_aea43917ff5cc28f3da3c622c0b3382c4"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">llfio_v2_xxx::handle::handle</a></div><div class="ttdeci">constexpr handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> handle.hpp:229</div></div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a135cf209f94453c0afcc4779dd2e3069"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">llfio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">file_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:182</div></div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a135cf209f94453c0afcc4779dd2e3069"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">llfio_v2_xxx::section_handle::backing</a></div><div class="ttdeci">file_handle * backing() const noexcept</div><div class="ttdoc">Returns the borrowed handle backing this section, if any.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:183</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -765,14 +766,14 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implicit move construction of section_handle permitted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  111</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a>(std::move(o))</div>
-<div class="line"><span class="lineno">  112</span>      , _backing(o._backing)</div>
-<div class="line"><span class="lineno">  113</span>      , _anonymous(std::move(o._anonymous))</div>
-<div class="line"><span class="lineno">  114</span>      , _flag(o._flag)</div>
-<div class="line"><span class="lineno">  115</span>  {</div>
-<div class="line"><span class="lineno">  116</span>    o._backing = <span class="keyword">nullptr</span>;</div>
-<div class="line"><span class="lineno">  117</span>    o._flag = flag::none;</div>
-<div class="line"><span class="lineno">  118</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  112</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#aea43917ff5cc28f3da3c622c0b3382c4">handle</a>(std::move(o))</div>
+<div class="line"><span class="lineno">  113</span>      , _backing(o._backing)</div>
+<div class="line"><span class="lineno">  114</span>      , _anonymous(std::move(o._anonymous))</div>
+<div class="line"><span class="lineno">  115</span>      , _flag(o._flag)</div>
+<div class="line"><span class="lineno">  116</span>  {</div>
+<div class="line"><span class="lineno">  117</span>    o._backing = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">  118</span>    o._flag = flag::none;</div>
+<div class="line"><span class="lineno">  119</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -885,7 +886,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the borrowed handle backing this section, if any. </p>
-<div class="fragment"><div class="line"><span class="lineno">  182</span>{ <span class="keywordflow">return</span> _backing; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  183</span>{ <span class="keywordflow">return</span> _backing; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -913,7 +914,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the borrowed native handle backing this section. </p>
-<div class="fragment"><div class="line"><span class="lineno">  186</span>{ <span class="keywordflow">return</span> _backing != <span class="keyword">nullptr</span> ? _backing-&gt;<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a>() : native_handle_type(); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  187</span>{ <span class="keywordflow">return</span> _backing != <span class="keyword">nullptr</span> ? _backing-&gt;<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">native_handle</a>() : native_handle_type(); }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a942b0d276c9f20fe41baab679b88fe72"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a942b0d276c9f20fe41baab679b88fe72">llfio_v2_xxx::handle::native_handle</a></div><div class="ttdeci">native_handle_type native_handle() const noexcept</div><div class="ttdoc">The native handle used by this handle.</div><div class="ttdef"><b>Definition</b> handle.hpp:425</div></div>
 </div><!-- fragment -->
 </div>
@@ -1284,7 +1285,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>True if the section reflects non-volatile RAM. </p>
-<div class="fragment"><div class="line"><span class="lineno">  180</span>{ <span class="keywordflow">return</span> !!(_flag &amp; flag::nvram); }</div>
+<div class="fragment"><div class="line"><span class="lineno">  181</span>{ <span class="keywordflow">return</span> !!(_flag &amp; flag::nvram); }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1733,16 +1734,16 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Move assignment of section_handle permitted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  123</span>  {</div>
-<div class="line"><span class="lineno">  124</span>    <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
-<div class="line"><span class="lineno">  125</span>    {</div>
-<div class="line"><span class="lineno">  126</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  127</span>    }</div>
-<div class="line"><span class="lineno">  128</span>    this-&gt;~section_handle();</div>
-<div class="line"><span class="lineno">  129</span>    <span class="keyword">new</span>(<span class="keyword">this</span>) <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">section_handle</a>(std::move(o));</div>
-<div class="line"><span class="lineno">  130</span>    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  131</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a34f702e58a35c1eee31f5a5d3e5ec73d"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">llfio_v2_xxx::section_handle::section_handle</a></div><div class="ttdeci">constexpr section_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:95</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  124</span>  {</div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
+<div class="line"><span class="lineno">  126</span>    {</div>
+<div class="line"><span class="lineno">  127</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  128</span>    }</div>
+<div class="line"><span class="lineno">  129</span>    this-&gt;~section_handle();</div>
+<div class="line"><span class="lineno">  130</span>    <span class="keyword">new</span>(<span class="keyword">this</span>) <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">section_handle</a>(std::move(o));</div>
+<div class="line"><span class="lineno">  131</span>    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  132</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a34f702e58a35c1eee31f5a5d3e5ec73d"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">llfio_v2_xxx::section_handle::section_handle</a></div><div class="ttdeci">constexpr section_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> map_handle.hpp:96</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2055,9 +2056,9 @@ Protected Attributes</h2></td></tr>
 </dl>
 <p>This convenience overload create a writable section if the backing file is writable, otherwise a read-only section.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX dup(), open() or NtCreateSection() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  162</span>  {</div>
-<div class="line"><span class="lineno">  163</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a07dc4eba215e0b670f807faa0f9b52b1">section</a>(<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>, bytes, <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a211fee447a47bdeb5424a2a5ae1de852">is_writable</a>() ? (flag::readwrite) : (flag::<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a>));</div>
-<div class="line"><span class="lineno">  164</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  163</span>  {</div>
+<div class="line"><span class="lineno">  164</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a07dc4eba215e0b670f807faa0f9b52b1">section</a>(<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>, bytes, <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a135cf209f94453c0afcc4779dd2e3069">backing</a>.<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a211fee447a47bdeb5424a2a5ae1de852">is_writable</a>() ? (flag::readwrite) : (flag::<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1section__handle.html#a5a4e0afe59d0eeb5683fb50d3d3ad549a63bd03aae67c348121ac0bf88161d90f">read</a>));</div>
+<div class="line"><span class="lineno">  165</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a211fee447a47bdeb5424a2a5ae1de852"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a211fee447a47bdeb5424a2a5ae1de852">llfio_v2_xxx::handle::is_writable</a></div><div class="ttdeci">bool is_writable() const noexcept</div><div class="ttdoc">True if the handle is writable.</div><div class="ttdef"><b>Definition</b> handle.hpp:334</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1section__handle_html_a07dc4eba215e0b670f807faa0f9b52b1"><div class="ttname"><a href="classllfio__v2__xxx_1_1section__handle.html#a07dc4eba215e0b670f807faa0f9b52b1">llfio_v2_xxx::section_handle::section</a></div><div class="ttdeci">static result&lt; section_handle &gt; section(file_handle &amp;backing, extent_type maximum_size, flag _flag) noexcept</div><div class="ttdoc">Create a memory section backed by a file.</div></div>
 </div><!-- fragment -->
@@ -2140,7 +2141,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the memory section's flags. </p>
-<div class="fragment"><div class="line"><span class="lineno">  178</span>{ <span class="keywordflow">return</span> _flag; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  179</span>{ <span class="keywordflow">return</span> _flag; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2202,7 +2203,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Sets the borrowed handle backing this section, if any. </p>
-<div class="fragment"><div class="line"><span class="lineno">  184</span>{ _backing = fh; }</div>
+<div class="fragment"><div class="line"><span class="lineno">  185</span>{ _backing = fh; }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2264,11 +2265,11 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Swap with another instance. </p>
-<div class="fragment"><div class="line"><span class="lineno">  137</span>  {</div>
-<div class="line"><span class="lineno">  138</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">section_handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
-<div class="line"><span class="lineno">  139</span>    *<span class="keyword">this</span> = std::move(o);</div>
-<div class="line"><span class="lineno">  140</span>    o = std::move(temp);</div>
-<div class="line"><span class="lineno">  141</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  138</span>  {</div>
+<div class="line"><span class="lineno">  139</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a34f702e58a35c1eee31f5a5d3e5ec73d">section_handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
+<div class="line"><span class="lineno">  140</span>    *<span class="keyword">this</span> = std::move(o);</div>
+<div class="line"><span class="lineno">  141</span>    o = std::move(temp);</div>
+<div class="line"><span class="lineno">  142</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2325,7 +2326,7 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">   87</span>{<span class="keyword">nullptr</span>};</div>
+<div class="fragment"><div class="line"><span class="lineno">   88</span>{<span class="keyword">nullptr</span>};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2348,7 +2349,7 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">   89</span>{flag::none};</div>
+<div class="fragment"><div class="line"><span class="lineno">   90</span>{flag::none};</div>
 </div><!-- fragment -->
 </div>
 </div>

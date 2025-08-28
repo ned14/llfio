@@ -173,15 +173,6 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_EXPERIMENTAL_STATUS_CODE</b>&#160;&#160;&#160;0</td></tr>
 <tr class="memdesc:aebebb7d8d2589a39eba3e0e84cb26559"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether to use SG14 experimental <code>status_code</code> instead of <code>std::error_code</code> <br /></td></tr>
 <tr class="separator:aebebb7d8d2589a39eba3e0e84cb26559"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadb2cf0e80a284995a25bd4d91242154" id="r_aadb2cf0e80a284995a25bd4d91242154"><td class="memItemLeft" align="right" valign="top"><a id="aadb2cf0e80a284995a25bd4d91242154" name="aadb2cf0e80a284995a25bd4d91242154"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_EXCLUDE_DYNAMIC_THREAD_POOL_GROUP</b>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:aadb2cf0e80a284995a25bd4d91242154"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac411c6fdd41c68385bda6af2534ac042" id="r_ac411c6fdd41c68385bda6af2534ac042"><td class="memItemLeft" align="right" valign="top"><a id="ac411c6fdd41c68385bda6af2534ac042" name="ac411c6fdd41c68385bda6af2534ac042"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_EXCLUDE_NETWORKING</b>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:ac411c6fdd41c68385bda6af2534ac042"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae12a33df168039b97346b6ad5b9879df" id="r_ae12a33df168039b97346b6ad5b9879df"><td class="memItemLeft" align="right" valign="top"><a id="ae12a33df168039b97346b6ad5b9879df" name="ae12a33df168039b97346b6ad5b9879df"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_DISABLE_OPENSSL</b>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:ae12a33df168039b97346b6ad5b9879df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabb964a24682a722a7eaad891ee497a61" id="r_gabb964a24682a722a7eaad891ee497a61"><td class="memItemLeft" align="right" valign="top">
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>LLFIO_V2</b>&#160;&#160;&#160;(QUICKCPPLIB_BIND_NAMESPACE_VERSION(llfio_v2))</td></tr>
 <tr class="memdesc:gabb964a24682a722a7eaad891ee497a61"><td class="mdescLeft">&#160;</td><td class="mdescRight">The namespace configuration of this LLFIO v2. Consists of a sequence of bracketed tokens later fused by the preprocessor into namespace and C++ module names. <br /></td></tr>
@@ -339,10 +330,10 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detai
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;FATAL: throw &quot;</span> #__VA_ARGS__ <span class="stringliteral">&quot; at &quot;</span> __FILE__ <span class="stringliteral">&quot;:%d\n&quot;</span>, __LINE__);                                                                           \</div>
 <div class="line">    abort();                                                                                                                                                   \</div>
 <div class="line">  }</div>
-</div><!-- fragment --><div class="fragment"><div class="line"><span class="lineno">  462</span>  {                                                                                                                                                            \</div>
-<div class="line"><span class="lineno">  463</span>    fprintf(stderr, <span class="stringliteral">&quot;FATAL: throw &quot;</span> #__VA_ARGS__ <span class="stringliteral">&quot; at &quot;</span> __FILE__ <span class="stringliteral">&quot;:%d\n&quot;</span>, __LINE__);                                                                           \</div>
-<div class="line"><span class="lineno">  464</span>    abort();                                                                                                                                                   \</div>
-<div class="line"><span class="lineno">  465</span>  }</div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="lineno">  451</span>  {                                                                                                                                                            \</div>
+<div class="line"><span class="lineno">  452</span>    fprintf(stderr, <span class="stringliteral">&quot;FATAL: throw &quot;</span> #__VA_ARGS__ <span class="stringliteral">&quot; at &quot;</span> __FILE__ <span class="stringliteral">&quot;:%d\n&quot;</span>, __LINE__);                                                                           \</div>
+<div class="line"><span class="lineno">  453</span>    abort();                                                                                                                                                   \</div>
+<div class="line"><span class="lineno">  454</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -372,9 +363,9 @@ template&lt;class T , typename std::enable_if&lt;(std::is_unsigned&lt; T &gt;::v
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  382</span>  {</div>
-<div class="line"><span class="lineno">  383</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(0);</div>
-<div class="line"><span class="lineno">  384</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  371</span>  {</div>
+<div class="line"><span class="lineno">  372</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(0);</div>
+<div class="line"><span class="lineno">  373</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -403,9 +394,9 @@ template&lt;class T , class U , typename std::enable_if&lt;(std::is_unsigned&lt;
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  376</span>  {</div>
-<div class="line"><span class="lineno">  377</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(v);</div>
-<div class="line"><span class="lineno">  378</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  365</span>  {</div>
+<div class="line"><span class="lineno">  366</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(v);</div>
+<div class="line"><span class="lineno">  367</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -434,9 +425,9 @@ template&lt;class T , class U , typename std::enable_if&lt;(std::is_unsigned&lt;
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  388</span>  {</div>
-<div class="line"><span class="lineno">  389</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(<span class="keyword">reinterpret_cast&lt;</span>uintptr_t<span class="keyword">&gt;</span>(v));</div>
-<div class="line"><span class="lineno">  390</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  377</span>  {</div>
+<div class="line"><span class="lineno">  378</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(<span class="keyword">reinterpret_cast&lt;</span>uintptr_t<span class="keyword">&gt;</span>(v));</div>
+<div class="line"><span class="lineno">  379</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
