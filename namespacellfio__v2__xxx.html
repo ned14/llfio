@@ -841,16 +841,16 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  657</span>{</div>
-<div class="line"><span class="lineno">  658</span><span class="preprocessor">#ifdef __cpp_exceptions</span></div>
-<div class="line"><span class="lineno">  659</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));</div>
-<div class="line"><span class="lineno">  660</span><span class="preprocessor">#else</span></div>
-<div class="line"><span class="lineno">  661</span>  (void) ep;</div>
-<div class="line"><span class="lineno">  662</span>  (void) not_matched;</div>
-<div class="line"><span class="lineno">  663</span>  abort();  <span class="comment">// should never be called</span></div>
-<div class="line"><span class="lineno">  664</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  665</span>}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html">llfio_v2_xxx::error_info</a></div><div class="ttdoc">The cause of the failure of an operation in LLFIO.</div><div class="ttdef"><b>Definition</b> status_code.hpp:452</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  678</span>{</div>
+<div class="line"><span class="lineno">  679</span><span class="preprocessor">#ifdef __cpp_exceptions</span></div>
+<div class="line"><span class="lineno">  680</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(OUTCOME_V2_NAMESPACE::error_from_exception(std::move(ep), not_matched));</div>
+<div class="line"><span class="lineno">  681</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno">  682</span>  (void) ep;</div>
+<div class="line"><span class="lineno">  683</span>  (void) not_matched;</div>
+<div class="line"><span class="lineno">  684</span>  abort();  <span class="comment">// should never be called</span></div>
+<div class="line"><span class="lineno">  685</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  686</span>}</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html">llfio_v2_xxx::error_info</a></div><div class="ttdoc">The cause of the failure of an operation in LLFIO.</div><div class="ttdef"><b>Definition</b> status_code.hpp:466</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -987,9 +987,9 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Helper for constructing an error info from an errc. </p>
-<div class="fragment"><div class="line"><span class="lineno">  685</span>{</div>
-<div class="line"><span class="lineno">  686</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(make_error_code(c));</div>
-<div class="line"><span class="lineno">  687</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  707</span>{</div>
+<div class="line"><span class="lineno">  708</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(make_error_code(c));</div>
+<div class="line"><span class="lineno">  709</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1223,9 +1223,9 @@ template&lt;class T &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  609</span>{</div>
-<div class="line"><span class="lineno">  610</span>  <span class="keywordflow">return</span> ei.ec;</div>
-<div class="line"><span class="lineno">  611</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  629</span>{</div>
+<div class="line"><span class="lineno">  630</span>  <span class="keywordflow">return</span> ei.ec;</div>
+<div class="line"><span class="lineno">  631</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -1896,9 +1896,9 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  540</span>{</div>
-<div class="line"><span class="lineno">  541</span>  <span class="keywordflow">return</span> make_error_code(a) != make_error_code(b);</div>
-<div class="line"><span class="lineno">  542</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  556</span>{</div>
+<div class="line"><span class="lineno">  557</span>  <span class="keywordflow">return</span> make_error_code(a) != make_error_code(b);</div>
+<div class="line"><span class="lineno">  558</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2690,14 +2690,14 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  600</span>{</div>
-<div class="line"><span class="lineno">  601</span>  <span class="keywordflow">if</span>(make_error_code(v))</div>
-<div class="line"><span class="lineno">  602</span>  {</div>
-<div class="line"><span class="lineno">  603</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::error_info(&quot;</span> &lt;&lt; v.<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
-<div class="line"><span class="lineno">  604</span>  }</div>
-<div class="line"><span class="lineno">  605</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::error_info(null)&quot;</span>;</div>
-<div class="line"><span class="lineno">  606</span>}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:521</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  620</span>{</div>
+<div class="line"><span class="lineno">  621</span>  <span class="keywordflow">if</span>(make_error_code(v))</div>
+<div class="line"><span class="lineno">  622</span>  {</div>
+<div class="line"><span class="lineno">  623</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::error_info(&quot;</span> &lt;&lt; v.<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">message</a>() &lt;&lt; <span class="stringliteral">&quot;)&quot;</span>;</div>
+<div class="line"><span class="lineno">  624</span>  }</div>
+<div class="line"><span class="lineno">  625</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::error_info(null)&quot;</span>;</div>
+<div class="line"><span class="lineno">  626</span>}</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_a3ba6efb57025c79297c3a3061ae78bf9"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#a3ba6efb57025c79297c3a3061ae78bf9">llfio_v2_xxx::error_info::message</a></div><div class="ttdeci">std::string message() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:537</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3321,9 +3321,9 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  536</span>{</div>
-<div class="line"><span class="lineno">  537</span>  <span class="keywordflow">return</span> make_error_code(a) == make_error_code(b);</div>
-<div class="line"><span class="lineno">  538</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  552</span>{</div>
+<div class="line"><span class="lineno">  553</span>  <span class="keywordflow">return</span> make_error_code(a) == make_error_code(b);</div>
+<div class="line"><span class="lineno">  554</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3555,16 +3555,17 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  546</span>{</div>
-<div class="line"><span class="lineno">  547</span>  <span class="keyword">auto</span> _a = make_error_code(a);</div>
-<div class="line"><span class="lineno">  548</span>  <span class="keyword">auto</span> _b = std::error_condition(b);</div>
-<div class="line"><span class="lineno">  549</span><span class="preprocessor">#ifndef _WIN32</span></div>
-<div class="line"><span class="lineno">  550</span>  <span class="comment">// Looks like libstdc++ doesn&#39;t map system category to generic category, which is a bug</span></div>
-<div class="line"><span class="lineno">  551</span>  <span class="keywordflow">if</span>(_a.category() == std::system_category() &amp;&amp; _b.category() == std::generic_category() &amp;&amp; _a.value() == <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(b))</div>
-<div class="line"><span class="lineno">  552</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><span class="lineno">  553</span><span class="preprocessor">#endif</span></div>
-<div class="line"><span class="lineno">  554</span>  <span class="keywordflow">return</span> _a == _b;</div>
-<div class="line"><span class="lineno">  555</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  562</span>{</div>
+<div class="line"><span class="lineno">  563</span>  <span class="keyword">auto</span> _a = make_error_code(a);</div>
+<div class="line"><span class="lineno">  564</span>  <span class="keyword">auto</span> _b = std::error_condition(b);</div>
+<div class="line"><span class="lineno">  565</span><span class="preprocessor">#ifndef _WIN32</span></div>
+<div class="line"><span class="lineno">  566</span>  <span class="comment">// Looks like libstdc++ doesn&#39;t map system category to generic category, which is a bug</span></div>
+<div class="line"><span class="lineno">  567</span>  <span class="keywordflow">if</span>(_a.category() == std::system_category() &amp;&amp; _b.category() == std::generic_category() &amp;&amp;</div>
+<div class="line"><span class="lineno">  568</span>     _a.value() == <span class="keyword">static_cast&lt;</span><span class="keywordtype">int</span><span class="keyword">&gt;</span>(b))</div>
+<div class="line"><span class="lineno">  569</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  570</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  571</span>  <span class="keywordflow">return</span> _a == _b;</div>
+<div class="line"><span class="lineno">  572</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3591,10 +3592,10 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  614</span>{</div>
-<div class="line"><span class="lineno">  615</span>  ei.<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#ab08549050a7e020a9939b1961ed1ae2c">throw_exception</a>();</div>
-<div class="line"><span class="lineno">  616</span>}</div>
-<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_ab08549050a7e020a9939b1961ed1ae2c"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#ab08549050a7e020a9939b1961ed1ae2c">llfio_v2_xxx::error_info::throw_exception</a></div><div class="ttdeci">void throw_exception() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:634</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  634</span>{</div>
+<div class="line"><span class="lineno">  635</span>  ei.<a class="code hl_function" href="structllfio__v2__xxx_1_1error__info.html#ab08549050a7e020a9939b1961ed1ae2c">throw_exception</a>();</div>
+<div class="line"><span class="lineno">  636</span>}</div>
+<div class="ttc" id="astructllfio__v2__xxx_1_1error__info_html_ab08549050a7e020a9939b1961ed1ae2c"><div class="ttname"><a href="structllfio__v2__xxx_1_1error__info.html#ab08549050a7e020a9939b1961ed1ae2c">llfio_v2_xxx::error_info::throw_exception</a></div><div class="ttdeci">void throw_exception() const</div><div class="ttdef"><b>Definition</b> status_code.hpp:654</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -3695,9 +3696,9 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </div><div class="memdoc">
 
 <p>Helper for constructing an error info from a POSIX errno. </p>
-<div class="fragment"><div class="line"><span class="lineno">  691</span>{</div>
-<div class="line"><span class="lineno">  692</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(std::error_code(c, std::system_category()));</div>
-<div class="line"><span class="lineno">  693</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  713</span>{</div>
+<div class="line"><span class="lineno">  714</span>  <span class="keywordflow">return</span> <a class="code hl_struct" href="structllfio__v2__xxx_1_1error__info.html">error_info</a>(std::error_code(c, std::system_category()));</div>
+<div class="line"><span class="lineno">  715</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
