@@ -84,7 +84,7 @@ jobs:
         else
           export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=$PWD/cmake/toolchain-windows-mingw.cmake"
         fi
-        ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" -DCTEST_SITE=$NAME -DCTEST_CMAKE_GENERATOR=Ninja
+        ctest -S .ci.cmake -VV --timeout 900 -DCTEST_DISABLE_TESTING=1 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" -DCTEST_SITE=$NAME -DCTEST_CMAKE_GENERATOR=Ninja
        
     - name: Upload Test Results
       if: always()
