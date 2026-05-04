@@ -6,7 +6,8 @@ These compilers and OSs are regularly tested by CI:
 - [Clang](https://clang.llvm.org/) on Linux
 - Xcode on Mac OS
 - Visual Studio on Windows
-- MinGW on Windows (note that you'll get lots of warnings)
+- Build only: Android NDK
+- Build only: MinGW on Windows (note that you'll get lots of warnings)
 
 Other compilers, architectures and OSs may work, but are not tested regularly.
 You will need a working Filesystem implementation in your STL, and at least C++ 17.

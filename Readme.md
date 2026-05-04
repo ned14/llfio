@@ -11,7 +11,7 @@
 </table></center>
 
 Herein lies a zero whole machine memory copy file i/o and filesystem
-library for the C++ standard, intended for storage devices with ~1 microsecond
+library originally for the C++ standard, intended for storage devices with ~1 microsecond
 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access
 Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to
 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1,
@@ -19,7 +19,8 @@ approx 40Gb/sec per thread. It has particularly strong support for writing porta
 filesystem algorithms which work well with directly mapped non-volatile storage such
 as Intel Optane.
 
-It is a complete rewrite after a Boost peer review in August 2015.
+It is a complete rewrite after a Boost peer review in August 2015. It was submitted
+for C++ standardisation in 2018, and that process was abandoned in 2025.
 
 Other characteristics:
 - Portable to any conforming C++ 17 compiler with a working Filesystem in its STL.
