@@ -41,7 +41,6 @@ include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
-option(LLFIO_ASSUME_CROSS_COMPILING "Whether to assume we are cross compiling. Normally automatically detected, but if automatic detection doesn't work, a working <filesystem> will not be found during cmake configure." OFF)
 option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_MAPPED_FILES_OFF "Whether to disable memory mapped files support in LLFIO" OFF)
@@ -182,14 +181,6 @@ include(QuickCppLibApplyDefaultDefinitions)
 
 # Set the C++ features this library requires
 all_compile_features(PUBLIC cxx_std_17)
-set(check_cxx_source_linkage_flags)
-if(NOT CMAKE_CXX_STANDARD)
-  if(MSVC)
-    set(check_cxx_source_linkage_flags /std:c++17)
-  else()
-    set(check_cxx_source_linkage_flags -std=c++17)
-  endif()
-endif()
 # Set the library dependencies this library has
 all_link_libraries(PUBLIC Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
 if(LLFIO_FORCE_SIGNAL_DETECTION_OFF)
@@ -205,36 +196,6 @@ endif()
 # Set the system dependencies this library has
 include(CheckCXXSourceCompiles)
 include(CheckCXXSourceRuns)
-function(check_cxx_source_linkage prog var)
-  set(CMAKE_REQUIRED_FLAGS ${check_cxx_source_linkage_flags})
-  if(MSVC AND CMAKE_GENERATOR MATCHES "Ninja")
-    set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} /EHsc")
-  endif()
-  if(CMAKE_CXX_STANDARD)
-    if(MSVC)
-      set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} /std:c++${CMAKE_CXX_STANDARD}")
-    else()
-      set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -std=c++${CMAKE_CXX_STANDARD}")
-    endif()
-  endif()
-  if(CMAKE_SYSTEM_PROCESSOR STREQUAL ${CMAKE_HOST_SYSTEM_PROCESSOR} AND NOT LLFIO_ASSUME_CROSS_COMPILING)
-    check_cxx_source_runs("${prog}" ${var})
-  else()
-    check_cxx_source_compiles("${prog}" ${var})
-  endif()
-  set(${var} "${${var}}" PARENT_SCOPE)
-endfunction()
-# Do we have native <filesystem> that just works without any extra effort?
-# We have to check if it runs, as binaries may link, but fail to run due to missing symbols
-check_cxx_source_linkage("
-#include <filesystem>
-int main() {
-  try { return std::filesystem::path(\"hi\").empty(); } catch(std::filesystem::filesystem_error) { return 1; }
-}
-" CXX_HAS_CXX17_FILESYSTEM)
-if(NOT CXX_HAS_CXX17_FILESYSTEM)
-  indented_message(FATAL_ERROR "FATAL: C++ 17 <filesystem> is not available, use a LLFIO from before year 2025 if you want legacy <filesystem> polyfill support")
-endif()
 if(LLFIO_FORCE_MAPPED_FILES_OFF)
   all_compile_definitions(PUBLIC LLFIO_EXCLUDE_MAPPED_FILE_HANDLE=1)
 endif()
