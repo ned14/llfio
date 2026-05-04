@@ -64,7 +64,8 @@ namespace utils
       GetSystemInfo(&si);
       pagesizes.push_back(si.dwPageSize);
       pagesizes_available.push_back(si.dwPageSize);
-      auto GetLargePageMinimum_ = reinterpret_cast<GetLargePageMinimum_t>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum"));
+      auto GetLargePageMinimum_ =
+      reinterpret_cast<GetLargePageMinimum_t>(GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetLargePageMinimum"));
       if(GetLargePageMinimum_ != nullptr)
       {
         windows_nt_kernel::init();
@@ -129,8 +130,8 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) ==
-           0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES),
+                                 static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
           return win32_error();
         }
@@ -154,7 +155,8 @@ namespace utils
 
     // Write all modified pages to storage
     SYSTEM_MEMORY_LIST_COMMAND command = MemoryPurgeStandbyList;
-    NTSTATUS ntstat = NtSetSystemInformation(80 /*SystemMemoryListInformation*/, &command, sizeof(SYSTEM_MEMORY_LIST_COMMAND));
+    NTSTATUS ntstat =
+    NtSetSystemInformation(80 /*SystemMemoryListInformation*/, &command, sizeof(SYSTEM_MEMORY_LIST_COMMAND));
     if(ntstat != STATUS_SUCCESS)
     {
       return ntkernel_error(ntstat);
@@ -185,8 +187,8 @@ namespace utils
         tp.PrivilegeCount = 1;
         tp.Privileges[0].Luid = luid;
         tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
-        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) ==
-           0)
+        if(AdjustTokenPrivileges(processToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES),
+                                 static_cast<PTOKEN_PRIVILEGES>(nullptr), static_cast<PDWORD>(nullptr)) == 0)
         {
           return win32_error();
         }
@@ -254,7 +256,7 @@ namespace utils
       ret.system_physical_memory_total = (uint64_t) pi.PhysicalTotal * pi.PageSize;
       ret.system_physical_memory_available = (uint64_t) pi.PhysicalAvailable * pi.PageSize;
       ret.system_commit_charge_maximum = (uint64_t) pi.CommitLimit * pi.PageSize;
-      ret.system_commit_charge_available = (uint64_t)(pi.CommitLimit - pi.CommitTotal) * pi.PageSize;
+      ret.system_commit_charge_available = (uint64_t) (pi.CommitLimit - pi.CommitTotal) * pi.PageSize;
     }
     return ret;
   }
@@ -262,7 +264,6 @@ namespace utils
   result<process_cpu_usage> current_process_cpu_usage() noexcept
   {
     process_cpu_usage ret;
-    memset(&ret, 0, sizeof(ret));
     {
       FILETIME IdleTime, KernelTime, UserTime;
       if(GetSystemTimes(&IdleTime, &KernelTime, &UserTime) == 0)
