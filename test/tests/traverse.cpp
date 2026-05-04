@@ -51,7 +51,7 @@ static inline void TestTraverse()
     {
       if(error == errc::too_many_files_open)
       {
-        return std::move(error);
+        return {std::move(error)};
       }
       failed_to_open.fetch_add(1, std::memory_order_relaxed);
       (void) data;

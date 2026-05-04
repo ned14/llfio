@@ -305,7 +305,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   LLFIO_DEADLINE_TO_SLEEP_INIT(d);
   if(req.buffers.empty())
   {
-    return std::move(req.buffers);
+    return {std::move(req.buffers)};
   }
   UNICODE_STRING _glob{};
   memset(&_glob, 0, sizeof(_glob));
@@ -430,7 +430,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         req.buffers._resize(entries_parsed);
         req.buffers._metadata = default_stat_contents;
         req.buffers._done = true;
-        return std::move(req.buffers);
+        return {std::move(req.buffers)};
       }
       if(count >= 1 && !(req.flags & flags::permit_racy_reads))
       {
@@ -496,7 +496,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
           // Fill is incomplete
           req.buffers._metadata = default_stat_contents;
           req.buffers._done = false;
-          return std::move(req.buffers);
+          return {std::move(req.buffers)};
         }
         if(done)
         {

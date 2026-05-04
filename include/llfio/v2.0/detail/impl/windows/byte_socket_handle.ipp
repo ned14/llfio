@@ -664,7 +664,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle::buffers_typ
   LLFIO_LOG_FUNCTION_CALL(this);
   if(req.buffers.empty())
   {
-    return std::move(req.buffers);
+    return {std::move(req.buffers)};
   }
   LLFIO_DEADLINE_TO_SLEEP_INIT(d);
   mode _mode = this->is_append_only() ? mode::append : (this->is_writable() ? mode::write : mode::read);
@@ -755,7 +755,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<listening_byte_socket_handle::buffers_typ
   {
     OUTCOME_TRY(b.first.shutdown(byte_socket_handle::shutdown_read));
   }
-  return std::move(req.buffers);
+  return {std::move(req.buffers)};
 }
 
 LLFIO_V2_NAMESPACE_END

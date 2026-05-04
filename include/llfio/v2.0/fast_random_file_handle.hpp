@@ -141,7 +141,7 @@ protected:
     {
       buffer = {buffer.data(), 0};
     }
-    return std::move(reqs.buffers);
+    return {std::move(reqs.buffers)};
   }
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<buffers_type> _do_read(io_request<buffers_type> reqs, deadline d = deadline()) noexcept override;
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC io_result<const_buffers_type> _do_write(io_request<const_buffers_type> reqs, deadline d = deadline()) noexcept override
@@ -153,7 +153,7 @@ protected:
     {
       buffer = {buffer.data(), 0};
     }
-    return std::move(reqs.buffers);
+    return {std::move(reqs.buffers)};
   }
 
 public:

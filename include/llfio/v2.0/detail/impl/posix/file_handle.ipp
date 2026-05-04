@@ -82,7 +82,7 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
       auto r = rfh.relink(dirh, path.filename());
       if(r)
       {
-        return std::move(rfh);
+        return {std::move(rfh)};
       }
       // If failed to rename, remove
       (void) rfh.unlink();

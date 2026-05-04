@@ -35,7 +35,7 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
     {
       buffer = {buffer.data(), 0};
     }
-    return std::move(reqs.buffers);
+    return {std::move(reqs.buffers)};
   }
   extent_type togo = _length - reqs.offset;
   // Fill the scatter buffers
@@ -136,7 +136,7 @@ fast_random_file_handle::io_result<fast_random_file_handle::buffers_type> fast_r
       }
     }
   }
-  return std::move(reqs.buffers);
+  return {std::move(reqs.buffers)};
 }
 
 LLFIO_V2_NAMESPACE_END

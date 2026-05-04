@@ -226,7 +226,7 @@ namespace algorithm
             filleds[1] = buffer_type{filleds[1].data() + b.size(), filleds[1].size() - b.size()};
           }
         }
-        return std::move(reqs.buffers);
+        return {std::move(reqs.buffers)};
       }
 
       /*! Perform the uncombining operation to the supplied buffers, splitting them
@@ -296,7 +296,7 @@ namespace algorithm
           OUTCOME_TRY(auto &&_, _target->write(req, d));
           OUTCOME_TRY((Op<target_handle_type, source_handle_type>::adjust_written_buffers(reqs.buffers, _[0], buffers[0])));
         }
-        return std::move(reqs.buffers);
+        return {std::move(reqs.buffers)};
       }
 
     public:

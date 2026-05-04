@@ -106,7 +106,7 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     auto r = rfh.relink(dirh, path.filename());
     if(r)
     {
-      return std::move(rfh);
+      return {std::move(rfh)};
     }
     // If failed to rename, remove
     (void) rfh.unlink();
@@ -270,7 +270,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   LLFIO_LOG_FUNCTION_CALL(this);
   if(req.buffers.empty())
   {
-    return std::move(req.buffers);
+    return {std::move(req.buffers)};
   }
   // Is glob a single entry match? If so, this is really a stat call
   path_view_type::zero_terminated_rendered_path<> zglob(req.glob);
@@ -340,7 +340,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
                                                           | stat_t::want::sparse;
     req.buffers._metadata = default_stat_contents;
     req.buffers._done = true;
-    return std::move(req.buffers);
+    return {std::move(req.buffers)};
   }
 #ifdef __linux__
   // Unlike FreeBSD, Linux doesn't define a getdents() function, so we'll do that here.
@@ -443,7 +443,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     req.buffers._resize(0);
     req.buffers._metadata = default_stat_contents;
     req.buffers._done = true;
-    return std::move(req.buffers);
+    return {std::move(req.buffers)};
   }
   (void) LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
@@ -505,14 +505,14 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       req.buffers._resize(n);
       req.buffers._metadata = default_stat_contents;
       req.buffers._done = true;
-      return std::move(req.buffers);
+      return {std::move(req.buffers)};
     }
     if(n >= req.buffers.size())
     {
       // Fill is incomplete
       req.buffers._metadata = default_stat_contents;
       req.buffers._done = false;
-      return std::move(req.buffers);
+      return {std::move(req.buffers)};
     }
   }
 }

@@ -563,7 +563,7 @@ namespace algorithm
           }
           if(run_error)
           {
-            return std::move(*run_error);
+            return {std::move(*run_error)};
           }
         }
 #ifndef NDEBUG
