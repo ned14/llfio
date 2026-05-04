@@ -45,8 +45,8 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor, size_t threads, void *data,
-                                                       bool force_slow_path) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor,
+                                                       size_t threads, void *data, bool force_slow_path) noexcept
   {
     return visitor->finished(
     data,
@@ -77,8 +77,10 @@ namespace algorithm
           {
             use_slow_path = true;
 #ifndef NDEBUG
-            std::cerr << "WARNING: llfio::traverse() is using slow path due to " << (rlimit_maxfd - topdirh->native_handle().fd)
-                      << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
+            std::cerr << "WARNING: llfio::traverse() is using slow path due to "
+                      << (rlimit_maxfd - topdirh->native_handle().fd)
+                      << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your "
+                         "application is > 1024 fd count safe."
                       << std::endl;
 #endif
           }
@@ -198,12 +200,16 @@ namespace algorithm
               new(this) workitem(std::move(o));
               return *this;
             }
-            path_view leaf() const noexcept { return using_sso ? path_view(_sso, _sso_length, path_view::zero_terminated) : path_view(_alloc); }
+            path_view leaf() const noexcept
+            {
+              return using_sso ? path_view(_sso, _sso_length, path_view::zero_terminated) : path_view(_alloc);
+            }
           };
 #endif
           std::vector<std::list<workitem>> workqueue;
           size_t workqueue_base{0};
-          size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0}, threads_running{0};
+          size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0},
+          threads_running{0};
 
           explicit state_t(size_t _max_sso_path_size, traverse_visitor *_visitor)
               : max_sso_path_size(_max_sso_path_size)
@@ -266,7 +272,8 @@ namespace algorithm
               auto r = directory_handle::directory(*mywork.dirh, mywork.leaf());
               if(!r)
               {
-                OUTCOME_TRY(auto &&replacementh, state->visitor->directory_open_failed(data, std::move(r).error(), *mywork.dirh, mywork.leaf(), mylevel));
+                OUTCOME_TRY(auto &&replacementh, state->visitor->directory_open_failed(
+                                                 data, std::move(r).error(), *mywork.dirh, mywork.leaf(), mylevel));
                 mydirh = std::make_shared<directory_handle>(std::move(replacementh));
               }
               else
@@ -281,7 +288,7 @@ namespace algorithm
               {
                 for(;;)
                 {
-                  buffers = {entries, std::move(buffers)};
+                  buffers = directory_handle::buffers_type{entries, std::move(buffers)};
                   OUTCOME_TRY(buffers, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
                   if(buffers.done())
                   {
@@ -418,21 +425,25 @@ namespace algorithm
                 {
                   state->workqueue_base = mylevel + 1;
                 }
-                size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining, depth_processed = state->depth_processed,
-                       known_depth_remaining = state->workqueue.size();
+                size_t dirs_processed = state->dirs_processed, known_dirs_remaining = state->known_dirs_remaining,
+                       depth_processed = state->depth_processed, known_depth_remaining = state->workqueue.size();
 #ifndef _WIN32
-                if(max_sso_path_size < size_t(-1) && rlimit_maxfd > 0 && rlimit_maxfd - mydirh->native_handle().fd < 65536)
+                if(max_sso_path_size < size_t(-1) && rlimit_maxfd > 0 &&
+                   rlimit_maxfd - mydirh->native_handle().fd < 65536)
                 {
                   state->max_sso_path_size = size_t(-1);
 #ifndef NDEBUG
-                  std::cerr << "WARNING: llfio::traverse() is falling back to slow path due to " << (rlimit_maxfd - mydirh->native_handle().fd)
-                            << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if your application is > 1024 fd count safe."
+                  std::cerr << "WARNING: llfio::traverse() is falling back to slow path due to "
+                            << (rlimit_maxfd - mydirh->native_handle().fd)
+                            << " unused file descriptors remaining! Raise the limit using setrlimit(RLIMIT_NOFILE) if "
+                               "your application is > 1024 fd count safe."
                             << std::endl;
 #endif
                 }
 #endif
                 g.unlock();
-                OUTCOME_TRY(state->visitor->stack_updated(data, dirs_processed, known_dirs_remaining, depth_processed, known_depth_remaining));
+                OUTCOME_TRY(state->visitor->stack_updated(data, dirs_processed, known_dirs_remaining, depth_processed,
+                                                          known_depth_remaining));
               }
             }
             return success();

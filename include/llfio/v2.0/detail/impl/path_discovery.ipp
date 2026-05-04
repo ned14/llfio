@@ -68,16 +68,17 @@ namespace path_discovery
     }
   }  // namespace detail
 
-  inline std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> _all_temporary_directories(span<path_view> overrides,
-                                                                                                                           span<path_view> fallbacks);
+  inline std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>>
+  _all_temporary_directories(span<path_view> overrides, span<path_view> fallbacks);
 
-  span<discovered_path> all_temporary_directories(bool refresh, span<path_view> fallbacks, span<path_view> overrides) noexcept
+  span<discovered_path> all_temporary_directories(bool refresh, span<path_view> fallbacks,
+                                                  span<path_view> overrides) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
     auto &ps = detail::path_store();
     if(!refresh && !ps.all.empty())
     {
-      return ps.all;
+      return {ps.all.data(), ps.all.size()};
     }
     std::lock_guard<std::mutex> g(ps.lock);
     if(refresh)
@@ -90,14 +91,16 @@ namespace path_discovery
     }
     if(!ps.all.empty())
     {
-      return ps.all;
+      return {ps.all.data(), ps.all.size()};
     }
     LLFIO_EXCEPTION_TRY
     {
-      std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> raw = _all_temporary_directories(overrides, fallbacks);
+      std::vector<std::pair<discovered_path::source_type, detail::_store::_discovered_path>> raw =
+      _all_temporary_directories(overrides, fallbacks);
       if(raw.empty())
       {
-        LLFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, something has gone very wrong");
+        LLFIO_LOG_FATAL(nullptr, "path_discovery::all_temporary_directories() sees no possible temporary directories, "
+                                 "something has gone very wrong");
         abort();
       }
       for(size_t n = 0; n < raw.size(); n++)
@@ -105,13 +108,15 @@ namespace path_discovery
         raw[n].second.priority = n;
       }
       // Firstly sort by source and path so duplicates are side by side
-      std::sort(raw.begin(), raw.end(),
-                [](const auto &a, const auto &b) { return (a.first < b.first) || (a.first == b.first && a.second.path < b.second.path); });
+      std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b)
+                { return (a.first < b.first) || (a.first == b.first && a.second.path < b.second.path); });
       // Remove duplicates
-      raw.erase(std::unique(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.first == b.first && a.second.path == b.second.path; }),
+      raw.erase(std::unique(raw.begin(), raw.end(), [](const auto &a, const auto &b)
+                            { return a.first == b.first && a.second.path == b.second.path; }),
                 raw.end());
       // Put them back into the order in which they were returned
-      std::sort(raw.begin(), raw.end(), [](const auto &a, const auto &b) { return a.second.priority < b.second.priority; });
+      std::sort(raw.begin(), raw.end(),
+                [](const auto &a, const auto &b) { return a.second.priority < b.second.priority; });
       ps.all.reserve(raw.size());
       ps._all.reserve(raw.size());
       for(auto &i : raw)
@@ -133,10 +138,11 @@ namespace path_discovery
     {
       LLFIO_LOG_WARN(nullptr, "path_discovery::all_temporary_directories() saw unknown exception throw");
     }
-    return ps.all;
+    return {ps.all.data(), ps.all.size()};
   }
 
-  span<discovered_path> verified_temporary_directories(const char *_storage_backed_regex, const char *_memory_backed_regex) noexcept
+  span<discovered_path> verified_temporary_directories(const char *_storage_backed_regex,
+                                                       const char *_memory_backed_regex) noexcept
   {
     LLFIO_LOG_FUNCTION_CALL(nullptr);
     auto &ps = detail::path_store();
@@ -182,7 +188,8 @@ namespace path_discovery
         }
         // Try to create a small file in that directory
         auto _fh =
-        file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary, file_handle::flag::unlink_on_first_close);
+        file_handle::uniquely_named_file(ps._all[n].h, file_handle::mode::write, file_handle::caching::temporary,
+                                         file_handle::flag::unlink_on_first_close);
         if(!_fh)
         {
 #if LLFIO_LOGGING_LEVEL >= 3
@@ -199,7 +206,9 @@ namespace path_discovery
         auto r = ps.all[n].stat->fill(ps._all[n].h);
         if(!r)
         {
-          LLFIO_LOG_WARN(nullptr, "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
+          LLFIO_LOG_WARN(
+          nullptr,
+          "path_discovery::verified_temporary_directories() failed to stat an open handle to a temp directory");
           ps.all[n].stat = {};
           ps._all[n].h = {};
           continue;
@@ -226,16 +235,19 @@ namespace path_discovery
         }
       }
       // Now partition into those with valid stat directories and those without
-      std::stable_partition(ps._all.begin(), ps._all.end(), [](const detail::_store::_discovered_path &a) { return a.h.is_valid(); });
+      std::stable_partition(ps._all.begin(), ps._all.end(),
+                            [](const detail::_store::_discovered_path &a) { return a.h.is_valid(); });
       auto it = std::stable_partition(ps.all.begin(), ps.all.end(), [](const discovered_path &a) { return a.stat; });
       ps.verified = span<discovered_path>(ps.all.data(), it - ps.all.begin());
       if(ps.verified.empty())
       {
         std::stringstream msg;
-        msg << "path_discovery::verified_temporary_directories() could not find at least one writable temporary directory. Directories probed were:\n";
+        msg << "path_discovery::verified_temporary_directories() could not find at least one writable temporary "
+               "directory. Directories probed were:\n";
         for(size_t n = 0; n < ps.all.size(); n++)
         {
-          msg << "\n   " << ps.all[n].path << " (" << ps.all[n].source << ") fs type = " << ps._all[n].fstypename << " valid = " << (bool) ps.all[n].stat;
+          msg << "\n   " << ps.all[n].path << " (" << ps.all[n].source << ") fs type = " << ps._all[n].fstypename
+              << " valid = " << (bool) ps.all[n].stat;
         }
         msg << "\n";
         LLFIO_LOG_FATAL(nullptr, msg.str().c_str());
@@ -276,14 +288,16 @@ namespace path_discovery
 #ifndef LLFIO_PATH_DISCOVERY_DISABLE_STORAGE_BACKED_TEMPORARY_FILES_DIRECTORY_WARNING
     if(!ps.storage_backed.is_valid())
     {
-      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for storage_backed_temporary_files_directory(), creation "
+      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for "
+                              "storage_backed_temporary_files_directory(), creation "
                               "of storage backed temporary files will fail with bad_file_descriptor!");
     }
 #endif
 #ifndef LLFIO_PATH_DISCOVERY_DISABLE_MEMORY_BACKED_TEMPORARY_FILES_DIRECTORY_WARNING
     if(!ps.memory_backed.is_valid())
     {
-      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for memory_backed_temporary_files_directory(), creation "
+      LLFIO_LOG_WARN(nullptr, "path_discovery:verified_temporary_directories() found no suitable path for "
+                              "memory_backed_temporary_files_directory(), creation "
                               "of memory backed temporary files will fail with bad_file_descriptor!");
     }
 #endif

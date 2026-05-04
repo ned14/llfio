@@ -182,7 +182,10 @@ include(QuickCppLibApplyDefaultDefinitions)
 # Set the C++ features this library requires
 all_compile_features(PUBLIC cxx_std_17)
 # Set the library dependencies this library has
-all_link_libraries(PUBLIC Threads::Threads $<$<PLATFORM_ID:Linux>:rt>)
+all_link_libraries(PUBLIC Threads::Threads)
+if(NOT ANDROID)
+  all_link_libraries(PUBLIC $<$<PLATFORM_ID:Linux>:rt>)
+endif()
 if(LLFIO_FORCE_SIGNAL_DETECTION_OFF)
   all_compile_definitions(PRIVATE LLFIO_DISABLE_SIGNAL_GUARD=1)
 endif()
