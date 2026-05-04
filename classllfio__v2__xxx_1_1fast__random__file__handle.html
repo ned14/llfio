@@ -807,7 +807,7 @@ Benchmarks:</h2>
 <div class="line"><span class="lineno">  141</span>    {</div>
 <div class="line"><span class="lineno">  142</span>      buffer = {buffer.data(), 0};</div>
 <div class="line"><span class="lineno">  143</span>    }</div>
-<div class="line"><span class="lineno">  144</span>    <span class="keywordflow">return</span> std::move(reqs.buffers);</div>
+<div class="line"><span class="lineno">  144</span>    <span class="keywordflow">return</span> {std::move(reqs.buffers)};</div>
 <div class="line"><span class="lineno">  145</span>  }</div>
 </div><!-- fragment -->
 </div>
@@ -883,7 +883,7 @@ Benchmarks:</h2>
 <div class="line"><span class="lineno">  153</span>    {</div>
 <div class="line"><span class="lineno">  154</span>      buffer = {buffer.data(), 0};</div>
 <div class="line"><span class="lineno">  155</span>    }</div>
-<div class="line"><span class="lineno">  156</span>    <span class="keywordflow">return</span> std::move(reqs.buffers);</div>
+<div class="line"><span class="lineno">  156</span>    <span class="keywordflow">return</span> {std::move(reqs.buffers)};</div>
 <div class="line"><span class="lineno">  157</span>  }</div>
 </div><!-- fragment -->
 </div>
