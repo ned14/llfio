@@ -41,6 +41,7 @@ include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
+option(LLFIO_BUILD_EXAMPLES "Build example programs" ON)
 option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_COROUTINES_OFF "Whether to not auto detect and enable coroutines for the LLFIO cmake targets" OFF)
 option(LLFIO_FORCE_MAPPED_FILES_OFF "Whether to disable memory mapped files support in LLFIO" OFF)
@@ -242,6 +243,10 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
     "llfio_sl--coroutines"
     "llfio_dl--coroutines"
   )
+  # If examples are disabled, filter out example/* sources from compile tests
+  if(NOT LLFIO_BUILD_EXAMPLES)
+    list(FILTER llfio_COMPILE_TESTS EXCLUDE REGEX "^example/")
+  endif()
   include(QuickCppLibMakeStandardTests)
   # For each test target, set definitions and linkage
   foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})

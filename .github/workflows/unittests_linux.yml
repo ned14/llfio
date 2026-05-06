@@ -31,7 +31,7 @@ jobs:
        sudo apt-get update
        if [ "${{ matrix.compiler }}" = "libc++" ]; then
          sudo apt install libc++-dev libc++abi-dev libomp-dev;
-         export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake";
+         export CMAKE_CONFIGURE_OPTIONS="-DCMAKE_TOOLCHAIN_FILE=../cmake/toolchain-linux-libc++.cmake;-DLLFIO_BUILD_EXAMPLES=OFF";
        fi
        if [ "${{ matrix.configuration }}" = "status_code" ]; then
          export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS;-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON";
