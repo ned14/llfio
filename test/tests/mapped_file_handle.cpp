@@ -47,7 +47,7 @@ template <class T, class F> void runtest(T &v, F &&write)
       count += buffers[b].size();
     }
     buffers.resize(b);
-    llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req(buffers, offset);
+    llfio::file_handle::io_request<llfio::file_handle::const_buffers_type> req({buffers.data(), buffers.size()}, offset);
     write(v, req);
   }
 };
