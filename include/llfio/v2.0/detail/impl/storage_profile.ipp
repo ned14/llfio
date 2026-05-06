@@ -1262,7 +1262,7 @@ namespace storage_profile
 
         std::vector<directory_entry> entries(no);
         begin = std::chrono::high_resolution_clock::now();
-        directory_handle::buffers_type ei(dirh.read(directory_handle::buffers_type(entries)).value());
+        directory_handle::buffers_type ei(dirh.read(directory_handle::buffers_type(span<directory_handle::buffer_type>(entries.data(), entries.size()))).value());
         assert(ei.done() == true);
         assert(ei.size() == no);
         end = std::chrono::high_resolution_clock::now();

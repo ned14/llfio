@@ -288,7 +288,7 @@ namespace algorithm
               {
                 for(;;)
                 {
-                  buffers = directory_handle::buffers_type{entries, std::move(buffers)};
+                  buffers = directory_handle::buffers_type{span<directory_handle::buffer_type>(entries.data(), entries.size()), std::move(buffers)};
                   OUTCOME_TRY(buffers, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
                   if(buffers.done())
                   {

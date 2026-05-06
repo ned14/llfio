@@ -11,3 +11,4 @@ possible. Otherwise ask for direction on what to do.
 3. When building and testing, extract what to do for the current platform
 from `.github/workflows/unittests_*.yml`.
 4. Ignore everything in the `attic` and `single-header` directories.
+5. Do not read files unless you need them.

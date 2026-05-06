@@ -1,5 +1,5 @@
 # LLFIO cmake
-# (C) 2016-2025 Niall Douglas <http://www.nedproductions.biz/>
+# (C) 2016-2026 Niall Douglas <http://www.nedproductions.biz/>
 # File Created: June 2016
 # 
 # 
@@ -183,9 +183,6 @@ include(QuickCppLibApplyDefaultDefinitions)
 all_compile_features(PUBLIC cxx_std_17)
 # Set the library dependencies this library has
 all_link_libraries(PUBLIC Threads::Threads)
-if(NOT ANDROID)
-  all_link_libraries(PUBLIC $<$<PLATFORM_ID:Linux>:rt>)
-endif()
 if(LLFIO_FORCE_SIGNAL_DETECTION_OFF)
   all_compile_definitions(PRIVATE LLFIO_DISABLE_SIGNAL_GUARD=1)
 endif()
