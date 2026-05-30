@@ -15,7 +15,7 @@ library originally for the C++ standard, intended for storage devices with ~1 mi
 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access
 Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to
 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1,
-approx 40Gb/sec per thread. It has particularly strong support for writing portable
+approx 40GB/sec per thread. It has particularly strong support for writing portable
 filesystem algorithms which work well with directly mapped non-volatile storage such
 as Intel Optane.
 
@@ -191,9 +191,9 @@ Manufacturer claimed 4Kb transfer latencies for the physical hardware:
 </table>
 
 Max bandwidth for the physical hardware:
-- DDR4 2133: **30Gb/sec** (main memory)
-- x4 PCIe 4.0: **7.5Gb/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
-- x4 PCIe 3.0: **3.75Gb/sec** (985Mb/sec per PCIe lane)
-- 2017 XPoint drive (x4 PCIe 3.0): **2.5Gb/sec**
-- 2017 NVMe flash drive (x4 PCIe 3.0): **2Gb/sec**
-- 10Gbit LAN: **1.2Gb/sec**
+- DDR4 2133: **30GB/sec** (main memory)
+- x4 PCIe 4.0: **7.5GB/sec** (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)
+- x4 PCIe 3.0: **3.75GB/sec** (985MB/sec per PCIe lane)
+- 2017 XPoint drive (x4 PCIe 3.0): **2.5GB/sec**
+- 2017 NVMe flash drive (x4 PCIe 3.0): **2GB/sec**
+- 10Gbit LAN: **1.2GB/sec**
