@@ -234,6 +234,12 @@ namespace detail
     }
     else
     {
+#if defined(_LIBCPP_VERSION)
+      // libc++ does not ship a std::codecvt<char8_t, wchar_t, mbstate_t> specialization.
+      (void) loc;
+      LLFIO_LOG_FATAL(nullptr, "path_view_component::rendered_path reencoding function does not support char8_t to wchar_t conversion with a custom locale on libc++.");
+      abort();
+#else
       auto &convert = std::use_facet<_codecvt<char8_t, wchar_t>>(*loc);
       std::mbstate_t cstate{};
       written = (DWORD)(src_buffer_length * convert.max_length() * sizeof(wchar_t));
@@ -266,6 +272,7 @@ namespace detail
         LLFIO_EXCEPTION_THROW(std::system_error(make_error_code(std::errc::no_buffer_space)));
       }
       state.buffer.Length = (USHORT) written;
+#endif
     }
     // Do any / to \ conversion now
     for(size_t n = 0; n < state.buffer.Length / sizeof(wchar_t); n++)
