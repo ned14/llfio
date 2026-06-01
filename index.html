@@ -100,7 +100,7 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master" alt="" style="pointer-events: none;" class="inline"/></a>  </td><td align="center"><a href="https://github.com/ned14/llfio/releases">Prebuilt</a><br  />
 <a href="https://github.com/ned14/llfio/releases">binaries</a>   </td></tr>
 </table>
-</center><p>Herein lies a zero whole machine memory copy file i/o and filesystem library originally for the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40Gb/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
+</center><p>Herein lies a zero whole machine memory copy file i/o and filesystem library originally for the C++ standard, intended for storage devices with ~1 microsecond 4Kb transfer latencies and those supporting Storage Class Memory (SCM)/Direct Access Storage (DAX). Its i/o overhead, including syscall overhead, has been benchmarked to 100 nanoseconds on Linux which corresponds to a theoretical maximum of 10M IOPS @ QD1, approx 40GB/sec per thread. It has particularly strong support for writing portable filesystem algorithms which work well with directly mapped non-volatile storage such as Intel Optane.</p>
 <p>It is a complete rewrite after a Boost peer review in August 2015. It was submitted for C++ standardisation in 2018, and that process was abandoned in 2025.</p>
 <p>Other characteristics:</p><ul>
 <li>Portable to any conforming C++ 17 compiler with a working Filesystem in its STL.</li>
@@ -422,12 +422,12 @@ Planned features implemented:</h2>
 </td></tr>
 </table>
 <p>Max bandwidth for the physical hardware:</p><ul>
-<li>DDR4 2133: <b>30Gb/sec</b> (main memory)</li>
-<li>x4 PCIe 4.0: <b>7.5Gb/sec</b> (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)</li>
-<li>x4 PCIe 3.0: <b>3.75Gb/sec</b> (985Mb/sec per PCIe lane)</li>
-<li>2017 XPoint drive (x4 PCIe 3.0): <b>2.5Gb/sec</b></li>
-<li>2017 NVMe flash drive (x4 PCIe 3.0): <b>2Gb/sec</b></li>
-<li>10Gbit LAN: <b>1.2Gb/sec</b> </li>
+<li>DDR4 2133: <b>30GB/sec</b> (main memory)</li>
+<li>x4 PCIe 4.0: <b>7.5GB/sec</b> (arrives end of 2017, the 2018 NVMe drives will use PCIe 4.0)</li>
+<li>x4 PCIe 3.0: <b>3.75GB/sec</b> (985MB/sec per PCIe lane)</li>
+<li>2017 XPoint drive (x4 PCIe 3.0): <b>2.5GB/sec</b></li>
+<li>2017 NVMe flash drive (x4 PCIe 3.0): <b>2GB/sec</b></li>
+<li>10Gbit LAN: <b>1.2GB/sec</b> </li>
 </ul>
 </div></div><!-- PageDoc -->
 </div><!-- contents -->
