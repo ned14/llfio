@@ -181,8 +181,17 @@ namespace algorithm
   - Fast path, 1 thread, traversed 131,915 directories and 8,254,162 entries in 2.73 seconds (+12%).
 
   - Fast path, 16 threads, traversed 131,915 directories and 8,254,162 entries in 0.525 seconds (+46%).
+
+  `enumeration_flags` is passed to each `directory_handle::read()` performed. On Windows,
+  `NtQueryDirectoryFile()` returns at most about 64KB of entries per call however large a
+  buffer it is given (issue #137), so a directory larger than that cannot be read as an
+  atomic snapshot and `read()` fails with `errc::operation_would_block`. Pass
+  `directory_handle::flags::permit_racy_reads` if you would rather have the entries than
+  the failure: an enumeration which fits into a single call is still an atomic snapshot,
+  one which does not reports `is_snapshot()` false.
   */
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0, void *data = nullptr, bool force_slow_path = false) noexcept;
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &dirh, traverse_visitor *visitor, size_t threads = 0, void *data = nullptr, bool force_slow_path = false,
+                                                       directory_handle::flags enumeration_flags = directory_handle::flags::none) noexcept;
 
 }  // namespace algorithm
 

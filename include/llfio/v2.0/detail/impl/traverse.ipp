@@ -46,7 +46,8 @@ LLFIO_V2_NAMESPACE_BEGIN
 namespace algorithm
 {
   LLFIO_HEADERS_ONLY_FUNC_SPEC result<size_t> traverse(const path_handle &_topdirh, traverse_visitor *visitor,
-                                                       size_t threads, void *data, bool force_slow_path) noexcept
+                                                       size_t threads, void *data, bool force_slow_path,
+                                                       directory_handle::flags enumeration_flags) noexcept
   {
     return visitor->finished(
     data,
@@ -91,6 +92,7 @@ namespace algorithm
           std::mutex lock;
           size_t max_sso_path_size;
           traverse_visitor *visitor{nullptr};
+          directory_handle::flags enumeration_flags{directory_handle::flags::none};
 #if 0
         struct workitem
         {
@@ -211,12 +213,13 @@ namespace algorithm
           size_t dirs_processed{0}, known_dirs_remaining{0}, depth_processed{0}, threads_sleeping{0},
           threads_running{0};
 
-          explicit state_t(size_t _max_sso_path_size, traverse_visitor *_visitor)
+          explicit state_t(size_t _max_sso_path_size, traverse_visitor *_visitor, directory_handle::flags _enumeration_flags)
               : max_sso_path_size(_max_sso_path_size)
               , visitor(_visitor)
+              , enumeration_flags(_enumeration_flags)
           {
           }
-        } state(use_slow_path ? size_t(-1) : LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE, visitor);
+        } state(use_slow_path ? size_t(-1) : LLFIO_ALGORITHM_TRAVERSE_MAX_SSO_PATH_SIZE, visitor, enumeration_flags);
         struct worker
         {
           state_t *state{nullptr};
@@ -289,7 +292,7 @@ namespace algorithm
                 for(;;)
                 {
                   buffers = directory_handle::buffers_type{span<directory_handle::buffer_type>(entries.data(), entries.size()), std::move(buffers)};
-                  OUTCOME_TRY(buffers, mydirh->read({std::move(buffers), {}, directory_handle::filter::none}));
+                  OUTCOME_TRY(buffers, mydirh->read({std::move(buffers), state->enumeration_flags, {}, directory_handle::filter::none}));
                   if(buffers.done())
                   {
                     break;

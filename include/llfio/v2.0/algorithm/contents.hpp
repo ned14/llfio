@@ -68,7 +68,8 @@ namespace algorithm
     {
     }
 
-    friend inline result<contents_type> contents(const path_handle &dirh, contents_visitor *visitor, size_t threads, bool force_slow_path) noexcept;
+    friend inline result<contents_type> contents(const path_handle &dirh, contents_visitor *visitor, size_t threads, bool force_slow_path,
+                                                 directory_handle::flags enumeration_flags) noexcept;
 
   protected:
     struct _state_type
@@ -221,7 +222,8 @@ namespace algorithm
   in header-only code, as it is very simple.
   */
   inline result<contents_visitor::contents_type> contents(const path_handle &dirh, contents_visitor *visitor = nullptr, size_t threads = 0,
-                                                          bool force_slow_path = false) noexcept
+                                                          bool force_slow_path = false,
+                                                          directory_handle::flags enumeration_flags = directory_handle::flags::none) noexcept
   {
     contents_visitor default_visitor;
     if(visitor == nullptr)
@@ -231,7 +233,7 @@ namespace algorithm
     contents_visitor::_state_type state(dirh);
     OUTCOME_TRY(auto &&dirhpath, dirh.current_path());
     state.rootdirpathlen.store(dirhpath.native().size() + 1, std::memory_order_relaxed);
-    OUTCOME_TRY(traverse(dirh, visitor, threads, &state, force_slow_path));
+    OUTCOME_TRY(traverse(dirh, visitor, threads, &state, force_slow_path, enumeration_flags));
     return {std::move(state.contents)};
   }
 
