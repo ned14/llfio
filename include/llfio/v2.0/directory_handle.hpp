@@ -140,6 +140,7 @@ public:
         , _kernel_buffer_size(o._kernel_buffer_size)
         , _metadata(o._metadata)
         , _done(o._done)
+        , _snapshot(o._snapshot)
     {
       static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -152,6 +153,7 @@ public:
         , _kernel_buffer_size(o._kernel_buffer_size)
         , _metadata(o._metadata)
         , _done(o._done)
+        , _snapshot(o._snapshot)
     {
       static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
