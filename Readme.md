@@ -7,8 +7,10 @@
 <td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/></a> </td>
 <td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/></a> </td>
 <td align="center"> <a href="https://github.com/ned14/llfio/releases">Prebuilt</a><br><a href="https://github.com/ned14/llfio/releases">binaries</a> </td>
+<td align="center"> <a href="Licence.txt">Apache 2.0</a><br><a href="Licence.txt">/ Boost 1.0</a> </td>
 </tr>
 </table></center>
+
 
 Herein lies a zero whole machine memory copy file i/o and filesystem
 library originally for the C++ standard, intended for storage devices with ~1 microsecond
@@ -197,3 +199,20 @@ Max bandwidth for the physical hardware:
 - 2017 XPoint drive (x4 PCIe 3.0): **2.5GB/sec**
 - 2017 NVMe flash drive (x4 PCIe 3.0): **2GB/sec**
 - 10Gbit LAN: **1.2GB/sec**
+
+## Contributing
+
+Bug reports, feature discussion and pull requests are welcome — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test and submit changes.
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+To report a security vulnerability, please see [SECURITY.md](SECURITY.md)
+rather than opening a public issue.
+
+## Licence
+
+This software is licensed under your choice of the **Apache License, Version 2.0**
+or the **Boost Software License, Version 1.0** — see [Licence.txt](Licence.txt)
+for the full text of both, and [NOTICE](NOTICE) for attribution information.
