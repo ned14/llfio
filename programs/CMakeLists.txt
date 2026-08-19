@@ -7,6 +7,8 @@ include(QuickCppLibUtils)
 
 project(llfio-programs VERSION 1.0 LANGUAGES CXX)
 
+enable_testing()
+
 find_quickcpplib_library(quickcpplib
   GIT_REPOSITORY "https://github.com/ned14/quickcpplib.git"
   REQUIRED
