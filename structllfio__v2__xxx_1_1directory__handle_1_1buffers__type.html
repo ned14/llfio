@@ -239,10 +239,11 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std
 <div class="line"><span class="lineno">  140</span>        , _kernel_buffer_size(o._kernel_buffer_size)</div>
 <div class="line"><span class="lineno">  141</span>        , _metadata(o._metadata)</div>
 <div class="line"><span class="lineno">  142</span>        , _done(o._done)</div>
-<div class="line"><span class="lineno">  143</span>    {</div>
-<div class="line"><span class="lineno">  144</span>      <span class="keyword">static_cast&lt;</span>_base &amp;<span class="keyword">&gt;</span>(o) = {};</div>
-<div class="line"><span class="lineno">  145</span>      o._kernel_buffer_size = 0;</div>
-<div class="line"><span class="lineno">  146</span>    }</div>
+<div class="line"><span class="lineno">  143</span>        , _snapshot(o._snapshot)</div>
+<div class="line"><span class="lineno">  144</span>    {</div>
+<div class="line"><span class="lineno">  145</span>      <span class="keyword">static_cast&lt;</span>_base &amp;<span class="keyword">&gt;</span>(o) = {};</div>
+<div class="line"><span class="lineno">  146</span>      o._kernel_buffer_size = 0;</div>
+<div class="line"><span class="lineno">  147</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -271,15 +272,16 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std
 </div><div class="memdoc">
 
 <p>Move constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno">  150</span>        : _base(std::move(o))</div>
-<div class="line"><span class="lineno">  151</span>        , _kernel_buffer(std::move(o._kernel_buffer))</div>
-<div class="line"><span class="lineno">  152</span>        , _kernel_buffer_size(o._kernel_buffer_size)</div>
-<div class="line"><span class="lineno">  153</span>        , _metadata(o._metadata)</div>
-<div class="line"><span class="lineno">  154</span>        , _done(o._done)</div>
-<div class="line"><span class="lineno">  155</span>    {</div>
-<div class="line"><span class="lineno">  156</span>      <span class="keyword">static_cast&lt;</span>_base &amp;<span class="keyword">&gt;</span>(o) = {};</div>
-<div class="line"><span class="lineno">  157</span>      o._kernel_buffer_size = 0;</div>
-<div class="line"><span class="lineno">  158</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno">  151</span>        : _base(std::move(o))</div>
+<div class="line"><span class="lineno">  152</span>        , _kernel_buffer(std::move(o._kernel_buffer))</div>
+<div class="line"><span class="lineno">  153</span>        , _kernel_buffer_size(o._kernel_buffer_size)</div>
+<div class="line"><span class="lineno">  154</span>        , _metadata(o._metadata)</div>
+<div class="line"><span class="lineno">  155</span>        , _done(o._done)</div>
+<div class="line"><span class="lineno">  156</span>        , _snapshot(o._snapshot)</div>
+<div class="line"><span class="lineno">  157</span>    {</div>
+<div class="line"><span class="lineno">  158</span>      <span class="keyword">static_cast&lt;</span>_base &amp;<span class="keyword">&gt;</span>(o) = {};</div>
+<div class="line"><span class="lineno">  159</span>      o._kernel_buffer_size = 0;</div>
+<div class="line"><span class="lineno">  160</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -392,23 +394,23 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_same&lt; typename std
 </div><div class="memdoc">
 
 <p>Move assignment. </p>
-<div class="fragment"><div class="line"><span class="lineno">  163</span>    {</div>
-<div class="line"><span class="lineno">  164</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
-<div class="line"><span class="lineno">  165</span>      {</div>
-<div class="line"><span class="lineno">  166</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  167</span>      }</div>
-<div class="line"><span class="lineno">  168</span>      std::unique_ptr&lt;char[]&gt; kernel_buffer = std::move(_kernel_buffer);</div>
-<div class="line"><span class="lineno">  169</span>      <span class="keywordtype">size_t</span> kernel_buffer_size = _kernel_buffer_size;</div>
-<div class="line"><span class="lineno">  170</span>      this-&gt;~buffers_type();</div>
-<div class="line"><span class="lineno">  171</span>      <span class="keyword">new</span>(<span class="keyword">this</span>) buffers_type(std::move(o));</div>
-<div class="line"><span class="lineno">  172</span>      <span class="keywordflow">if</span>(kernel_buffer_size &gt; _kernel_buffer_size)</div>
-<div class="line"><span class="lineno">  173</span>      {</div>
-<div class="line"><span class="lineno">  174</span>        _kernel_buffer.reset();</div>
-<div class="line"><span class="lineno">  175</span>        _kernel_buffer = std::move(kernel_buffer);</div>
-<div class="line"><span class="lineno">  176</span>        _kernel_buffer_size = kernel_buffer_size;</div>
-<div class="line"><span class="lineno">  177</span>      }</div>
-<div class="line"><span class="lineno">  178</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  179</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno">  165</span>    {</div>
+<div class="line"><span class="lineno">  166</span>      <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
+<div class="line"><span class="lineno">  167</span>      {</div>
+<div class="line"><span class="lineno">  168</span>        <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  169</span>      }</div>
+<div class="line"><span class="lineno">  170</span>      std::unique_ptr&lt;char[]&gt; kernel_buffer = std::move(_kernel_buffer);</div>
+<div class="line"><span class="lineno">  171</span>      <span class="keywordtype">size_t</span> kernel_buffer_size = _kernel_buffer_size;</div>
+<div class="line"><span class="lineno">  172</span>      this-&gt;~buffers_type();</div>
+<div class="line"><span class="lineno">  173</span>      <span class="keyword">new</span>(<span class="keyword">this</span>) buffers_type(std::move(o));</div>
+<div class="line"><span class="lineno">  174</span>      <span class="keywordflow">if</span>(kernel_buffer_size &gt; _kernel_buffer_size)</div>
+<div class="line"><span class="lineno">  175</span>      {</div>
+<div class="line"><span class="lineno">  176</span>        _kernel_buffer.reset();</div>
+<div class="line"><span class="lineno">  177</span>        _kernel_buffer = std::move(kernel_buffer);</div>
+<div class="line"><span class="lineno">  178</span>        _kernel_buffer_size = kernel_buffer_size;</div>
+<div class="line"><span class="lineno">  179</span>      }</div>
+<div class="line"><span class="lineno">  180</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  181</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>

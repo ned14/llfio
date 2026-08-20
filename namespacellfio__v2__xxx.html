@@ -800,11 +800,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Create a handle opening access to a directory on path.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  469</span>{</div>
-<div class="line"><span class="lineno">  470</span>  <span class="keywordflow">return</span> directory_handle::directory(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
-<div class="line"><span class="lineno">  471</span>                                     std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
-<div class="line"><span class="lineno">  472</span>                                     std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
-<div class="line"><span class="lineno">  473</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  475</span>{</div>
+<div class="line"><span class="lineno">  476</span>  <span class="keywordflow">return</span> directory_handle::directory(std::forward&lt;<span class="keyword">decltype</span>(base)&gt;(base), std::forward&lt;<span class="keyword">decltype</span>(path)&gt;(path), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
+<div class="line"><span class="lineno">  477</span>                                     std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
+<div class="line"><span class="lineno">  478</span>                                     std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
+<div class="line"><span class="lineno">  479</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2614,9 +2614,9 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  438</span>{</div>
-<div class="line"><span class="lineno">  439</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::buffers_type&quot;</span>;</div>
-<div class="line"><span class="lineno">  440</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  444</span>{</div>
+<div class="line"><span class="lineno">  445</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::buffers_type&quot;</span>;</div>
+<div class="line"><span class="lineno">  446</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2653,14 +2653,14 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  429</span>{</div>
-<div class="line"><span class="lineno">  430</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;none&quot;</span>, <span class="stringliteral">&quot;fastdeleted&quot;</span>};</div>
-<div class="line"><span class="lineno">  431</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))</div>
-<div class="line"><span class="lineno">  432</span>  {</div>
-<div class="line"><span class="lineno">  433</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::filter::&lt;unknown&gt;&quot;</span>;</div>
-<div class="line"><span class="lineno">  434</span>  }</div>
-<div class="line"><span class="lineno">  435</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::filter::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];</div>
-<div class="line"><span class="lineno">  436</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  435</span>{</div>
+<div class="line"><span class="lineno">  436</span>  <span class="keyword">static</span> <span class="keyword">constexpr</span> <span class="keyword">const</span> <span class="keywordtype">char</span> *values[] = {<span class="stringliteral">&quot;none&quot;</span>, <span class="stringliteral">&quot;fastdeleted&quot;</span>};</div>
+<div class="line"><span class="lineno">  437</span>  <span class="keywordflow">if</span>(<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v) &gt;= <span class="keyword">sizeof</span>(values) / <span class="keyword">sizeof</span>(values[0]) || (values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)] == <span class="keyword">nullptr</span>))</div>
+<div class="line"><span class="lineno">  438</span>  {</div>
+<div class="line"><span class="lineno">  439</span>    <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::filter::&lt;unknown&gt;&quot;</span>;</div>
+<div class="line"><span class="lineno">  440</span>  }</div>
+<div class="line"><span class="lineno">  441</span>  <span class="keywordflow">return</span> s &lt;&lt; <span class="stringliteral">&quot;llfio::directory_handle::filter::&quot;</span> &lt;&lt; values[<span class="keyword">static_cast&lt;</span><span class="keywordtype">size_t</span><span class="keyword">&gt;</span>(v)];</div>
+<div class="line"><span class="lineno">  442</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4156,10 +4156,10 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </div><div class="memdoc">
 
 <p>Swap with another instance. </p>
-<div class="fragment"><div class="line"><span class="lineno">  457</span>{</div>
-<div class="line"><span class="lineno">  458</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#a988fca7e79f17902068f2fe8f0356782">swap</a>(std::forward&lt;<span class="keyword">decltype</span>(o)&gt;(o));</div>
-<div class="line"><span class="lineno">  459</span>}</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a988fca7e79f17902068f2fe8f0356782"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a988fca7e79f17902068f2fe8f0356782">llfio_v2_xxx::directory_handle::swap</a></div><div class="ttdeci">void swap(directory_handle &amp;o) noexcept</div><div class="ttdoc">Swap with another instance.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:293</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  463</span>{</div>
+<div class="line"><span class="lineno">  464</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#a988fca7e79f17902068f2fe8f0356782">swap</a>(std::forward&lt;<span class="keyword">decltype</span>(o)&gt;(o));</div>
+<div class="line"><span class="lineno">  465</span>}</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a988fca7e79f17902068f2fe8f0356782"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a988fca7e79f17902068f2fe8f0356782">llfio_v2_xxx::directory_handle::swap</a></div><div class="ttdeci">void swap(directory_handle &amp;o) noexcept</div><div class="ttdoc">Swap with another instance.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:295</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4426,11 +4426,11 @@ template&lt;class CharT , typename std::enable_if&lt;(<a class="el" href="classl
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  500</span>{</div>
-<div class="line"><span class="lineno">  501</span>  <span class="keywordflow">return</span> directory_handle::temp_directory(std::forward&lt;<span class="keyword">decltype</span>(name)&gt;(name), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
-<div class="line"><span class="lineno">  502</span>                                          std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
-<div class="line"><span class="lineno">  503</span>                                          std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
-<div class="line"><span class="lineno">  504</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  506</span>{</div>
+<div class="line"><span class="lineno">  507</span>  <span class="keywordflow">return</span> directory_handle::temp_directory(std::forward&lt;<span class="keyword">decltype</span>(name)&gt;(name), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
+<div class="line"><span class="lineno">  508</span>                                          std::forward&lt;<span class="keyword">decltype</span>(_creation)&gt;(_creation), std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching),</div>
+<div class="line"><span class="lineno">  509</span>                                          std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
+<div class="line"><span class="lineno">  510</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -4853,10 +4853,10 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
 </div><div class="memdoc">
 <p>Create a directory handle creating a randomly named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  483</span>{</div>
-<div class="line"><span class="lineno">  484</span>  <span class="keywordflow">return</span> directory_handle::uniquely_named_directory(std::forward&lt;<span class="keyword">decltype</span>(dirpath)&gt;(dirpath), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
-<div class="line"><span class="lineno">  485</span>                                                    std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
-<div class="line"><span class="lineno">  486</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  489</span>{</div>
+<div class="line"><span class="lineno">  490</span>  <span class="keywordflow">return</span> directory_handle::uniquely_named_directory(std::forward&lt;<span class="keyword">decltype</span>(dirpath)&gt;(dirpath), std::forward&lt;<span class="keyword">decltype</span>(_mode)&gt;(_mode),</div>
+<div class="line"><span class="lineno">  491</span>                                                    std::forward&lt;<span class="keyword">decltype</span>(_caching)&gt;(_caching), std::forward&lt;<span class="keyword">decltype</span>(flags)&gt;(flags));</div>
+<div class="line"><span class="lineno">  492</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>

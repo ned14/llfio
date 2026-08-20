@@ -183,14 +183,14 @@ template&lt;class &gt; </div>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">  221</span>                                                               {}, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">filter</a> _filtering = <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt;char&gt; _kernelbuffer = {})</div>
-<div class="line"><span class="lineno">  222</span>        : buffers(std::move(_buffers))</div>
-<div class="line"><span class="lineno">  223</span>        , glob(_glob)</div>
-<div class="line"><span class="lineno">  224</span>        , filtering(_filtering)</div>
-<div class="line"><span class="lineno">  225</span>        , kernelbuffer(_kernelbuffer)</div>
-<div class="line"><span class="lineno">  226</span>    {</div>
-<div class="line"><span class="lineno">  227</span>    }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ab609ccd931eb25e1699df0444dd87b42"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">llfio_v2_xxx::directory_handle::filter</a></div><div class="ttdeci">filter</div><div class="ttdoc">How to do deleted file elimination on Windows.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:199</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  223</span>                                                               {}, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">filter</a> _filtering = <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>, span&lt;char&gt; _kernelbuffer = {})</div>
+<div class="line"><span class="lineno">  224</span>        : buffers(std::move(_buffers))</div>
+<div class="line"><span class="lineno">  225</span>        , glob(_glob)</div>
+<div class="line"><span class="lineno">  226</span>        , filtering(_filtering)</div>
+<div class="line"><span class="lineno">  227</span>        , kernelbuffer(_kernelbuffer)</div>
+<div class="line"><span class="lineno">  228</span>    {</div>
+<div class="line"><span class="lineno">  229</span>    }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ab609ccd931eb25e1699df0444dd87b42"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">llfio_v2_xxx::directory_handle::filter</a></div><div class="ttdeci">filter</div><div class="ttdoc">How to do deleted file elimination on Windows.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:201</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">llfio_v2_xxx::directory_handle::filter::fastdeleted</a></div><div class="ttdeci">@ fastdeleted</div><div class="ttdoc">For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (f...</div></div>
 </div><!-- fragment -->
 </div>
@@ -259,15 +259,15 @@ template&lt;class &gt; </div>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">  238</span>                                                                                   {}, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">filter</a> _filtering = <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>,</div>
-<div class="line"><span class="lineno">  239</span>                             span&lt;char&gt; _kernelbuffer = {})</div>
-<div class="line"><span class="lineno">  240</span>        : buffers(std::move(_buffers))</div>
-<div class="line"><span class="lineno">  241</span>        , glob(_glob)</div>
-<div class="line"><span class="lineno">  242</span>        , flags(_flags)</div>
-<div class="line"><span class="lineno">  243</span>        , filtering(_filtering)</div>
-<div class="line"><span class="lineno">  244</span>        , kernelbuffer(_kernelbuffer)</div>
-<div class="line"><span class="lineno">  245</span>    {</div>
-<div class="line"><span class="lineno">  246</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno">  240</span>                                                                                   {}, <a class="code hl_enumeration" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42">filter</a> _filtering = <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>,</div>
+<div class="line"><span class="lineno">  241</span>                             span&lt;char&gt; _kernelbuffer = {})</div>
+<div class="line"><span class="lineno">  242</span>        : buffers(std::move(_buffers))</div>
+<div class="line"><span class="lineno">  243</span>        , glob(_glob)</div>
+<div class="line"><span class="lineno">  244</span>        , flags(_flags)</div>
+<div class="line"><span class="lineno">  245</span>        , filtering(_filtering)</div>
+<div class="line"><span class="lineno">  246</span>        , kernelbuffer(_kernelbuffer)</div>
+<div class="line"><span class="lineno">  247</span>    {</div>
+<div class="line"><span class="lineno">  248</span>    }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -285,7 +285,7 @@ template&lt;class &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  206</span>{};</div>
+<div class="fragment"><div class="line"><span class="lineno">  208</span>{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -302,7 +302,7 @@ template&lt;class &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  209</span>{<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>};</div>
+<div class="fragment"><div class="line"><span class="lineno">  211</span>{<a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">filter::fastdeleted</a>};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -319,7 +319,7 @@ template&lt;class &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  208</span>{_flags_type::none};</div>
+<div class="fragment"><div class="line"><span class="lineno">  210</span>{_flags_type::none};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -336,7 +336,7 @@ template&lt;class &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  207</span>{};</div>
+<div class="fragment"><div class="line"><span class="lineno">  209</span>{};</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -353,7 +353,7 @@ template&lt;class &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  210</span>{};</div>
+<div class="fragment"><div class="line"><span class="lineno">  212</span>{};</div>
 </div><!-- fragment -->
 </div>
 </div>

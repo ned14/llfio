@@ -471,10 +471,10 @@ Protected Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8" name="ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8"></a>fastdeleted&#160;</td><td class="fielddoc"><p>For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable) </p>
 </td></tr>
 </table>
-<div class="fragment"><div class="line"><span class="lineno">  199</span>  {</div>
-<div class="line"><span class="lineno">  200</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div>
-<div class="line"><span class="lineno">  201</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">fastdeleted</a>  <span class="comment">//!&lt; For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div>
-<div class="line"><span class="lineno">  202</span>  };</div>
+<div class="fragment"><div class="line"><span class="lineno">  201</span>  {</div>
+<div class="line"><span class="lineno">  202</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a>,        <span class="comment">//!&lt; Do no filtering at all</span></div>
+<div class="line"><span class="lineno">  203</span>    <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">fastdeleted</a>  <span class="comment">//!&lt; For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (fast and fairly reliable)</span></div>
+<div class="line"><span class="lineno">  204</span>  };</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a14847befc159c1492671b53718fc46f8">llfio_v2_xxx::directory_handle::filter::fastdeleted</a></div><div class="ttdeci">@ fastdeleted</div><div class="ttdoc">For Windows without POSIX delete semantics, filter out LLFIO deleted files based on their filename (f...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8">llfio_v2_xxx::directory_handle::filter::none</a></div><div class="ttdeci">@ none</div><div class="ttdoc">Do no filtering at all.</div></div>
 </div><!-- fragment -->
@@ -505,7 +505,7 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Default constructor. </p>
-<div class="fragment"><div class="line"><span class="lineno">  252</span>{}  <span class="comment">// NOLINT</span></div>
+<div class="fragment"><div class="line"><span class="lineno">  254</span>{}  <span class="comment">// NOLINT</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -556,10 +556,10 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a directory_handle from a supplied native path_handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  255</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>)</div>
-<div class="line"><span class="lineno">  256</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(devid, inode)</div>
-<div class="line"><span class="lineno">  257</span>  {</div>
-<div class="line"><span class="lineno">  258</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  257</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>)</div>
+<div class="line"><span class="lineno">  258</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(devid, inode)</div>
+<div class="line"><span class="lineno">  259</span>  {</div>
+<div class="line"><span class="lineno">  260</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a1d2070f6019c86e19de3707bf59ffa97"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">llfio_v2_xxx::fs_handle::fs_handle</a></div><div class="ttdeci">constexpr fs_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> fs_handle.hpp:174</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1handle_html_a013936bc1254b1a47567fe29698d1b1c"><div class="ttname"><a href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">llfio_v2_xxx::handle::flags</a></div><div class="ttdeci">flag flags() const noexcept</div><div class="ttdoc">The flags this handle was opened with.</div><div class="ttdef"><b>Definition</b> handle.hpp:423</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__handle_html_a01603d237d7f48f649abebd25bb7daaf"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">llfio_v2_xxx::path_handle::path_handle</a></div><div class="ttdeci">constexpr path_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> path_handle.hpp:66</div></div>
@@ -601,9 +601,9 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Construct a directory_handle from a supplied native path_handle. </p>
-<div class="fragment"><div class="line"><span class="lineno">  261</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>)</div>
-<div class="line"><span class="lineno">  262</span>  {</div>
-<div class="line"><span class="lineno">  263</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  263</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(h), <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>)</div>
+<div class="line"><span class="lineno">  264</span>  {</div>
+<div class="line"><span class="lineno">  265</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -632,10 +632,10 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implicit move construction of directory_handle permitted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  266</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(o))</div>
-<div class="line"><span class="lineno">  267</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(std::move(o))</div>
-<div class="line"><span class="lineno">  268</span>  {</div>
-<div class="line"><span class="lineno">  269</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  268</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(o))</div>
+<div class="line"><span class="lineno">  269</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(std::move(o))</div>
+<div class="line"><span class="lineno">  270</span>  {</div>
+<div class="line"><span class="lineno">  271</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -680,10 +680,10 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Explicit conversion from handle permitted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  274</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(o))</div>
-<div class="line"><span class="lineno">  275</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(devid, inode)</div>
-<div class="line"><span class="lineno">  276</span>  {</div>
-<div class="line"><span class="lineno">  277</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  276</span>      : <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#a01603d237d7f48f649abebd25bb7daaf">path_handle</a>(std::move(o))</div>
+<div class="line"><span class="lineno">  277</span>      , <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a1d2070f6019c86e19de3707bf59ffa97">fs_handle</a>(devid, inode)</div>
+<div class="line"><span class="lineno">  278</span>  {</div>
+<div class="line"><span class="lineno">  279</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -709,13 +709,13 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  353</span>  {</div>
-<div class="line"><span class="lineno">  354</span>    <span class="keywordflow">if</span>(_v)</div>
-<div class="line"><span class="lineno">  355</span>    {</div>
-<div class="line"><span class="lineno">  356</span>      (void) <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#a340c23fb5d0b41c799f82df8beaaf60c">directory_handle::close</a>();</div>
-<div class="line"><span class="lineno">  357</span>    }</div>
-<div class="line"><span class="lineno">  358</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a340c23fb5d0b41c799f82df8beaaf60c"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a340c23fb5d0b41c799f82df8beaaf60c">llfio_v2_xxx::directory_handle::close</a></div><div class="ttdeci">virtual result&lt; void &gt; close() noexcept override</div><div class="ttdoc">Immediately close the native handle type managed by this handle.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:359</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  355</span>  {</div>
+<div class="line"><span class="lineno">  356</span>    <span class="keywordflow">if</span>(_v)</div>
+<div class="line"><span class="lineno">  357</span>    {</div>
+<div class="line"><span class="lineno">  358</span>      (void) <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#a340c23fb5d0b41c799f82df8beaaf60c">directory_handle::close</a>();</div>
+<div class="line"><span class="lineno">  359</span>    }</div>
+<div class="line"><span class="lineno">  360</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_a340c23fb5d0b41c799f82df8beaaf60c"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#a340c23fb5d0b41c799f82df8beaaf60c">llfio_v2_xxx::directory_handle::close</a></div><div class="ttdeci">virtual result&lt; void &gt; close() noexcept override</div><div class="ttdoc">Immediately close the native handle type managed by this handle.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:361</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -885,24 +885,24 @@ Protected Attributes</h2></td></tr>
 <p>Immediately close the native handle type managed by this handle. </p>
 
 <p>Reimplemented from <a class="el" href="classllfio__v2__xxx_1_1path__handle.html#ae577ca27f11e0e759d5342c1a312724d">llfio_v2_xxx::path_handle</a>.</p>
-<div class="fragment"><div class="line"><span class="lineno">  360</span>  {</div>
-<div class="line"><span class="lineno">  361</span>    LLFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
-<div class="line"><span class="lineno">  362</span>    <span class="keywordflow">if</span>(_.flags &amp; flag::unlink_on_first_close)</div>
-<div class="line"><span class="lineno">  363</span>    {</div>
-<div class="line"><span class="lineno">  364</span>      <span class="comment">// if called from the destructor, no virtual dispatch will happen</span></div>
-<div class="line"><span class="lineno">  365</span>      <span class="comment">// which is expected/fine in this case</span></div>
-<div class="line"><span class="lineno">  366</span>      <span class="keyword">auto</span> ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a7b4f17a0b437d430a37d3875d8570bf2">unlink</a>();  <span class="comment">// NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)</span></div>
-<div class="line"><span class="lineno">  367</span>      <span class="keywordflow">if</span>(!ret)</div>
-<div class="line"><span class="lineno">  368</span>      {</div>
-<div class="line"><span class="lineno">  369</span>        <span class="comment">// File may have already been deleted, if so ignore</span></div>
-<div class="line"><span class="lineno">  370</span>        <span class="keywordflow">if</span>(ret.error() != errc::no_such_file_or_directory)</div>
-<div class="line"><span class="lineno">  371</span>        {</div>
-<div class="line"><span class="lineno">  372</span>          <span class="keywordflow">return</span> std::move(ret).error();</div>
-<div class="line"><span class="lineno">  373</span>        }</div>
-<div class="line"><span class="lineno">  374</span>      }</div>
-<div class="line"><span class="lineno">  375</span>    }</div>
-<div class="line"><span class="lineno">  376</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#ae577ca27f11e0e759d5342c1a312724d">path_handle::close</a>();</div>
-<div class="line"><span class="lineno">  377</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  362</span>  {</div>
+<div class="line"><span class="lineno">  363</span>    LLFIO_LOG_FUNCTION_CALL(<span class="keyword">this</span>);</div>
+<div class="line"><span class="lineno">  364</span>    <span class="keywordflow">if</span>(_.flags &amp; flag::unlink_on_first_close)</div>
+<div class="line"><span class="lineno">  365</span>    {</div>
+<div class="line"><span class="lineno">  366</span>      <span class="comment">// if called from the destructor, no virtual dispatch will happen</span></div>
+<div class="line"><span class="lineno">  367</span>      <span class="comment">// which is expected/fine in this case</span></div>
+<div class="line"><span class="lineno">  368</span>      <span class="keyword">auto</span> ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1fs__handle.html#a7b4f17a0b437d430a37d3875d8570bf2">unlink</a>();  <span class="comment">// NOLINT(clang-analyzer-optin.cplusplus.VirtualCall)</span></div>
+<div class="line"><span class="lineno">  369</span>      <span class="keywordflow">if</span>(!ret)</div>
+<div class="line"><span class="lineno">  370</span>      {</div>
+<div class="line"><span class="lineno">  371</span>        <span class="comment">// File may have already been deleted, if so ignore</span></div>
+<div class="line"><span class="lineno">  372</span>        <span class="keywordflow">if</span>(ret.error() != errc::no_such_file_or_directory)</div>
+<div class="line"><span class="lineno">  373</span>        {</div>
+<div class="line"><span class="lineno">  374</span>          <span class="keywordflow">return</span> std::move(ret).error();</div>
+<div class="line"><span class="lineno">  375</span>        }</div>
+<div class="line"><span class="lineno">  376</span>      }</div>
+<div class="line"><span class="lineno">  377</span>    }</div>
+<div class="line"><span class="lineno">  378</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="classllfio__v2__xxx_1_1path__handle.html#ae577ca27f11e0e759d5342c1a312724d">path_handle::close</a>();</div>
+<div class="line"><span class="lineno">  379</span>  }</div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1fs__handle_html_a7b4f17a0b437d430a37d3875d8570bf2"><div class="ttname"><a href="classllfio__v2__xxx_1_1fs__handle.html#a7b4f17a0b437d430a37d3875d8570bf2">llfio_v2_xxx::fs_handle::unlink</a></div><div class="ttdeci">virtual result&lt; void &gt; unlink(deadline d=std::chrono::seconds(30)) noexcept</div><div class="ttdoc">Unlinks the current path of this open handle, causing its entry to immediately disappear from the fil...</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1path__handle_html_ae577ca27f11e0e759d5342c1a312724d"><div class="ttname"><a href="classllfio__v2__xxx_1_1path__handle.html#ae577ca27f11e0e759d5342c1a312724d">llfio_v2_xxx::path_handle::close</a></div><div class="ttdeci">virtual result&lt; void &gt; close() noexcept override</div><div class="ttdoc">Immediately close the native handle type managed by this handle.</div><div class="ttdef"><b>Definition</b> path_handle.hpp:141</div></div>
 </div><!-- fragment -->
@@ -1973,16 +1973,16 @@ Protected Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Move assignment of directory_handle permitted. </p>
-<div class="fragment"><div class="line"><span class="lineno">  280</span>  {</div>
-<div class="line"><span class="lineno">  281</span>    <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
-<div class="line"><span class="lineno">  282</span>    {</div>
-<div class="line"><span class="lineno">  283</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  284</span>    }</div>
-<div class="line"><span class="lineno">  285</span>    this-&gt;~directory_handle();</div>
-<div class="line"><span class="lineno">  286</span>    <span class="keyword">new</span>(<span class="keyword">this</span>) <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">directory_handle</a>(std::move(o));</div>
-<div class="line"><span class="lineno">  287</span>    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
-<div class="line"><span class="lineno">  288</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ad505f506be33c58cf7176878e552d59e"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">llfio_v2_xxx::directory_handle::directory_handle</a></div><div class="ttdeci">constexpr directory_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:252</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  282</span>  {</div>
+<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">if</span>(<span class="keyword">this</span> == &amp;o)</div>
+<div class="line"><span class="lineno">  284</span>    {</div>
+<div class="line"><span class="lineno">  285</span>      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  286</span>    }</div>
+<div class="line"><span class="lineno">  287</span>    this-&gt;~directory_handle();</div>
+<div class="line"><span class="lineno">  288</span>    <span class="keyword">new</span>(<span class="keyword">this</span>) <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">directory_handle</a>(std::move(o));</div>
+<div class="line"><span class="lineno">  289</span>    <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
+<div class="line"><span class="lineno">  290</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ad505f506be33c58cf7176878e552d59e"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">llfio_v2_xxx::directory_handle::directory_handle</a></div><div class="ttdeci">constexpr directory_handle()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:254</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2273,10 +2273,10 @@ Protected Attributes</h2></td></tr>
 <p>Flags for how to enumerate directory entries. </p>
 <p>&lt; No flags</p>
 <p>&lt; Do not error out if a atomic snapshot cannot be performed</p>
-<div class="fragment"><div class="line"><span class="lineno">  193</span>                                              {</div>
-<div class="line"><span class="lineno">  194</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = 0u,                      <span class="comment">//!&lt; No flags</span></div>
-<div class="line"><span class="lineno">  195</span>  permit_racy_reads = (1u &lt;&lt; 0u)  <span class="comment">//!&lt; Do not error out if a atomic snapshot cannot be performed</span></div>
-<div class="line"><span class="lineno">  196</span>  } QUICKCPPLIB_BITFIELD_END(<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) <span class="keyword">using </span>_flags_type = <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>;</div>
+<div class="fragment"><div class="line"><span class="lineno">  195</span>                                              {</div>
+<div class="line"><span class="lineno">  196</span>  <a class="code hl_enumvalue" href="classllfio__v2__xxx_1_1directory__handle.html#ab609ccd931eb25e1699df0444dd87b42a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = 0u,                      <span class="comment">//!&lt; No flags</span></div>
+<div class="line"><span class="lineno">  197</span>  permit_racy_reads = (1u &lt;&lt; 0u)  <span class="comment">//!&lt; Do not error out if a atomic snapshot cannot be performed</span></div>
+<div class="line"><span class="lineno">  198</span>  } QUICKCPPLIB_BITFIELD_END(<a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) <span class="keyword">using </span>_flags_type = <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>;</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2313,7 +2313,7 @@ Protected Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer. This operation returns a <b>snapshot</b>, without races, of the directory contents at the moment of the call, unless <code>flags::permit_racy_reads</code> is set.</p>
+<p>Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer. This operation returns a <b>snapshot</b>, without races, of the directory contents at the moment of the call, unless <code>flags::permit_racy_reads</code> is set. If the directory is changing so rapidly that no snapshot can be obtained, this operation re-enumerates a bounded number of times (and never for longer than the deadline) before giving up, in which case it returns a racy enumeration with <code>is_snapshot()</code> false, or <code>errc::operation_would_block</code> if the enumeration could not be completed at all.</p>
 <dl class="section return"><dt>Returns</dt><dd>Returns the buffers filled, what metadata was filled in and whether the entire directory was read or not. You should <em>always</em> examine <code>.metadata()</code> for the metadata you are about to use, fetching it with <code>stat_t::fill()</code> if not yet present. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -2704,11 +2704,11 @@ Windows only</h3>
 </div><div class="memdoc">
 
 <p>Swap with another instance. </p>
-<div class="fragment"><div class="line"><span class="lineno">  294</span>  {</div>
-<div class="line"><span class="lineno">  295</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">directory_handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
-<div class="line"><span class="lineno">  296</span>    *<span class="keyword">this</span> = std::move(o);</div>
-<div class="line"><span class="lineno">  297</span>    o = std::move(temp);</div>
-<div class="line"><span class="lineno">  298</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  296</span>  {</div>
+<div class="line"><span class="lineno">  297</span>    <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ad505f506be33c58cf7176878e552d59e">directory_handle</a> temp(std::move(*<span class="keyword">this</span>));</div>
+<div class="line"><span class="lineno">  298</span>    *<span class="keyword">this</span> = std::move(o);</div>
+<div class="line"><span class="lineno">  299</span>    o = std::move(temp);</div>
+<div class="line"><span class="lineno">  300</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -2832,11 +2832,11 @@ Windows only</h3>
 </div><div class="memdoc">
 <p>Create a directory handle creating the named directory on some path which the OS declares to be suitable for temporary files. Note also that an empty name is equivalent to calling <code>uniquely_named_file(path_discovery::storage_backed_temporary_files_directory())</code> and the creation parameter is ignored.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  347</span>  {</div>
-<div class="line"><span class="lineno">  348</span>    <span class="keyword">auto</span> &amp;tempdirh = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">path_discovery::storage_backed_temporary_files_directory</a>();</div>
-<div class="line"><span class="lineno">  349</span>    <span class="keywordflow">return</span> name.empty() ? <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ae41f5bf78cb5398e496f462324e0bc9e">uniquely_named_directory</a>(tempdirh, _mode, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#afafc5eddb8a601cba4d9693c66657f15">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
-<div class="line"><span class="lineno">  350</span>  }</div>
-<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ae41f5bf78cb5398e496f462324e0bc9e"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ae41f5bf78cb5398e496f462324e0bc9e">llfio_v2_xxx::directory_handle::uniquely_named_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:315</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  349</span>  {</div>
+<div class="line"><span class="lineno">  350</span>    <span class="keyword">auto</span> &amp;tempdirh = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">path_discovery::storage_backed_temporary_files_directory</a>();</div>
+<div class="line"><span class="lineno">  351</span>    <span class="keywordflow">return</span> name.empty() ? <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#ae41f5bf78cb5398e496f462324e0bc9e">uniquely_named_directory</a>(tempdirh, _mode, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>) : <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#afafc5eddb8a601cba4d9693c66657f15">directory</a>(tempdirh, name, _mode, _creation, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
+<div class="line"><span class="lineno">  352</span>  }</div>
+<div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_ae41f5bf78cb5398e496f462324e0bc9e"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#ae41f5bf78cb5398e496f462324e0bc9e">llfio_v2_xxx::directory_handle::uniquely_named_directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; uniquely_named_directory(const path_handle &amp;dirpath, mode _mode=mode::write, caching _caching=caching::temporary, flag flags=flag::none) noexcept</div><div class="ttdef"><b>Definition</b> directory_handle.hpp:317</div></div>
 <div class="ttc" id="aclassllfio__v2__xxx_1_1directory__handle_html_afafc5eddb8a601cba4d9693c66657f15"><div class="ttname"><a href="classllfio__v2__xxx_1_1directory__handle.html#afafc5eddb8a601cba4d9693c66657f15">llfio_v2_xxx::directory_handle::directory</a></div><div class="ttdeci">static result&lt; directory_handle &gt; directory(const path_handle &amp;base, path_view_type path, mode _mode=mode::read, creation _creation=creation::open_existing, caching _caching=caching::all, flag flags=flag::none) noexcept</div></div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1path__discovery_html_a7b400319c8c5973bb2ccbf6f1c38b4db"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1path__discovery.html#a7b400319c8c5973bb2ccbf6f1c38b4db">llfio_v2_xxx::path_discovery::storage_backed_temporary_files_directory</a></div><div class="ttdeci">const path_handle &amp; storage_backed_temporary_files_directory() noexcept</div><div class="ttdoc">Returns a reference to an open handle to a verified temporary directory where files created are store...</div></div>
 </div><!-- fragment -->
@@ -3447,24 +3447,24 @@ template&lt;class... Args, class Clock , class Duration &gt; </div>
 </div><div class="memdoc">
 <p>Create a directory handle creating a uniquely named file on a path. The file is opened exclusively with <code>creation::only_if_not_exist</code> so it will never collide with nor overwrite any existing entry.</p>
 <dl class="section user"><dt>Errors returnable</dt><dd>Any of the values POSIX open() or CreateFile() can return. </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  317</span>  {</div>
-<div class="line"><span class="lineno">  318</span>    LLFIO_EXCEPTION_TRY</div>
-<div class="line"><span class="lineno">  319</span>    {</div>
-<div class="line"><span class="lineno">  320</span>      <span class="keywordflow">for</span>(;;)</div>
-<div class="line"><span class="lineno">  321</span>      {</div>
-<div class="line"><span class="lineno">  322</span>        <span class="keyword">auto</span> randomname = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
-<div class="line"><span class="lineno">  323</span>        result&lt;directory_handle&gt; ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#afafc5eddb8a601cba4d9693c66657f15">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
-<div class="line"><span class="lineno">  324</span>        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
-<div class="line"><span class="lineno">  325</span>        {</div>
-<div class="line"><span class="lineno">  326</span>          <span class="keywordflow">return</span> ret;</div>
-<div class="line"><span class="lineno">  327</span>        }</div>
-<div class="line"><span class="lineno">  328</span>      }</div>
-<div class="line"><span class="lineno">  329</span>    }</div>
-<div class="line"><span class="lineno">  330</span>    LLFIO_EXCEPTION_CATCH_ALL</div>
-<div class="line"><span class="lineno">  331</span>    {</div>
-<div class="line"><span class="lineno">  332</span>      <span class="keywordflow">return</span> error_from_exception();</div>
-<div class="line"><span class="lineno">  333</span>    }</div>
-<div class="line"><span class="lineno">  334</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  319</span>  {</div>
+<div class="line"><span class="lineno">  320</span>    LLFIO_EXCEPTION_TRY</div>
+<div class="line"><span class="lineno">  321</span>    {</div>
+<div class="line"><span class="lineno">  322</span>      <span class="keywordflow">for</span>(;;)</div>
+<div class="line"><span class="lineno">  323</span>      {</div>
+<div class="line"><span class="lineno">  324</span>        <span class="keyword">auto</span> randomname = <a class="code hl_function" href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">utils::random_string</a>(32);</div>
+<div class="line"><span class="lineno">  325</span>        result&lt;directory_handle&gt; ret = <a class="code hl_function" href="classllfio__v2__xxx_1_1directory__handle.html#afafc5eddb8a601cba4d9693c66657f15">directory</a>(dirpath, randomname, _mode, creation::only_if_not_exist, _caching, <a class="code hl_function" href="classllfio__v2__xxx_1_1handle.html#a013936bc1254b1a47567fe29698d1b1c">flags</a>);</div>
+<div class="line"><span class="lineno">  326</span>        <span class="keywordflow">if</span>(ret || (!ret &amp;&amp; ret.error() != errc::file_exists))</div>
+<div class="line"><span class="lineno">  327</span>        {</div>
+<div class="line"><span class="lineno">  328</span>          <span class="keywordflow">return</span> ret;</div>
+<div class="line"><span class="lineno">  329</span>        }</div>
+<div class="line"><span class="lineno">  330</span>      }</div>
+<div class="line"><span class="lineno">  331</span>    }</div>
+<div class="line"><span class="lineno">  332</span>    LLFIO_EXCEPTION_CATCH_ALL</div>
+<div class="line"><span class="lineno">  333</span>    {</div>
+<div class="line"><span class="lineno">  334</span>      <span class="keywordflow">return</span> error_from_exception();</div>
+<div class="line"><span class="lineno">  335</span>    }</div>
+<div class="line"><span class="lineno">  336</span>  }</div>
 <div class="ttc" id="anamespacellfio__v2__xxx_1_1utils_html_a6a29cf29a4b097411f6c1e5274bfb417"><div class="ttname"><a href="namespacellfio__v2__xxx_1_1utils.html#a6a29cf29a4b097411f6c1e5274bfb417">llfio_v2_xxx::utils::random_string</a></div><div class="ttdeci">std::string random_string(size_t randomlen)</div><div class="ttdoc">Returns a cryptographically random string capable of being used as a filename. Essentially random_fil...</div><div class="ttdef"><b>Definition</b> utils.hpp:170</div></div>
 </div><!-- fragment -->
 </div>
