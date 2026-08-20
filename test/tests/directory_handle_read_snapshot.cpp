@@ -41,6 +41,7 @@ static inline void TestDirectoryHandleReadSnapshot()
   using namespace LLFIO_V2_NAMESPACE;
   using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
   using directory_entry = LLFIO_V2_NAMESPACE::directory_entry;
+  using file_handle = LLFIO_V2_NAMESPACE::file_handle;
   using buffer_type = LLFIO_V2_NAMESPACE::directory_handle::buffer_type;
   using buffers_type = LLFIO_V2_NAMESPACE::directory_handle::buffers_type;
   using flags = LLFIO_V2_NAMESPACE::directory_handle::flags;
@@ -50,8 +51,9 @@ static inline void TestDirectoryHandleReadSnapshot()
   using caching = LLFIO_V2_NAMESPACE::directory_handle::caching;
   using errc = LLFIO_V2_NAMESPACE::errc;
 
-  static constexpr size_t LARGE_ENTRIES = 4000;   // must need more than one NtQueryDirectoryFile() call on Windows
-  static constexpr size_t SMALL_ENTRIES = 5;      // fits into a single syscall
+  static constexpr size_t LARGE_ENTRIES = 4000;  // entries in the large directory; with the writer thread running, pass
+                                                 // 2 must span more than one NtQueryDirectoryFile() call
+  static constexpr size_t SMALL_ENTRIES = 5;     // fits into a single syscall
   static constexpr size_t SPAN_HEADROOM = 65536;  // headroom in the span for entries added by the writer thread
   static constexpr const char *LARGE_DIR_NAME = "testdir_readsnapshot_large";
   static constexpr const char *SMALL_DIR_NAME = "testdir_readsnapshot_small";
@@ -112,10 +114,33 @@ static inline void TestDirectoryHandleReadSnapshot()
   // again. With flags::permit_racy_reads, a multi-syscall enumeration always returns
   // is_snapshot() == false (no retries are attempted for the NO_MORE_FILES path).
   {
+    // A quiescent directory can enumerate in a single NtQueryDirectoryFile() syscall: the
+    // pass 2 buffer is sized from pass 1 to fit the whole directory, and kernels which fill
+    // that buffer completely (no issue #137 under-fill) return everything in one call, which
+    // correctly reports is_snapshot() == true as a single syscall is an atomic snapshot. To
+    // force the multi-syscall enumeration needed here deterministically, a writer thread keeps
+    // adding entries so that pass 2 always scans a directory larger than pass 1 measured,
+    // guaranteeing a multi-syscall enumeration and hence is_snapshot() == false regardless of
+    // kernel under-fill behaviour.
+    std::atomic<bool> stop2{false};
+    std::thread writer2(
+    [&]()
+    {
+      size_t n = 0;
+      while(!stop2.load(std::memory_order_relaxed))
+      {
+        char name[32];
+        snprintf(name, sizeof(name), "stale%06zu", n++);
+        auto fh = file_handle::file(largedirh, name, file_handle::mode::write, file_handle::creation::if_needed,
+                                    file_handle::caching::none);
+        (void) fh;
+        std::this_thread::yield();
+      }
+    });
     std::vector<buffer_type> bigbuf(LARGE_ENTRIES + SPAN_HEADROOM);
     buffers_type racy(bigbuf);
     bool got_racy = false;
-    for(int attempt = 0; attempt < 4 && !got_racy; attempt++)
+    for(int attempt = 0; attempt < 10 && !got_racy; attempt++)
     {
       auto r = largedirh.read({std::move(racy), flags::permit_racy_reads, {}, filter::none}, std::chrono::seconds(30));
       BOOST_REQUIRE(r);               // permit_racy_reads must never error out on a snapshot failure
@@ -126,7 +151,9 @@ static inline void TestDirectoryHandleReadSnapshot()
       }
       racy = std::move(r.value());
     }
-    // The large directory must need more than one syscall on Windows (issue #137 under-fill)
+    stop2.store(true);
+    writer2.join();
+    // With the writer growing the directory, the enumeration must need more than one syscall on Windows
     BOOST_REQUIRE(got_racy);
     std::vector<buffer_type> smallbuf(SMALL_ENTRIES);
     buffers_type reused(span<buffer_type>(smallbuf.data(), smallbuf.size()), std::move(racy));
