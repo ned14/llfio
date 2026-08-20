@@ -81,7 +81,7 @@ class LLFIO_DECL directory_handle : public path_handle, public fs_handle
     return success();
   }
 
-  mutable std::atomic<unsigned> _lock{0};  // used to serialise read()
+  mutable spinlock _lock{};  // used to serialise read()
 
 public:
   using path_type = path_handle::path_type;
@@ -140,6 +140,7 @@ public:
         , _kernel_buffer_size(o._kernel_buffer_size)
         , _metadata(o._metadata)
         , _done(o._done)
+        , _snapshot(o._snapshot)
     {
       static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -152,6 +153,7 @@ public:
         , _kernel_buffer_size(o._kernel_buffer_size)
         , _metadata(o._metadata)
         , _done(o._done)
+        , _snapshot(o._snapshot)
     {
       static_cast<_base &>(o) = {};
       o._kernel_buffer_size = 0;
@@ -408,7 +410,11 @@ public:
 
   /*! Fill the buffers type with as many directory entries as will fit into any optionally supplied buffer.
   This operation returns a **snapshot**, without races, of the directory contents at the moment of the
-  call, unless `flags::permit_racy_reads` is set.
+  call, unless `flags::permit_racy_reads` is set. If the directory is changing so rapidly that no
+  snapshot can be obtained, this operation re-enumerates a bounded number of times (and never for
+  longer than the deadline) before giving up, in which case it returns a racy enumeration with
+  `is_snapshot()` false, or `errc::operation_would_block` if the enumeration could not be completed
+  at all.
 
   \return Returns the buffers filled, what metadata was filled in and whether the entire directory
   was read or not. You should *always* examine `.metadata()` for the metadata you are about to use,

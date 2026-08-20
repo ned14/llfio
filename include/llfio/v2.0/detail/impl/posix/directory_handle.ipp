@@ -386,11 +386,8 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   {
     buffer = req.kernelbuffer.empty() ? reinterpret_cast<dirent *>(req.buffers._kernel_buffer.get()) : reinterpret_cast<dirent *>(req.kernelbuffer.data());
     bytesavailable = req.kernelbuffer.empty() ? req.buffers._kernel_buffer_size : req.kernelbuffer.size();
-    while(_lock.exchange(1, std::memory_order_relaxed) != 0)
-    {
-      std::this_thread::yield();
-    }
-    auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
+    _lock.lock();
+    auto unlock = make_scope_exit([this]() noexcept { _lock.unlock(); });
     (void) unlock;
 // Seek to start
 #ifdef __GLIBC__
@@ -407,6 +404,29 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     do
     {
       assert(bytes <= bytesavailable);
+      if(bytes == bytesavailable)
+      {
+        // The scan has not yet ended, but the kernel buffer is completely full. This can only
+        // happen when the caller supplied a kernel buffer which is too small for the directory;
+        // an internal kernel buffer is grown and the whole scan redone instead. This must be
+        // handled before the syscall because passing a zero length to getdents() returns EINVAL
+        // on some platforms and a spurious end-of-scan on others.
+        if(!req.kernelbuffer.empty())
+        {
+          return errc::no_buffer_space;  // user needs to supply a bigger buffer
+        }
+        size_t toallocate = req.buffers._kernel_buffer_size * 2;
+        auto *mem = (char *) operator new[](toallocate, std::nothrow);  // don't initialise
+        if(mem == nullptr)
+        {
+          return errc::not_enough_memory;
+        }
+        req.buffers._kernel_buffer.reset();
+        req.buffers._kernel_buffer = std::unique_ptr<char[]>(mem);
+        req.buffers._kernel_buffer_size = toallocate;
+        // We need to reset and do the whole thing again to ensure single shot atomicity
+        break;
+      }
       _bytes = getdents(_v.fd, reinterpret_cast<char *>(buffer) + bytes, bytesavailable - bytes);
       if(_bytes == 0)
       {

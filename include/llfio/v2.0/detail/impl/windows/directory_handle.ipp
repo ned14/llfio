@@ -303,6 +303,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
 #endif
   LLFIO_LOG_FUNCTION_CALL(this);
   LLFIO_DEADLINE_TO_SLEEP_INIT(d);
+  req.buffers._snapshot = true;
   if(req.buffers.empty())
   {
     return {std::move(req.buffers)};
@@ -317,6 +318,15 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     _glob.MaximumLength = _glob.Length + sizeof(wchar_t);
   }
   what_to_enumerate_type *buffer = nullptr;
+  size_t retries = 0;
+  static constexpr size_t MAX_RETRIES = 2;  // maximum times to re-enumerate after the directory changed before giving up on a snapshot
+  /* The whole two-pass enumeration, including any re-enumeration retries, must be serialised
+  per handle as the kernel directory scan position is advanced by each call. Acquire the lock
+  once here and let the scope exit release it on every return; the retry loop below must never
+  re-acquire it (that would self-deadlock). */
+  _lock.lock();
+  auto unlock = make_scope_exit([this]() noexcept { _lock.unlock(); });
+  (void) unlock;
   {
     /* Recent editions of Windows call ProbeForWrite() on the buffer passed.
     This is a very slow call, in fact it is worth calling the syscall multiple
@@ -324,15 +334,23 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     large buffer. We therefore iterate the directory twice, firstly just for names
     so we can calculate what buffer sizes we shall need. We then iterate the
     directory for all entries + stat structures as a single snapshot.
+
+    The 64KiB size of the pass one buffer is purely to keep this stack frame small;
+    it is NOT a kernel limit. Per the ReactOS implementation of NtQueryDirectoryFile
+    (ntoskrnl/io/iomgr/iofunc.c) and the fastfat/NTFS filesystem drivers
+    (drivers/filesystems/fastfat/dirctrl.c, drivers/filesystems/ntfs/dirctl.c): the
+    I/O manager probes and forwards the full caller-supplied Length to the filesystem,
+    and the filesystem fills directory entries until the next entry no longer fits,
+    returning STATUS_SUCCESS with the byte count actually used in
+    IoStatus.Information. A partial fill is therefore indistinguishable from a full
+    fill except by making a further query call, which is why the end of the directory
+    can only be detected by a subsequent call returning STATUS_NO_MORE_FILES (issue
+    #137). A single entry which does not fit into the supplied buffer is reported as
+    STATUS_BUFFER_OVERFLOW (0x80000005), which can therefore only happen when the
+    directory has grown since pass one sized the buffer.
     */
   retry:
     size_t kernelbuffertoallocate = 1024;  // starting slop
-    while(_lock.exchange(1, std::memory_order_relaxed) != 0)
-    {
-      std::this_thread::yield();
-    }
-    auto unlock = make_scope_exit([this]() noexcept { _lock.store(0, std::memory_order_release); });
-    (void) unlock;
     {
       char _buffer[65536 + sizeof(FILE_NAMES_INFORMATION)];
       auto *buffer_ = (FILE_NAMES_INFORMATION *) _buffer;
@@ -350,6 +368,15 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         {
           if((NTSTATUS) 0x80000006l /*STATUS_NO_MORE_FILES*/ == ntstat)
           {
+            break;
+          }
+          if((NTSTATUS) 0xC000000Fl /*STATUS_NO_SUCH_FILE*/ == ntstat)
+          {
+            // The first query of a scan which matches nothing returns STATUS_NO_SUCH_FILE
+            // rather than STATUS_NO_MORE_FILES, per the fastfat and NTFS drivers
+            // (fastfat/dirctrl.c FatQueryDirectory: "if (InitialQuery) Status = STATUS_NO_SUCH_FILE",
+            // ntfs/dirctl.c NtfsQueryDirectory: "Status = (First ? STATUS_NO_SUCH_FILE : STATUS_NO_MORE_FILES)").
+            // There is nothing to measure, so end pass one here.
             break;
           }
           return ntkernel_error(ntstat);
@@ -394,6 +421,7 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
     bytes = std::min(max_bytes, (ULONG) kernelbuffertoallocate);
     auto *buffer_ = buffer;
     size_t entries_parsed = 0;
+    bool racy = false;
     for(size_t count = 0;; count++)
     {
       IO_STATUS_BLOCK isb = make_iostatus();
@@ -405,26 +433,68 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       }
       if(ntstat < 0)
       {
+        if((NTSTATUS) 0x80000005 /*STATUS_BUFFER_OVERFLOW*/ == ntstat)
+        {
+          // Confirmed against ReactOS (fastfat/dirctrl.c FatQueryDirectory, ntfs/dirctl.c NtfsQueryDirectory):
+          // STATUS_BUFFER_OVERFLOW is returned only when the supplied buffer cannot hold even a single
+          // directory entry; if any entry was written the driver instead returns STATUS_SUCCESS with the
+          // partial byte count in IoStatus.Information. So this can only mean the directory has grown
+          // since pass one sized the buffer.
+          // The directory has grown since we initially read it, so the buffer is now too small
+          if(req.flags & flags::permit_racy_reads)
+          {
+            // permit_racy_reads: never error out on a snapshot failure, and never return an
+            // incomplete enumeration. Re-enumerate from scratch with a freshly re-measured,
+            // larger buffer until the deadline; a user-supplied kernel buffer cannot be grown,
+            // so that is a caller configuration error rather than a snapshot failure.
+            if(!req.kernelbuffer.empty())
+            {
+              return errc::no_buffer_space;
+            }
+            LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+            goto retry;
+          }
+          if(++retries < MAX_RETRIES)
+          {
+            LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+            goto retry;
+          }
+          // Give up trying for a snapshot, tell the caller to retry later
+          return errc::operation_would_block;
+        }
         if(ntstat != (NTSTATUS) 0x80000006 /*STATUS_NO_MORE_FILES*/)
         {
-          return ntkernel_error(ntstat);
+          if((NTSTATUS) 0xC000000F /*STATUS_NO_SUCH_FILE*/ != ntstat || entries_parsed != 0)
+          {
+            return ntkernel_error(ntstat);
+          }
+          // STATUS_NO_SUCH_FILE with nothing parsed so far: the first query of the scan matched
+          // nothing (fastfat/dirctrl.c FatQueryDirectory InitialQuery, ntfs/dirctl.c NtfsQueryDirectory
+          // First), which the filesystem drivers only ever return when no entry has been written.
+          // It is the empty-scan equivalent of STATUS_NO_MORE_FILES, so fall through and complete
+          // the (empty) enumeration.
         }
         if(count <= 1)
         {
           assert(isb.Information == 0);
         }
-        else
+        else if(!racy)
         {
-          if(req.flags & flags::permit_racy_reads)
+          // The directory has changed since we initially read it, need a bigger buffer
+          if(!(req.flags & flags::permit_racy_reads))
           {
-            req.buffers._snapshot = false;
+            if(++retries < MAX_RETRIES)
+            {
+              LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+              goto retry;
+            }
           }
-          else
-          {
-            // The directory has changed since we initially read it, need a bigger buffer
-            LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
-            goto retry;
-          }
+          // Give up trying for a snapshot, return the enumeration anyway
+          racy = true;
+        }
+        if(racy)
+        {
+          req.buffers._snapshot = false;
         }
         // Fill is complete
         req.buffers._resize(entries_parsed);
@@ -432,15 +502,29 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         req.buffers._done = true;
         return {std::move(req.buffers)};
       }
-      if(count >= 1 && !(req.flags & flags::permit_racy_reads))
+      if(count >= 1 && !(req.flags & flags::permit_racy_reads) && !racy)
       {
-        return errc::operation_would_block;
+        // The kernel failed to fit the whole directory into a single syscall, either because it chose
+        // not to fully fill the buffer (issue #137) or the directory changed; re-enumerate to
+        // try to obtain a snapshot
+        if(++retries < MAX_RETRIES)
+        {
+          LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+          goto retry;
+        }
+        // Give up trying for a snapshot, finish this enumeration anyway
+        racy = true;
       }
-      if(isb.Information > bytes - 1024)
+      if(!racy && isb.Information > bytes - 1024)
       {
         // The directory has changed since we initially read it, need a bigger buffer
-        LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
-        goto retry;
+        if(++retries < MAX_RETRIES)
+        {
+          LLFIO_DEADLINE_TO_TIMEOUT_LOOP(d);
+          goto retry;
+        }
+        // Give up trying for a snapshot, finish this enumeration anyway
+        racy = true;
       }
       /* https://github.com/ned14/llfio/issues/137 reports that NT doesn't always fully fill
       the buffer supplied for non-obvious reasons, and requires repeated additional enumerations
