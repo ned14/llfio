@@ -1386,10 +1386,7 @@ namespace windows_nt_kernel
     }
     if(NtExtendSection == nullptr)
     {
-      if((NtExtendSection = reinterpret_cast<NtExtendSection_t>(GetProcAddress(ntdllh, "NtExtendSection"))) == nullptr)
-      {
-        abort();
-      }
+      NtExtendSection = reinterpret_cast<NtExtendSection_t>(GetProcAddress(ntdllh, "NtExtendSection"));
     }
     if(NtMapViewOfSection == nullptr)
     {

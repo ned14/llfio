@@ -193,7 +193,7 @@ public:
   \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.maximum_extent()`.
   This cannot exceed the size of any backing file used if that file is not writable.
 
-  \errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
+  \errors Any of the values `NtExtendSection()` or `ftruncate()` can return, or `function_not_supported` if `NtExtendSection()` is unavailable.
   */
   LLFIO_MAKE_FREE_FUNCTION
   LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<extent_type> truncate(extent_type newsize = 0) noexcept;
@@ -1001,7 +1001,7 @@ inline result<section_handle::extent_type> length(const section_handle &self) no
 \param newsize The new size of the memory section, which cannot be zero. Specify zero to use `backing.maximum_extent()`.
 This cannot exceed the size of any backing file used if that file is not writable.
 
-\errors Any of the values `NtExtendSection()` or `ftruncate()` can return.
+\errors Any of the values `NtExtendSection()` or `ftruncate()` can return, or `function_not_supported` if `NtExtendSection()` is unavailable.
 */
 inline result<section_handle::extent_type> truncate(section_handle &self, section_handle::extent_type newsize = 0) noexcept
 {

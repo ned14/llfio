@@ -344,6 +344,10 @@ result<section_handle::extent_type> section_handle::truncate(extent_type newsize
   windows_nt_kernel::init();
   using namespace windows_nt_kernel;
   LLFIO_LOG_FUNCTION_CALL(this);
+  if(NtExtendSection == nullptr)
+  {
+    return errc::function_not_supported;
+  }
   if(newsize == 0u)
   {
     if(_backing != nullptr)
