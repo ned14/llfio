@@ -32,3 +32,5 @@ reproduction of Windows.
 12. If not running on Linux, try to test the Linux only code using
 docker or another VM. Similarly for Mac OS only code, and FreeBSD only
 code, if VMs for those are available on the local system.
+13. If you need more data about why CI failed, https://my.cdash.org/index.php?project=Boost.AFIO
+can be useful to consult.

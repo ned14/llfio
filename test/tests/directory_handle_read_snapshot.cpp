@@ -121,26 +121,31 @@ static inline void TestDirectoryHandleReadSnapshot()
     // force the multi-syscall enumeration needed here deterministically, a writer thread keeps
     // adding entries so that pass 2 always scans a directory larger than pass 1 measured,
     // guaranteeing a multi-syscall enumeration and hence is_snapshot() == false regardless of
-    // kernel under-fill behaviour.
+    // kernel under-fill behaviour. The writer is bounded so that the directory can never
+    // outgrow the span headroom: an enumeration which ran out of span (done() == false) would
+    // not exercise the racy path at all.
     std::atomic<bool> stop2{false};
+    std::atomic<size_t> added2{0};
+    static constexpr size_t MAX_ADD2 = 8192;  // far below SPAN_HEADROOM, but > the pass 2 sizing slop
     std::thread writer2(
     [&]()
     {
       size_t n = 0;
-      while(!stop2.load(std::memory_order_relaxed))
+      while(!stop2.load(std::memory_order_relaxed) && added2.load(std::memory_order_relaxed) < MAX_ADD2)
       {
         char name[32];
         snprintf(name, sizeof(name), "stale%06zu", n++);
         auto fh = file_handle::file(largedirh, name, file_handle::mode::write, file_handle::creation::if_needed,
                                     file_handle::caching::none);
         (void) fh;
+        added2.fetch_add(1, std::memory_order_relaxed);
         std::this_thread::yield();
       }
     });
     std::vector<buffer_type> bigbuf(LARGE_ENTRIES + SPAN_HEADROOM);
     buffers_type racy(bigbuf);
     bool got_racy = false;
-    for(int attempt = 0; attempt < 10 && !got_racy; attempt++)
+    for(int attempt = 0; attempt < 30 && !got_racy; attempt++)
     {
       auto r = largedirh.read({std::move(racy), flags::permit_racy_reads, {}, filter::none}, std::chrono::seconds(30));
       BOOST_REQUIRE(r);               // permit_racy_reads must never error out on a snapshot failure
@@ -169,17 +174,20 @@ static inline void TestDirectoryHandleReadSnapshot()
   // adding entries while read() runs. This exercises the retry paths (directory changing
   // between pass 1 and pass 2) and the STATUS_BUFFER_OVERFLOW handling.
   std::atomic<bool> stop{false};
+  std::atomic<size_t> added{0};
+  static constexpr size_t MAX_ADD3 = 8192;  // far below SPAN_HEADROOM, so the span can never be exhausted
   std::thread writer(
   [&]()
   {
     size_t n = 0;
-    while(!stop.load(std::memory_order_relaxed))
+    while(!stop.load(std::memory_order_relaxed) && added.load(std::memory_order_relaxed) < MAX_ADD3)
     {
       char name[32];
       snprintf(name, sizeof(name), "extra%06zu", n++);
       auto fh = file_handle::file(largedirh, name, file_handle::mode::write, file_handle::creation::if_needed,
                                   file_handle::caching::none);
       (void) fh;
+      added.fetch_add(1, std::memory_order_relaxed);
       std::this_thread::yield();
     }
   });
