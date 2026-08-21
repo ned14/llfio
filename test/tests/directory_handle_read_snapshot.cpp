@@ -147,6 +147,13 @@ static inline void TestDirectoryHandleReadSnapshot()
     bool got_racy = false;
     for(int attempt = 0; attempt < 30 && !got_racy; attempt++)
     {
+      // read() resizes the returned buffers' span to the entries actually enumerated, so
+      // reusing the returned buffers as-is would leave the next read with a span too small
+      // for the writer-grown directory, guaranteeing done() == false (an incomplete
+      // enumeration, which never reports is_snapshot() == false and so would not exercise
+      // the racy path at all). Restamp the span back over the full headroom, reusing only
+      // the internal kernel buffer, per the documented reuse pattern in read()'s \mallocs.
+      racy = buffers_type(span<buffer_type>(bigbuf.data(), bigbuf.size()), std::move(racy));
       auto r = largedirh.read({std::move(racy), flags::permit_racy_reads, {}, filter::none}, std::chrono::seconds(30));
       BOOST_REQUIRE(r);               // permit_racy_reads must never error out on a snapshot failure
       BOOST_CHECK(r.value().done());  // permit_racy_reads must never return an incomplete enumeration

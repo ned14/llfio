@@ -26,9 +26,7 @@ ctest_build(TARGET _sl)
 set(retval 0)
 if(NOT CTEST_DISABLE_TESTING)
   # shared_fs_mutex takes too long on CI
-  # tls_socket_handle is unstable
-  # dynamic_thread_pool_group is unstable
-  set(LLFIO_DISABLE_TESTS "shared_fs_mutex|tls_socket_handle|dynamic_thread_pool_group")
+  set(LLFIO_DISABLE_TESTS "shared_fs_mutex")
   if(WIN32)
     # Azure's Windows version doesn't permit unprivileged creation of symbolic links
     if(CTEST_CMAKE_GENERATOR MATCHES "Visual Studio 15 2017.*")

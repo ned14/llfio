@@ -113,6 +113,7 @@ set(llfio_HEADERS
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thrd_signal_handle_common.ipp.ipp"
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thrd_signal_handle_posix.c.ipp"
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thrd_signal_handle_windows.c.ipp"
+  "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thread_atexit.c.ipp"
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thread_atexit.cpp.ipp"
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/thread_atexit.h"
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/tss_async_signal_safe.c.ipp"
