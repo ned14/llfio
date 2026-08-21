@@ -1157,9 +1157,9 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
        if(causingaddr < _addr || causingaddr >= (_addr + _reservation))
        {
          // Not caused by this map
-         return WG14_SIGNALS_PREFIX(thrd_signal_decision_next_decider);
+         return WG14_SIGNALS_PREFIX(sig_decision_next_decider);
        }
-       return WG14_SIGNALS_PREFIX(thrd_signal_decision_invoke_recovery);
+       return WG14_SIGNALS_PREFIX(sig_decision_call_recovery);
      }
 #endif
      ))

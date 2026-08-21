@@ -109,23 +109,20 @@ namespace detail
   {
     virtual ~signal_guard_indirect() {}
     virtual void do_guarded() noexcept = 0;
-    virtual enum WG14_SIGNALS_PREFIX(thrd_signal_decision_t)
-    do_decider(struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi) noexcept = 0;
-    virtual void do_recover(const struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi) noexcept = 0;
+    virtual enum WG14_SIGNALS_PREFIX(sig_decision)
+    do_decider(struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi) noexcept = 0;
+    virtual void do_recover(const struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi) noexcept = 0;
 
-    static union WG14_SIGNALS_PREFIX(thrd_raised_signal_info_value)
-    c_guarded(union WG14_SIGNALS_PREFIX(thrd_raised_signal_info_value) value)
+    static union WG14_SIGNALS_PREFIX(stdc_siginfo_value) c_guarded(union WG14_SIGNALS_PREFIX(stdc_siginfo_value) value)
     {
       ((signal_guard_indirect *) value.ptr_value)->do_guarded();
       return value;
     }
-    static enum WG14_SIGNALS_PREFIX(thrd_signal_decision_t)
-    c_decider(struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi)
+    static enum WG14_SIGNALS_PREFIX(sig_decision) c_decider(struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi)
     {
       return ((signal_guard_indirect *) rsi->value.ptr_value)->do_decider(rsi);
     }
-    static union WG14_SIGNALS_PREFIX(thrd_raised_signal_info_value)
-    c_recover(const struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi)
+    static union WG14_SIGNALS_PREFIX(stdc_siginfo_value) c_recover(const struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi)
     {
       ((signal_guard_indirect *) rsi->value.ptr_value)->do_recover(rsi);
       return rsi->value;
@@ -154,27 +151,33 @@ inline auto signal_guard(const sigset_t *guarded, F &&f, H &&h, C &&c, Args &&..
     {
     }
     virtual void do_guarded() noexcept override { ret.emplace(f()); }
-    virtual enum WG14_SIGNALS_PREFIX(thrd_signal_decision_t)
-    do_decider(struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi) noexcept override
+    virtual enum WG14_SIGNALS_PREFIX(sig_decision)
+    do_decider(struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi) noexcept override
     {
       return decider(rsi);
     }
-    virtual void do_recover(const struct WG14_SIGNALS_PREFIX(thrd_raised_signal_info) * rsi) noexcept override
+    virtual void do_recover(const struct WG14_SIGNALS_PREFIX(stdc_siginfo) * rsi) noexcept override
     {
       ret.emplace(recover(rsi));
     }
   } trampoline(static_cast<type &&>(bound), static_cast<H &&>(h), static_cast<C &&>(c));
-  union WG14_SIGNALS_PREFIX(thrd_raised_signal_info_value) value;
+  union WG14_SIGNALS_PREFIX(stdc_siginfo_value) value;
   value.ptr_value = (void *) &trampoline;
-  WG14_SIGNALS_PREFIX(thrd_signal_invoke)
-  (guarded, detail::signal_guard_indirect::c_guarded, detail::signal_guard_indirect::c_recover,
-   detail::signal_guard_indirect::c_decider, value);
+  union WG14_SIGNALS_PREFIX(stdc_siginfo_value) ret = WG14_SIGNALS_PREFIX(sigguarded)(
+  guarded, detail::signal_guard_indirect::c_guarded, detail::signal_guard_indirect::c_recover,
+  detail::signal_guard_indirect::c_decider, value);
+  if(ret.int_value == WG14_SIGNALS_PREFIX(SIGGUARDED_FAILURE_VALUE).int_value)
+  {
+    // The per-thread state required by sigguarded() could not be set up, so
+    // the guarded function was never called. Degrade to running it unguarded.
+    return f(static_cast<Args &&>(args)...);
+  }
   return trampoline.ret.value();
 }
 template <class F, class H> inline auto signal_guard(const sigset_t *guarded, F &&f, H &&h)
 {
   return signal_guard(guarded, static_cast<F &&>(f), static_cast<H &&>(h),
-                      [](const auto *) { return WG14_SIGNALS_PREFIX(thrd_signal_decision_invoke_recovery); });
+                      [](const auto *) { return WG14_SIGNALS_PREFIX(sig_decision_call_recovery); });
 }
 
 class signal_guard_installation_holder
@@ -183,10 +186,10 @@ class signal_guard_installation_holder
 
 public:
   explicit signal_guard_installation_holder(const sigset_t *set)
-      : _h(WG14_SIGNALS_PREFIX(threadsafe_signals_install(set)))
+      : _h(WG14_SIGNALS_PREFIX(siginstall(set)))
   {
   }
-  ~signal_guard_installation_holder() { WG14_SIGNALS_PREFIX(threadsafe_signals_uninstall(_h)); }
+  ~signal_guard_installation_holder() { WG14_SIGNALS_PREFIX(siguninstall(_h)); }
   signal_guard_installation_holder(const signal_guard_installation_holder &) = delete;
   signal_guard_installation_holder(signal_guard_installation_holder &&) = delete;
   signal_guard_installation_holder &operator=(const signal_guard_installation_holder &) = delete;
