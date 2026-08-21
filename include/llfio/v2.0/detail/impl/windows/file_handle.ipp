@@ -103,6 +103,8 @@ result<file_handle> file_handle::file(const path_handle &base, file_handle::path
     }
     if(ntstat < 0)
     {
+      // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+      nativeh = native_handle_type();
       return ntkernel_error(ntstat);
     }
     switch(_creation)
@@ -246,6 +248,8 @@ result<file_handle> file_handle::temp_inode(const path_handle &dirh, mode _mode,
       }
       if(ntstat < 0 && ntstat != static_cast<NTSTATUS>(0xC0000035L) /*STATUS_OBJECT_NAME_COLLISION*/)
       {
+        // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+        nativeh = native_handle_type();
         return ntkernel_error(ntstat);
       }
     }

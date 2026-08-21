@@ -29,6 +29,12 @@ to an argument which is mandatory.
 source code for Windows, consider examining the source code for Reactos
 (https://github.com/reactos/reactos) which is a binary compatible
 reproduction of Windows.
+11a. Do NOT run the `shared_fs_mutex` tests under wine: they hang or fail
+unreliably in that environment. Skip them when running the wine test
+suite.
+11b. Under wine, ignore failures in the noisy `utils` tests that measure
+cpu usage, timings and the like (e.g. `current_process_cpu_usage`): they
+are unreliable in that environment.
 12. If not running on Linux, try to test the Linux only code using
 docker or another VM. Similarly for Mac OS only code, and FreeBSD only
 code, if VMs for those are available on the local system.

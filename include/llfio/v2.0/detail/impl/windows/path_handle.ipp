@@ -128,6 +128,8 @@ result<path_handle> path_handle::path(const path_handle &base, path_handle::path
     }
     if(ntstat < 0)
     {
+      // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+      nativeh = native_handle_type();
       return ntkernel_error(ntstat);
     }
   }

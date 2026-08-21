@@ -115,8 +115,8 @@ static inline void TestCloneExtents()
     BOOST_CHECK(handles[0].fh.maximum_extent().value() == handles[0].maximum_extent);
     BOOST_REQUIRE(handles[1].fh.maximum_extent().value() == destshouldbe);
     llfio::stat_t src_stat(nullptr), dest_stat(nullptr);
-    src_stat.fill(handles[0].fh).value();
-    dest_stat.fill(handles[1].fh).value();
+    src_stat.fill(handles[0].fh, llfio::stat_t::want::blocks).value();
+    dest_stat.fill(handles[1].fh, llfio::stat_t::want::blocks).value();
     std::cout << "   Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
 
@@ -192,8 +192,8 @@ static inline void TestCloneOrCopyFileWhole()
               << destfh.maximum_extent().value() << " maximum extent." << std::endl;
     BOOST_REQUIRE(srcfh.maximum_extent().value() == destfh.maximum_extent().value());
     llfio::stat_t src_stat(nullptr), dest_stat(nullptr);
-    src_stat.fill(srcfh).value();
-    dest_stat.fill(destfh).value();
+    src_stat.fill(srcfh, llfio::stat_t::want::blocks).value();
+    dest_stat.fill(destfh, llfio::stat_t::want::blocks).value();
     std::cout << "Source file has " << src_stat.st_blocks << " blocks allocated. Destination file has " << dest_stat.st_blocks << " blocks allocated."
               << std::endl;
 #ifndef __APPLE__

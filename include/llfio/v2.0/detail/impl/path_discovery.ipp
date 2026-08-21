@@ -203,7 +203,8 @@ namespace path_discovery
           continue;
         }
         ps.all[n].stat = stat_t(nullptr);
-        auto r = ps.all[n].stat->fill(ps._all[n].h);
+        // Only ask for the fields we use, some filing systems and OSs do not support fetching all of want::all
+        auto r = ps.all[n].stat->fill(ps._all[n].h, stat_t::want::dev | stat_t::want::ino | stat_t::want::type);
         if(!r)
         {
           LLFIO_LOG_WARN(

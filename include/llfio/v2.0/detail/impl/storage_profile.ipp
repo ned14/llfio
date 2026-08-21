@@ -374,7 +374,7 @@ namespace storage_profile
       LLFIO_EXCEPTION_TRY
       {
         statfs_t fsinfo;
-        OUTCOME_TRYV(fsinfo.fill(h));
+        OUTCOME_TRYV(fsinfo.fill(h, statfs_t::want::fstypename | statfs_t::want::blocks | statfs_t::want::bsize | statfs_t::want::bfree));
         sp.fs_name.value = fsinfo.f_fstypename;
         sp.fs_config.value = "todo";
         sp.fs_size.value = fsinfo.f_blocks * fsinfo.f_bsize;

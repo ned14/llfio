@@ -119,6 +119,8 @@ result<directory_handle> directory_handle::directory(const path_handle &base, pa
     }
     if(ntstat < 0)
     {
+      // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+      nativeh = native_handle_type();
       if(creation::always_new == _creation && (NTSTATUS) 0xc0000035 /*STATUS_OBJECT_NAME_COLLISION*/ == ntstat)
       {
         return errc::directory_not_empty;

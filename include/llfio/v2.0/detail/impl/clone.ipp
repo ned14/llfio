@@ -47,14 +47,23 @@ namespace algorithm
         destleaf = destleaf_;
       }
       stat_t stat(nullptr);
-      OUTCOME_TRY(stat.fill(src));
+      OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
+                                    stat_t::want::mtim | stat_t::want::birthtim
+#ifndef _WIN32
+                                    | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+#endif
+                                    ));
       if(creation != file_handle::creation::always_new)
       {
         auto r = file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
         if(r)
         {
           stat_t deststat(nullptr);
-          OUTCOME_TRY(deststat.fill(r.value()));
+          OUTCOME_TRY(deststat.fill(r.value(), stat_t::want::type | stat_t::want::size | stat_t::want::mtim
+#ifndef _WIN32
+                                                  | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+#endif
+                                                  ));
           if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_size == deststat.st_size)
 #ifndef _WIN32
              && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) &&
@@ -140,7 +149,12 @@ namespace algorithm
         }
       }
       stat_t stat(nullptr);
-      OUTCOME_TRY(stat.fill(src));
+      OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
+                                    stat_t::want::mtim | stat_t::want::birthtim
+#ifndef _WIN32
+                                    | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+#endif
+                                    ));
 
       OUTCOME_TRY(auto &&desth, file_handle::temp_inode(destdir, file_handle::mode::write, src.kernel_caching()));
       if(!atomic_replace)

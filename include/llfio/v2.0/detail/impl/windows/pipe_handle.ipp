@@ -118,11 +118,15 @@ result<pipe_handle> pipe_handle::pipe(pipe_handle::path_view_type path, pipe_han
       // This matches full duplex pipe behaviour on Linux
       if(nativeh.is_readable() && nativeh.is_writable() && (NTSTATUS) 0xC00000AE /*STATUS_PIPE_BUSY*/ == ntstat)
       {
+        // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+        nativeh = native_handle_type();
         return errc::no_such_device_or_address;  // ENXIO, as per Linux
       }
       if(nativeh.is_readable())
       {
         // assert(false);
+        // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+        nativeh = native_handle_type();
         return ntkernel_error(ntstat);
       }
       // loop

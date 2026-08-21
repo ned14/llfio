@@ -137,6 +137,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<symlink_handle> symlink_handle::symlink(c
     }
     if(ntstat < 0)
     {
+      // NtCreateFile may have written the handle out-param, so clear it to prevent the result destructor closing a bogus handle
+      nativeh = native_handle_type();
       return ntkernel_error(ntstat);
     }
   }

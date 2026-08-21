@@ -81,38 +81,77 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       ++ret;
     }
   }
-  if((wanted & want::bsize) || (wanted & want::blocks) || (wanted & want::bfree) || (wanted & want::bavail))
+  if((wanted & want::bsize) || (wanted & want::blocks) || (wanted & want::bfree) || (wanted & want::bavail) || (wanted & want::iosize))
   {
+    // Prefer the modern FileFsFullSizeInformationExtended (15) as FileFsFullSizeInformation (7) is deprecated,
+    // falling back to it for older OSs and wine which do not implement the extended info class
+    bool have_extended = true;
     auto *fffsi = reinterpret_cast<FILE_FS_FULL_SIZE_INFORMATION *>(buffer);
     isb.Status = -1;
-    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(FILE_FS_FULL_SIZE_INFORMATION), FileFsFullSizeInformation);
+    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(FILE_FS_FULL_SIZE_INFORMATION_EX), FileFsFullSizeInformationExtended);
     if(STATUS_PENDING == ntstat)
     {
       ntstat = ntwait(h.native_handle().h, isb, deadline());
     }
     if(ntstat != 0)
     {
-      return ntkernel_error(ntstat);
+      have_extended = false;
+      isb.Status = -1;
+      ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, fffsi, sizeof(FILE_FS_FULL_SIZE_INFORMATION), FileFsFullSizeInformation);
+      if(STATUS_PENDING == ntstat)
+      {
+        ntstat = ntwait(h.native_handle().h, isb, deadline());
+      }
+      if(ntstat != 0)
+      {
+        return ntkernel_error(ntstat);
+      }
     }
+    auto *fffsix = reinterpret_cast<FILE_FS_FULL_SIZE_INFORMATION_EX *>(fffsi);
     if(wanted & want::bsize)
     {
-      f_bsize = fffsi->BytesPerSector * fffsi->SectorsPerAllocationUnit;
+      f_bsize = fffsix->BytesPerSector * fffsix->SectorsPerAllocationUnit;
       ++ret;
     }
     if(wanted & want::blocks)
     {
-      f_blocks = fffsi->TotalAllocationUnits.QuadPart;
+      f_blocks = fffsix->TotalAllocationUnits.QuadPart;
       ++ret;
     }
     if(wanted & want::bfree)
     {
-      f_bfree = fffsi->ActualAvailableAllocationUnits.QuadPart;
+      f_bfree = fffsix->ActualAvailableAllocationUnits.QuadPart;
       ++ret;
     }
     if(wanted & want::bavail)
     {
-      f_bavail = fffsi->CallerAvailableAllocationUnits.QuadPart;
+      f_bavail = fffsix->CallerAvailableAllocationUnits.QuadPart;
       ++ret;
+    }
+    if(wanted & want::iosize)
+    {
+      if(have_extended)
+      {
+        f_iosize = fffsix->PhysicalBytesPerSectorForPerformance;
+        ++ret;
+      }
+      else
+      {
+        // FileFsFullSizeInformation (7) does not provide a physical sector size, so try FileFsSectorSizeInformation (11)
+        auto *ffssi = reinterpret_cast<FILE_FS_SECTOR_SIZE_INFORMATION *>(buffer);
+        isb.Status = -1;
+        ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffssi, sizeof(FILE_FS_SECTOR_SIZE_INFORMATION), FileFsSectorSizeInformation);
+        if(STATUS_PENDING == ntstat)
+        {
+          ntstat = ntwait(h.native_handle().h, isb, deadline());
+        }
+        if(ntstat == 0)
+        {
+          f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
+          ++ret;
+        }
+        // Some filing systems and OSs do not support sector size info, so leave f_iosize unfilled
+      }
     }
   }
   if(wanted & want::fsid)
@@ -130,22 +169,6 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
       memcpy(&f_fsid, ffoi->ObjectId, sizeof(f_fsid));
       ++ret;
     }
-  }
-  if(wanted & want::iosize)
-  {
-    auto *ffssi = reinterpret_cast<FILE_FS_SECTOR_SIZE_INFORMATION *>(buffer);
-    isb.Status = -1;
-    ntstat = NtQueryVolumeInformationFile(h.native_handle().h, &isb, ffssi, sizeof(FILE_FS_SECTOR_SIZE_INFORMATION), FileFsSectorSizeInformation);
-    if(STATUS_PENDING == ntstat)
-    {
-      ntstat = ntwait(h.native_handle().h, isb, deadline());
-    }
-    if(ntstat != 0)
-    {
-      return ntkernel_error(ntstat);
-    }
-    f_iosize = ffssi->PhysicalBytesPerSectorForPerformance;
-    ++ret;
   }
   if(!!(wanted & want::iosinprogress) || !!(wanted & want::iosbusytime))
   {

@@ -188,7 +188,8 @@ namespace windows_nt_kernel
     FileFsObjectIdInformation = 8,
     FileFsDriverPathInformation = 9,
     FileFsVolumeFlagsInformation = 10,
-    FileFsSectorSizeInformation = 11
+    FileFsSectorSizeInformation = 11,
+    FileFsFullSizeInformationExtended = 15
   } FS_INFORMATION_CLASS;
 
   typedef enum
@@ -835,6 +836,19 @@ namespace windows_nt_kernel
     ULONG SectorsPerAllocationUnit;
     ULONG BytesPerSector;
   } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
+
+  typedef struct _FILE_FS_FULL_SIZE_INFORMATION_EX  // NOLINT
+  {
+    LARGE_INTEGER TotalAllocationUnits;
+    LARGE_INTEGER CallerAvailableAllocationUnits;
+    LARGE_INTEGER ActualAvailableAllocationUnits;
+    ULONG SectorsPerAllocationUnit;
+    ULONG BytesPerSector;
+    ULONG ByteShiftForSectorSize;
+    ULONG PhysicalBytesPerSectorForPerformance;
+    ULONG ByteShiftForPhysicalSectorSize;
+    LARGE_INTEGER ActualAvailableAllocationUnitsOnVolume;
+  } FILE_FS_FULL_SIZE_INFORMATION_EX, *PFILE_FS_FULL_SIZE_INFORMATION_EX;
 
   typedef struct _FILE_FS_SIZE_INFORMATION  // NOLINT
   {
