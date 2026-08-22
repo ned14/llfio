@@ -28,9 +28,9 @@ LLFIO_V2_NAMESPACE_BEGIN
 
 namespace algorithm
 {
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type> clone_or_copy(file_handle &src, const path_handle &destdir, path_view destleaf,
-                                                                              bool preserve_timestamps, bool force_copy_now, file_handle::creation creation,
-                                                                              deadline d) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<file_handle::extent_type>
+  clone_or_copy(file_handle &src, const path_handle &destdir, path_view destleaf, bool preserve_timestamps,
+                bool force_copy_now, file_handle::creation creation, deadline d) noexcept
   {
     LLFIO_EXCEPTION_TRY
     {
@@ -47,27 +47,32 @@ namespace algorithm
         destleaf = destleaf_;
       }
       stat_t stat(nullptr);
-      OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
-                                    stat_t::want::mtim | stat_t::want::birthtim
 #ifndef _WIN32
-                                    | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+      OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
+                                 stat_t::want::mtim | stat_t::want::birthtim | stat_t::want::perms | stat_t::want::uid |
+                                 stat_t::want::gid | stat_t::want::rdev));
+#else
+      OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
+                                 stat_t::want::mtim | stat_t::want::birthtim | stat_t::want::perms));
 #endif
-                                    ));
       if(creation != file_handle::creation::always_new)
       {
-        auto r = file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
+        auto r =
+        file_handle::file(destdir, destleaf, file_handle::mode::attr_read, file_handle::creation::open_existing);
         if(r)
         {
           stat_t deststat(nullptr);
           OUTCOME_TRY(deststat.fill(r.value(), stat_t::want::type | stat_t::want::size | stat_t::want::mtim
 #ifndef _WIN32
-                                                  | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+                                               | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid |
+                                               stat_t::want::rdev
 #endif
-                                                  ));
-          if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) && (stat.st_size == deststat.st_size)
+                                    ));
+          if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) &&
+             (stat.st_size == deststat.st_size)
 #ifndef _WIN32
-             && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) && (stat.st_gid == deststat.st_gid) &&
-             (stat.st_rdev == deststat.st_rdev)
+             && (stat.st_perms == deststat.st_perms) && (stat.st_uid == deststat.st_uid) &&
+             (stat.st_gid == deststat.st_gid) && (stat.st_rdev == deststat.st_rdev)
 #endif
           )
           {
@@ -75,7 +80,8 @@ namespace algorithm
           }
         }
       }
-      OUTCOME_TRY(auto &&dest, file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
+      OUTCOME_TRY(auto &&dest,
+                  file_handle::file(destdir, destleaf, file_handle::mode::write, creation, src.kernel_caching()));
       bool failed = true;
       auto undest = make_scope_exit(
       [&]() noexcept
@@ -119,8 +125,10 @@ namespace algorithm
     }
   }
 
-  LLFIO_HEADERS_ONLY_FUNC_SPEC result<bool> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir, path_view destleaf, bool atomic_replace,
-                                                                        bool preserve_timestamps, bool force_copy_now, deadline d) noexcept
+  LLFIO_HEADERS_ONLY_FUNC_SPEC result<bool> relink_or_clone_copy_unlink(file_handle &src, const path_handle &destdir,
+                                                                        path_view destleaf, bool atomic_replace,
+                                                                        bool preserve_timestamps, bool force_copy_now,
+                                                                        deadline d) noexcept
   {
     LLFIO_EXCEPTION_TRY
     {
@@ -150,11 +158,11 @@ namespace algorithm
       }
       stat_t stat(nullptr);
       OUTCOME_TRY(stat.fill(src, stat_t::want::type | stat_t::want::size | stat_t::want::blocks | stat_t::want::atim |
-                                    stat_t::want::mtim | stat_t::want::birthtim
+                                 stat_t::want::mtim | stat_t::want::birthtim
 #ifndef _WIN32
-                                    | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
+                                 | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid | stat_t::want::rdev
 #endif
-                                    ));
+                            ));
 
       OUTCOME_TRY(auto &&desth, file_handle::temp_inode(destdir, file_handle::mode::write, src.kernel_caching()));
       if(!atomic_replace)
@@ -212,8 +220,8 @@ namespace algorithm
           if(r)
           {
             // Note that if this fails, we leak the randomly named linked file.
-            OUTCOME_TRY(auto &&desth2,
-                        file_handle::file(destdir, randomname, file_handle::mode::write, file_handle::creation::open_existing, src.kernel_caching()));
+            OUTCOME_TRY(auto &&desth2, file_handle::file(destdir, randomname, file_handle::mode::write,
+                                                         file_handle::creation::open_existing, src.kernel_caching()));
             if(desth.unique_id() == desth2.unique_id())
             {
               LLFIO_DEADLINE_TO_PARTIAL_DEADLINE(nd, d);
