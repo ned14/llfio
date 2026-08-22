@@ -62,12 +62,13 @@ namespace algorithm
         if(r)
         {
           stat_t deststat(nullptr);
-          OUTCOME_TRY(deststat.fill(r.value(), stat_t::want::type | stat_t::want::size | stat_t::want::mtim
 #ifndef _WIN32
-                                               | stat_t::want::perms | stat_t::want::uid | stat_t::want::gid |
-                                               stat_t::want::rdev
+          OUTCOME_TRY(deststat.fill(r.value(), stat_t::want::type | stat_t::want::size | stat_t::want::mtim |
+                                               stat_t::want::perms | stat_t::want::uid | stat_t::want::gid |
+                                               stat_t::want::rdev));
+#else
+          OUTCOME_TRY(deststat.fill(r.value(), stat_t::want::type | stat_t::want::size | stat_t::want::mtim));
 #endif
-                                    ));
           if((stat.st_type == deststat.st_type) && (stat.st_mtim == deststat.st_mtim) &&
              (stat.st_size == deststat.st_size)
 #ifndef _WIN32
