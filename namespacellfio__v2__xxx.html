@@ -4798,7 +4798,7 @@ template&lt;class T , typename std::enable_if&lt;(!std::is_base_of&lt; <a class=
   </table>
   </dd>
 </dl>
-<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return. </dd></dl>
+<dl class="section user"><dt>Errors returnable</dt><dd>Any of the values <code>NtExtendSection()</code> or <code>ftruncate()</code> can return, or <code>function_not_supported</code> if <code>NtExtendSection()</code> is unavailable. </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno"> 1007</span>{</div>
 <div class="line"><span class="lineno"> 1008</span>  <span class="keywordflow">return</span> self.<a class="code hl_function" href="classllfio__v2__xxx_1_1section__handle.html#a8942748c5d52f342dc9d9a062a7298db">truncate</a>(std::forward&lt;<span class="keyword">decltype</span>(newsize)&gt;(newsize));</div>
 <div class="line"><span class="lineno"> 1009</span>}</div>
