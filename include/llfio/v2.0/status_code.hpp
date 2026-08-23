@@ -398,7 +398,7 @@ namespace detail
 }  // namespace detail
 inline file_io_error
 error_from_exception(std::exception_ptr &&ep = std::current_exception(),
-                     SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
+                     SYSTEM_ERROR2_NAMESPACE::system_code not_matched = SYSTEM_ERROR2_NAMESPACE::generic_code(errc::resource_unavailable_try_again)) noexcept
 {
 #ifdef __cpp_exceptions
   return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(
