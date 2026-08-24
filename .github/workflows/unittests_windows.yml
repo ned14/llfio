@@ -29,12 +29,17 @@ jobs:
         if [ "${{ matrix.image }}" = "windows-2025-vs2026" ]; then
           NAME=VS2025;
           GENERATOR="Visual Studio 18 2026";
+          # Work around MSVC 14.51 (VS2026) rejecting the implicit errc->system_code
+          # conversion in a default argument (error C2440), see vs2026_bug_repro/.
+          WORKAROUND="-DLLFIO_STATUS_CODE_MSVC1451_WORKAROUND=ON";
         else
           NAME=VS2022;
           GENERATOR="Visual Studio 17 2022";
+          WORKAROUND="";
         fi
         echo ::set-output name=NAME::${NAME}
         echo ::set-output name=GENERATOR::${GENERATOR}
+        echo ::set-output name=WORKAROUND::${WORKAROUND}
 
            
     - name: CMake tests Windows
@@ -44,6 +49,13 @@ jobs:
       run: |
         if [ "${{ matrix.configuration }}" = "status_code" ]; then
           export CMAKE_CONFIGURE_OPTIONS="-DLLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE=ON"
+        fi
+        if [ -n "${{ steps.vars.outputs.WORKAROUND }}" ]; then
+          if [ -n "$CMAKE_CONFIGURE_OPTIONS" ]; then
+            export CMAKE_CONFIGURE_OPTIONS="$CMAKE_CONFIGURE_OPTIONS;${{ steps.vars.outputs.WORKAROUND }}"
+          else
+            export CMAKE_CONFIGURE_OPTIONS="${{ steps.vars.outputs.WORKAROUND }}"
+          fi
         fi
         ctest -S .ci.cmake -VV --timeout 900 "-DCTEST_CONFIGURE_OPTIONS=$CMAKE_CONFIGURE_OPTIONS" -DCTEST_SITE=$NAME -DCTEST_CMAKE_GENERATOR="${{ steps.vars.outputs.GENERATOR }}"
        

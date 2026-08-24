@@ -398,7 +398,16 @@ namespace detail
 }  // namespace detail
 inline file_io_error
 error_from_exception(std::exception_ptr &&ep = std::current_exception(),
+#ifdef LLFIO_STATUS_CODE_MSVC1451_WORKAROUND
+                     // MSVC 14.51 (VS2026) incorrectly rejects the implicit chain of user-defined conversions
+                     // errc -> generic_code -> system_code in a default argument (error C2440, fixed in the
+                     // vs2026_bug_repro/ directory of this repository). This workaround performs the
+                     // generic_code intermediate conversion explicitly; it is semantically identical.
+                     SYSTEM_ERROR2_NAMESPACE::system_code not_matched = SYSTEM_ERROR2_NAMESPACE::generic_code(
+                     SYSTEM_ERROR2_NAMESPACE::errc::resource_unavailable_try_again)) noexcept
+#else
                      SYSTEM_ERROR2_NAMESPACE::system_code not_matched = errc::resource_unavailable_try_again) noexcept
+#endif
 {
 #ifdef __cpp_exceptions
   return SYSTEM_ERROR2_NAMESPACE::system_code_from_exception(
