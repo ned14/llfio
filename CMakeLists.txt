@@ -40,7 +40,7 @@ include(QuickCppLibUtils)
 include(QuickCppLibPolicies)
 
 option(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE "Whether to use SG14 status_code for failure handling" OFF)
-option(LLFIO_STATUS_CODE_MSVC1451_WORKAROUND "Whether to work around MSVC 14.51 (VS2026) incorrectly rejecting the implicit errc->system_code conversion in a default argument (error C2440) by performing the generic_code intermediate conversion explicitly" OFF)
+option(LLFIO_STATUS_CODE_MSVC1451_WORKAROUND "Whether to work around MSVC 14.51 (VS2026) incorrectly rejecting the implicit errc->system_code conversion (error C2440) by performing the generic_code intermediate conversion explicitly. Also injects the equivalent KERNELTEST_STATUS_CODE_MSVC1451_WORKAROUND into kerneltest's headers" OFF)
 option(LLFIO_ENABLE_DEPENDENCY_SMOKE_TEST "Whether to build executables which are smoke tests that LLFIO is fully working. Used by various package managers such as vcpkg." OFF)
 option(LLFIO_BUILD_EXAMPLES "Build example programs" ON)
 option(LLFIO_FORCE_CONCEPTS_OFF "Whether to not auto detect and enable concepts for the LLFIO cmake targets" OFF)
@@ -261,6 +261,18 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
     REQUIRED
     IS_HEADER_ONLY
   )
+  if(LLFIO_USE_EXPERIMENTAL_SG14_STATUS_CODE AND LLFIO_STATUS_CODE_MSVC1451_WORKAROUND)
+    # kerneltest's headers contain the same implicit errc -> system_code conversions which MSVC 14.51
+    # (VS2026) wrongly rejects (see vs2026_bug_repro/). Because kerneltest is header-only and its
+    # affected code gets compiled inside this project's test translation units, injecting the
+    # workaround macro onto the kerneltest interface fixes those TUs no matter how kerneltest
+    # was brought into this build (sibling, superbuild or installed package).
+    if(TARGET kerneltest_hl)
+      set_property(TARGET kerneltest_hl APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS KERNELTEST_STATUS_CODE_MSVC1451_WORKAROUND=1)
+    else()
+      set_property(TARGET kerneltest::hl APPEND PROPERTY INTERFACE_COMPILE_DEFINITIONS KERNELTEST_STATUS_CODE_MSVC1451_WORKAROUND=1)
+    endif()
+  endif()
   foreach(test_target ${llfio_TEST_TARGETS})
     target_link_libraries(${test_target} PRIVATE kerneltest::hl)
     if(test_target MATCHES coroutines)
