@@ -1,14 +1,40 @@
-<center><table border="0" cellpadding="4">
-<tr>
-<td align="center"> <a href="https://github.com/ned14/llfio">LLFIO</a><br><a href="https://github.com/ned14/llfio">on GitHub</a> </td>
-<td align="center"> <a href="https://ned14.github.io/llfio/">API</a><br><a href="https://ned14.github.io/llfio/">Documentation</a> </td>
-<td align="center"> <a href="https://my.cdash.org/index.php?project=Boost.AFIO">CTest summary</a><br><a href="https://my.cdash.org/index.php?project=Boost.AFIO">dashboard</a> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master"/></a> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master"/></a> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22"><img src="https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master"/></a> </td>
-<td align="center"> <a href="https://github.com/ned14/llfio/releases">Prebuilt</a><br><a href="https://github.com/ned14/llfio/releases">binaries</a> </td>
-</tr>
-</table></center>
+<div align="center">
+
+# LLFIO
+
+[![License](https://img.shields.io/badge/license-Apache%202.0%20%2F%20Boost%201.0-blue)](Licence.txt)
+[![C++](https://img.shields.io/badge/C%2B%2B-17%2F20-blue)](#other-characteristics)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20BSD-lightgrey)](#other-characteristics)
+[![Unit tests Linux](https://github.com/ned14/llfio/workflows/Unit%20tests%20Linux/badge.svg?branch=master)](https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Linux%22)
+[![Unit tests Mac OS](https://github.com/ned14/llfio/workflows/Unit%20tests%20Mac%20OS/badge.svg?branch=master)](https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Mac+OS%22)
+[![Unit tests Windows](https://github.com/ned14/llfio/workflows/Unit%20tests%20Windows/badge.svg?branch=master)](https://github.com/ned14/llfio/actions?query=workflow%3A%22Unit+tests+Windows%22)
+
+**Zero whole machine memory copy file i/o and filesystem library for C++.**
+
+[API Documentation](https://ned14.github.io/llfio/) ·
+[CTest dashboard](https://my.cdash.org/index.php?project=Boost.AFIO) ·
+[Prebuilt binaries](https://github.com/ned14/llfio/releases) ·
+[Build instructions](Build.md)
+
+</div>
+
+---
+
+## Table of contents
+
+- [Overview](#overview)
+- [Other characteristics](#other-characteristics)
+- [Examples of use](#examples-of-use)
+- [v2 architecture and design implemented](#v2-architecture-and-design-implemented)
+- [Planned features implemented](#planned-features-implemented)
+- [Why you might need LLFIO](#why-you-might-need-llfio)
+- [Contributing](#contributing)
+- [Security](#security)
+- [Licence](#licence)
+
+---
+
+## Overview
 
 Herein lies a zero whole machine memory copy file i/o and filesystem
 library originally for the C++ standard, intended for storage devices with ~1 microsecond
@@ -22,7 +48,8 @@ as Intel Optane.
 It is a complete rewrite after a Boost peer review in August 2015. It was submitted
 for C++ standardisation in 2018, and that process was abandoned in 2025.
 
-Other characteristics:
+## Other characteristics
+
 - Portable to any conforming C++ 17 compiler with a working Filesystem in its STL.
 - Works with C++ exceptions and RTTI globally disabled.
 - Fully clean with C++ 20.
@@ -39,7 +66,9 @@ Other characteristics:
 
 \note Most of this code is mature quality. It has been shipping in production with multiple vendors for some years now, indeed amongst many big data solutions it powers the low level custom database component of the US Security and Exchange Commission's MIDAS solution which ingresses Terabytes of trade data per day. It is considered quite reliable on Windows and Linux (less well tested on Mac OS).
 
-Examples of use (more examples: https://github.com/ned14/llfio/tree/develop/example):
+## Examples of use
+
+More examples: https://github.com/ned14/llfio/tree/develop/example
 <table width="100%" border="0" cellpadding="4">
 <tr>
 <td width="50%" valign="top">
@@ -61,11 +90,7 @@ for a database of latencies for various previously tested OS, filing systems and
 
 Todo list for already implemented parts: https://ned14.github.io/llfio/todo.html
 
-<p>&nbsp;</p>
-<center><span style="font-size: large; text-decoration: underline;">[Build instructions can found here](Build.md)</span></center>
-<p>&nbsp;</p>
-
-## v2 architecture and design implemented:
+## v2 architecture and design implemented
 
 | NEW in v2 | Boost peer review feedback |     |
 | --------- | -------------------------- | --- |
@@ -160,9 +185,11 @@ Features possibly to be added after a Boost peer review:
 - Permissions support (ACLs).
 
 
+## Why you might need LLFIO
+
 <table width="100%" border="0" cellpadding="4">
 <tr>
-<th colspan="3">Why you might need LLFIO<hr></th>
+<th colspan="3">Latency numbers<hr></th>
 </tr>
 <tr>
 <td valign="top" width="33%">
@@ -197,3 +224,20 @@ Max bandwidth for the physical hardware:
 - 2017 XPoint drive (x4 PCIe 3.0): **2.5GB/sec**
 - 2017 NVMe flash drive (x4 PCIe 3.0): **2GB/sec**
 - 10Gbit LAN: **1.2GB/sec**
+
+## Contributing
+
+Bug reports, feature discussion and pull requests are welcome — see
+[CONTRIBUTING.md](CONTRIBUTING.md) for how to build, test and submit changes.
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+
+## Security
+
+To report a security vulnerability, please see [SECURITY.md](SECURITY.md)
+rather than opening a public issue.
+
+## Licence
+
+This software is licensed under your choice of the **Apache License, Version 2.0**
+or the **Boost Software License, Version 1.0** — see [Licence.txt](Licence.txt)
+for the full text of both, and [NOTICE](NOTICE) for attribution information.
