@@ -27,6 +27,13 @@ Distributed under the Boost Software License, Version 1.0.
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <atomic>
+
+#ifdef __linux__
+#include <linux/magic.h>
+#include <sys/statfs.h>
+#endif
+
 #ifdef __FreeBSD__
 #include <sys/sysctl.h>  // for sysctl()
 #include <sys/user.h>    // for struct kinfo_file
@@ -37,6 +44,127 @@ Distributed under the Boost Software License, Version 1.0.
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
+
+#ifdef __linux__
+
+namespace detail
+{
+  class proc_base_holder
+  {
+  public:
+    constexpr proc_base_holder() = default;
+
+    result<native_handle_type> set(handle &&handle) noexcept
+    {
+      // Check that the handle is a path
+      if(!handle.is_valid() || !handle.is_path())
+      {
+        return posix_error(EINVAL);
+      }
+      {
+        // Check that the handle is part of a procfs filesystem
+        struct ::statfs proc_statfs{};
+        if(-1 == ::fstatfs(handle.native_handle().fd, &proc_statfs))
+        {
+          return posix_error();
+        }
+        if(proc_statfs.f_type != PROC_SUPER_MAGIC)
+        {
+          return posix_error(EINVAL);
+        }
+      }
+      {
+        // Check that the handle is the procfs mount point by attempting to resolve "/proc/self"
+        const ::pid_t pid{::getpid()};
+        char resolved_self[64];
+        ssize_t resolved_self_size{
+        ::readlinkat(handle.native_handle().fd, "self", resolved_self, sizeof(resolved_self))};
+        if(resolved_self_size < 0)
+        {
+          return posix_error(EINVAL);
+        }
+        if(static_cast<size_t>(resolved_self_size) >= sizeof(resolved_self))
+        {
+          return posix_error(EINVAL);
+        }
+        resolved_self[resolved_self_size] = '\0';
+        errno = 0;
+        char *endptr{nullptr};
+        const unsigned long resolved_self_pid{std::strtoul(resolved_self, &endptr, 10)};
+        if(errno != 0 || resolved_self == endptr || static_cast<unsigned long>(pid) != resolved_self_pid)
+        {
+          return posix_error(EINVAL);
+        }
+      }
+
+      // Set global_proc_base if it is not already set.
+      int existing{-1};
+      if(raw_fd.compare_exchange_strong(existing, handle.native_handle().fd, std::memory_order_acq_rel))
+      {
+        // If process_proc_base had not already been set, take ownership of the fd from the given handle.
+        // We now expect the fd to stay open for the duration of the process.
+        return std::move(handle).release();
+      }
+      // If process_proc_base has already been set, do not consider it an error since any handle to /proc should work.
+      return native_handle_type{native_handle_type::disposition::path | native_handle_type::disposition::kernel_handle,
+                                existing};
+    }
+
+    result<native_handle_type> get() noexcept
+    {
+      if(int fd{raw_fd.load(std::memory_order_acquire)}; fd >= 0)
+      {
+        return native_handle_type{
+        native_handle_type::disposition::path | native_handle_type::disposition::kernel_handle, fd};
+      }
+      // No proc_base has been set for the process, attempt to open "/proc"
+      native_handle_type native_handle{};
+      native_handle.fd = ::open("/proc", O_PATH | O_CLOEXEC);
+      if(native_handle.fd < 0)
+      {
+        return posix_error();
+      }
+      native_handle.behaviour |= native_handle_type::disposition::path | native_handle_type::disposition::kernel_handle;
+      handle proc_base_handle{std::move(native_handle), handle::flag::none};
+      return set(std::move(proc_base_handle));
+    }
+
+    ~proc_base_holder()
+    {
+      if(int fd{raw_fd.load(std::memory_order_acquire)}; fd >= 0)
+      {
+        ::close(fd);
+      }
+    }
+
+    static proc_base_holder &get_instance() noexcept
+    {
+      // Since raw_fd should be -1 for invalid instead of 0, making this global would open it up to static
+      // initialization order problems prior to constinit. So make it a static-local instead.
+      static
+#if __cpp_constinit >= 201907L
+      constinit
+#endif
+      proc_base_holder instance;
+      return instance;
+    }
+
+  private:
+    std::atomic<int> raw_fd{-1};
+  };
+}  // namespace detail
+
+result<native_handle_type> get_proc_base() noexcept
+{
+  return detail::proc_base_holder::get_instance().get();
+}
+
+result<native_handle_type> set_proc_base(handle &&proc_handle) noexcept
+{
+  return detail::proc_base_holder::get_instance().set(std::move(proc_handle));
+}
+
+#endif // __linux__
 
 handle::~handle()
 {
@@ -64,9 +192,10 @@ result<handle::path_type> handle::current_path() const noexcept
     auto *out = const_cast<char *>(ret.data());
     // Linux keeps a symlink at /proc/self/fd/n
     char in[64];
-    snprintf(in, sizeof(in), "/proc/self/fd/%d", _v.fd);
+    snprintf(in, sizeof(in), "self/fd/%d", _v.fd);
+    OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
     ssize_t len;
-    if((len = readlink(in, out, 32768)) == -1)
+    if((len = ::readlinkat(proc_base.fd, in, out, 32768)) == -1)
     {
       return posix_error();
     }

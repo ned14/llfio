@@ -94,41 +94,49 @@ namespace utils
 #elif defined(__linux__)
       pagesizes.push_back(getpagesize());
       pagesizes_available.push_back(getpagesize());
-      int ih = ::open("/proc/meminfo", O_RDONLY | O_CLOEXEC);
+      int ih{-1};
+      if (auto proc_base = get_proc_base())
+      {
+        ih = ::openat(proc_base.assume_value().fd, "meminfo", O_RDONLY | O_CLOEXEC);
+      }
       if(-1 != ih)
       {
         char buffer[4096], *hugepagesize, *hugepages;
-        buffer[::read(ih, buffer, sizeof(buffer) - 1)] = 0;
-        ::close(ih);
-        hugepagesize = strstr(buffer, "Hugepagesize:");
-        hugepages = strstr(buffer, "HugePages_Total:");
-        if((hugepagesize != nullptr) && (hugepages != nullptr))
+        ssize_t buffer_len{::read(ih, buffer, sizeof(buffer) - 1)};
+        if (buffer_len >= 0)
         {
-          unsigned _hugepages = 0, _hugepagesize = 0;
-          while(*++hugepagesize != ' ')
+          buffer[buffer_len] = 0;
+          ::close(ih);
+          hugepagesize = strstr(buffer, "Hugepagesize:");
+          hugepages = strstr(buffer, "HugePages_Total:");
+          if((hugepagesize != nullptr) && (hugepages != nullptr))
           {
-            ;
-          }
-          while(*++hugepages != ' ')
-          {
-            ;
-          }
-          while(*++hugepagesize == ' ')
-          {
-            ;
-          }
-          while(*++hugepages == ' ')
-          {
-            ;
-          }
-          sscanf(hugepagesize, "%u", &_hugepagesize);  // NOLINT
-          sscanf(hugepages, "%u", &_hugepages);        // NOLINT
-          if(_hugepagesize != 0u)
-          {
-            pagesizes.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
-            if(_hugepages != 0u)
+            unsigned _hugepages = 0, _hugepagesize = 0;
+            while(*++hugepagesize != ' ')
             {
-              pagesizes_available.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
+              ;
+            }
+            while(*++hugepages != ' ')
+            {
+              ;
+            }
+            while(*++hugepagesize == ' ')
+            {
+              ;
+            }
+            while(*++hugepages == ' ')
+            {
+              ;
+            }
+            sscanf(hugepagesize, "%u", &_hugepagesize);  // NOLINT
+            sscanf(hugepages, "%u", &_hugepages);        // NOLINT
+            if(_hugepagesize != 0u)
+            {
+              pagesizes.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
+              if(_hugepages != 0u)
+              {
+                pagesizes_available.push_back((static_cast<size_t>(_hugepagesize)) * 1024);
+              }
             }
           }
         }
@@ -172,7 +180,8 @@ namespace utils
   {
     (void) flush_modified_data();
 #ifdef __linux__
-    int h = ::open("/proc/sys/vm/drop_caches", O_WRONLY | O_CLOEXEC);
+    OUTCOME_TRY(const native_handle_type& proc_base, get_proc_base());
+    int h = ::openat(proc_base.fd, "sys/vm/drop_caches", O_WRONLY | O_CLOEXEC);
     if(h == -1)
     {
       return posix_error();
@@ -196,7 +205,11 @@ namespace utils
     {
       return cached == 2;
     }
-    int h = ::open("/proc/version", O_RDONLY | O_CLOEXEC);
+    int h{-1};
+    if (auto proc_base = get_proc_base())
+    {
+      h = ::openat(proc_base.assume_value().fd, "version", O_RDONLY | O_CLOEXEC);
+    }
     if(h == -1)
     {
       cached = 1;
@@ -226,11 +239,11 @@ namespace utils
 #ifdef __linux__
     LLFIO_EXCEPTION_TRY
     {
-      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void>
+      auto fill_buffer = [](std::vector<char> &buffer, const native_handle_type& base, const char *path) -> result<void>
       {
         for(;;)
         {
-          int ih = ::open(path, O_RDONLY);
+          int ih = ::openat(base.fd, path, O_RDONLY);
           if(ih == -1)
           {
             return posix_error();
@@ -350,6 +363,9 @@ namespace utils
       private_paged_in = ??? MISSING
 
       */
+
+      OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
+
       process_memory_usage ret;
       if(!!(want & process_memory_usage::want::this_process))
       {
@@ -359,7 +375,7 @@ namespace utils
              (want & process_memory_usage::want::private_paged_in))
           {
             std::vector<char> buffer(256);
-            OUTCOME_TRY(fill_buffer(buffer, "/proc/self/statm"));
+            OUTCOME_TRY(fill_buffer(buffer, proc_base, "self/statm"));
             if(buffer.size() > 1)
             {
               size_t file_and_shared_pages_paged_in = 0;
@@ -374,7 +390,7 @@ namespace utils
           if(want & process_memory_usage::want::private_committed)
           {
             std::vector<char> smaps_rollup(256), maps(65536);
-            auto r = fill_buffer(smaps_rollup, "/proc/self/smaps_rollup");
+            auto r = fill_buffer(smaps_rollup, proc_base, "self/smaps_rollup");
             if(!r)
             {
               if(r.error() == errc::no_such_file_or_directory)
@@ -384,7 +400,7 @@ namespace utils
               }
               return std::move(r).error();
             }
-            OUTCOME_TRY(fill_buffer(maps, "/proc/self/maps"));
+            OUTCOME_TRY(fill_buffer(maps, proc_base, "self/maps"));
             uint64_t lazyfree = 0;
             {
               string_view i(smaps_rollup.data(), smaps_rollup.size());
@@ -419,7 +435,7 @@ namespace utils
         else
         {
           std::vector<char> buffer(1024 * 1024);
-          OUTCOME_TRY(fill_buffer(buffer, "/proc/self/smaps"));
+          OUTCOME_TRY(fill_buffer(buffer, proc_base, "self/smaps"));
           const string_view totalview(buffer.data(), buffer.size());
           // std::cerr << totalview << std::endl;
           std::vector<string_view> anon_entries, non_anon_entries;
@@ -509,7 +525,7 @@ namespace utils
       if(!!(want & process_memory_usage::want::this_system))
       {
         std::vector<char> buffer(1024);
-        OUTCOME_TRY(fill_buffer(buffer, "/proc/meminfo"));
+        OUTCOME_TRY(fill_buffer(buffer, proc_base, "meminfo"));
         if(buffer.size() > 1)
         {
           string_view i(buffer.data(), buffer.size());
@@ -665,11 +681,11 @@ namespace utils
       cpu <user> <user-nice> <kernel> <idle>
       */
       std::vector<char> buffer1(65536), buffer2(65536);
-      auto fill_buffer = [](std::vector<char> &buffer, const char *path) -> result<void>
+      auto fill_buffer = [](std::vector<char> &buffer, const native_handle_type& base, const char *path) -> result<void>
       {
         for(;;)
         {
-          int ih = ::open(path, O_RDONLY);
+          int ih = ::openat(base.fd, path, O_RDONLY);
           if(ih == -1)
           {
             return posix_error();
@@ -699,9 +715,12 @@ namespace utils
         }
         return success();
       };
+
+      OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
+
       static const uint64_t ts_multiplier = 1000000000ULL / sysconf(_SC_CLK_TCK);
-      OUTCOME_TRY(fill_buffer(buffer1, "/proc/self/stat"));
-      OUTCOME_TRY(fill_buffer(buffer2, "/proc/stat"));
+      OUTCOME_TRY(fill_buffer(buffer1, proc_base, "self/stat"));
+      OUTCOME_TRY(fill_buffer(buffer2, proc_base, "stat"));
       if(sscanf(buffer1.data(), "%*d %*s %*c %*d %*d %*d %*d %*d %*u %*u %*u %*u %*u %" SCNu64 " %" SCNu64, &ret.process_ns_in_user_mode,
                 &ret.process_ns_in_kernel_mode) < 2)
       {

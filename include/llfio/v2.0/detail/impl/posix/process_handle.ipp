@@ -71,7 +71,8 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle::path_type> process_handle
   char buffer[PATH_MAX + 1];
 #ifdef __linux__
   // Read what the symbolic link at /proc/self/exe points at
-  ssize_t len = ::readlink("/proc/self/exe", buffer, PATH_MAX);
+  OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
+  ssize_t len = ::readlinkat(proc_base.fd, "self/exe", buffer, PATH_MAX);
   if(len > 0)
   {
     buffer[len] = 0;
