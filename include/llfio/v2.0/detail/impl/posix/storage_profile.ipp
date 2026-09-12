@@ -100,7 +100,8 @@ namespace storage_profile
           sp.cpu_physical_cores.value = 0;
 #if defined(__linux__)
           {
-            int ih = ::open("/proc/cpuinfo", O_RDONLY | O_CLOEXEC);
+            OUTCOME_TRY(const native_handle_type& proc_base, get_proc_base());
+            int ih = ::openat(proc_base.fd, "cpuinfo", O_RDONLY | O_CLOEXEC);
             if(ih >= 0)
             {
               char cpuinfo[8192];

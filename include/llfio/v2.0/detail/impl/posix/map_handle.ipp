@@ -27,6 +27,8 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../signal_guard.hpp"
 
+#include <atomic>
+
 #include <sys/mman.h>
 
 // #define LLFIO_DEBUG_LINUX_MUNMAP
@@ -51,6 +53,34 @@ static struct llfio_linux_munmap_debug_t
 #endif
 
 LLFIO_V2_NAMESPACE_BEGIN
+
+namespace detail
+{
+  result<map_handle::memory_accounting_kind> get_memory_accounting_kind() noexcept
+  {
+    OUTCOME_TRY(const native_handle_type &proc_base, get_proc_base());
+    int fd = ::openat(proc_base.fd, "sys/vm/overcommit_memory", O_RDONLY | O_CLOEXEC);
+    if(fd < 0)
+    {
+      return posix_error();
+    }
+    char buffer[8];
+    ssize_t bytes_read{::read(fd, buffer, 8)};
+    ::close(fd);
+    if(bytes_read <= 0)
+    {
+      return posix_error(bytes_read == 0 ? EIO : errno);
+    }
+    if(buffer[0] == '2')
+    {
+      return map_handle::memory_accounting_kind::commit_charge;
+    }
+    else
+    {
+      return map_handle::memory_accounting_kind::over_commit;
+    }
+  }
+}
 
 section_handle::~section_handle()
 {
@@ -268,29 +298,22 @@ map_handle::_do_barrier(map_handle::io_request<map_handle::const_buffers_type> r
 #ifdef __linux__
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC map_handle::memory_accounting_kind map_handle::memory_accounting() noexcept
 {
-  static memory_accounting_kind v{memory_accounting_kind::unknown};
-  if(v != memory_accounting_kind::unknown)
+  static std::atomic<memory_accounting_kind> v{memory_accounting_kind::unknown};
+  if(memory_accounting_kind current_val{v.load(std::memory_order_relaxed)};
+     current_val != memory_accounting_kind::unknown)
   {
-    return v;
+    return current_val;
   }
-  int fd = ::open("/proc/sys/vm/overcommit_memory", O_RDONLY);
-  if(fd != -1)
+
+  result<memory_accounting_kind> result{detail::get_memory_accounting_kind()};
+  if (!result.has_value())
   {
-    char buffer[8];
-    if(::read(fd, buffer, 8) > 0)
-    {
-      if(buffer[0] == '2')
-      {
-        v = memory_accounting_kind::commit_charge;
-      }
-      else
-      {
-        v = memory_accounting_kind::over_commit;
-      }
-    }
-    ::close(fd);
+    return memory_accounting_kind::unknown;
   }
-  return v;
+  // Assume that the value does not change and we can safely overwrite this
+  // even if another thread got here first.
+  v.store(result.assume_value(), std::memory_order_relaxed);
+  return result.assume_value();
 }
 #endif
 

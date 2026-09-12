@@ -101,9 +101,10 @@ namespace detail
               auto *out = const_cast<char *>(ret.data());
               // Linux keeps a symlink at /proc/self/fd/n
               char in[64];
-              snprintf(in, sizeof(in), "/proc/self/fd/%d", tffd);
+              snprintf(in, sizeof(in), "self/fd/%d", tffd);
+              OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
               ssize_t len;
-              if((len = readlink(in, out, 32768)) >= 0)
+              if((len = ::readlinkat(proc_base.fd, in, out, 32768)) >= 0)
               {
                 ret.resize(len);
                 _currentpath = std::move(ret);
@@ -211,8 +212,9 @@ result<void> fs_handle::relink(const path_handle &base, path_view_type path, boo
       return errc::function_not_supported;
     }
     char _path[PATH_MAX];
-    snprintf(_path, PATH_MAX, "/proc/self/fd/%d", h.native_handle().fd);
-    if(-1 == ::linkat(AT_FDCWD, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
+    snprintf(_path, PATH_MAX, "self/fd/%d", h.native_handle().fd);
+    OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
+    if(-1 == ::linkat(proc_base.fd, _path, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
     {
       return posix_error();
     }
@@ -356,8 +358,9 @@ result<void> fs_handle::link(const path_handle &base, path_view_type path, deadl
   {
     // May not have the CAP_DAC_READ_SEARCH capability which prevents AT_EMPTY_PATH working, try working around that
     char in[64];
-    snprintf(in, sizeof(in), "/proc/self/fd/%d", h.native_handle().fd);
-    if(-1 != ::linkat(AT_FDCWD, in, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
+    snprintf(in, sizeof(in), "self/fd/%d", h.native_handle().fd);
+    OUTCOME_TRY(const native_handle_type proc_base, get_proc_base());
+    if(-1 != ::linkat(proc_base.fd, in, base.is_valid() ? base.native_handle().fd : AT_FDCWD, zpath.c_str(), AT_SYMLINK_FOLLOW))
     {
       return success();
     }
