@@ -351,6 +351,56 @@ public:
     return name.empty() ? uniquely_named_directory(tempdirh, _mode, _caching, flags) : directory(tempdirh, name, _mode, _creation, _caching, flags);
   }
 
+  /*! \brief Flush any metadata changes to this directory's entry list to permanent storage.
+
+  This is the directory analogue of `byte_io_handle::barrier()`. It is what makes a preceding
+  `fs_handle::relink()` (i.e. an atomic rename of a file into this directory) durable: the rename
+  changes the directory's metadata, and unless that metadata reaches storage, a power loss may lose
+  the rename even though the renamed file's own data and metadata were already flushed. Renaming a
+  file into place without this is the classic way to lose a crash-safe save - the new contents are
+  safely on storage, and their name is not.
+
+  This is a general-purpose operation, not a helper for any one algorithm: LLFIO already issues
+  exactly this flush of its own accord, when safety barriers are enabled, for a directory it opens
+  (see `flag::disable_safety_barriers`), and this call is how a caller asks for it explicitly, or
+  gets it at all under the caching modes where LLFIO does not issue it. It is unaffected by that
+  flag, which only governs the barriers LLFIO issues unasked.
+
+  It belongs on this class, and nowhere more general. A directory's entry list is the only metadata
+  of this kind LLFIO has, and `directory_handle` is the only handle type with one. It cannot be a
+  `byte_io_handle` operation, as a directory is not a byte i/o handle. It cannot be on `fs_handle`,
+  as `fs_handle` is also the base of `symlink_handle`, which holds no descriptor to flush. And it
+  cannot be on `path_handle`, which may name anything at all, not merely a directory.
+
+  \note There is deliberately no `deadline` parameter, unlike `byte_io_handle::barrier()`. A
+  synchronous barrier cannot honour a deadline, and `byte_io_handle::barrier()` rejects a non-empty
+  one with `errc::not_supported` rather than pretending, so a parameter which could only ever make
+  the call fail is not offered here.
+
+  \warning Only as durable as the platform's own flush is, and no more. On POSIX this is a `fsync()`
+  of the directory descriptor, the same call LLFIO already makes on a directory it has just opened,
+  so on Apple it is the known-weak `fsync()`, *not* the `fcntl(F_FULLFSYNC)` which
+  `byte_io_handle::barrier()` uses there to work around Apple's `fsync()` not waiting for the device
+  to flush its buffers; directory durability on Apple is therefore weaker than file durability on
+  Apple. On Windows this is an `NtFlushBuffersFile(Ex)` of the directory handle, which a filing
+  system is entitled to refuse for a directory, and such a refusal is reported to the caller as an
+  error rather than being quietly ignored. As with any flush, a filing system which accepts the call
+  and does nothing with it cannot be detected from here.
+
+  \warning A filing system which does not implement directory flushes may refuse this call, with
+  `errc::invalid_argument` or similar. A failure means "durability could not be established", not
+  necessarily "the preceding changes were not made", and a caller for whom the directory entry is a
+  best-effort matter - a temporary file on a `tmpfs`, say - must tolerate it.
+
+  This is a relatively expensive operation, so issue it once after a batch of changes, not per change.
+
+  \return Success, or an error.
+  \errors Any of the values POSIX fsync() or Windows NtFlushBuffersFileEx() can return, and
+  `errc::invalid_argument` for a default constructed handle.
+  \mallocs None.
+  */
+  LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> barrier() noexcept;
+
   LLFIO_HEADERS_ONLY_VIRTUAL_SPEC ~directory_handle() override
   {
     if(_v)

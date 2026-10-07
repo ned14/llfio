@@ -537,4 +537,24 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   }
 }
 
+result<void> directory_handle::barrier() noexcept
+{
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(!_v)
+  {
+    return errc::invalid_argument;
+  }
+  /* This is the same `fsync()` LLFIO already performs on a directory it has just opened, so this is
+  not a new operation for the code base, merely a newly named one. It is deliberately *not* the
+  `fcntl(F_FULLFSYNC)` which `byte_io_handle::_do_barrier()` uses on Apple to work around `fsync()`
+  not waiting for the device to flush its buffers: `F_FULLFSYNC` is not documented for a directory
+  descriptor, and guessing would be worse than the documented, weaker guarantee. See the warnings in
+  `directory_handle::barrier()`'s documentation. */
+  if(::fsync(_v.fd) < 0)
+  {
+    return posix_error();
+  }
+  return success();
+}
+
 LLFIO_V2_NAMESPACE_END
