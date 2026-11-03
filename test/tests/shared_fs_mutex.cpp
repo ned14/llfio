@@ -148,8 +148,8 @@ struct child_workers
 
   template <class... Args> child_workers(std::string name, size_t workersno, Args &&... _args)
   {
-    std::basic_stringstream<filesystem::path::value_type> ss1, ss2, ss3;
-    auto convstr = [](const std::string &v) { return filesystem::path(v).native(); };
+    std::basic_stringstream<std::filesystem::path::value_type> ss1, ss2, ss3;
+    auto convstr = [](const std::string &v) { return std::filesystem::path(v).native(); };
     ss1 << "--kerneltestchild," << convstr(name) << ",";
     ss3 << ",";
     detail::print_args(ss3, std::forward<Args>(_args)...);
@@ -158,7 +158,7 @@ struct child_workers
     {
       ss2 = decltype(ss2)();
       ss2 << ss1.str() << n << ss3.str();
-      std::vector<filesystem::path::string_type> args{ss2.str()};
+      std::vector<std::filesystem::path::string_type> args{ss2.str()};
       auto newchild = child_process::child_process::launch(child_process::current_process_path(), std::move(args), child_process::current_process_env(), true);
 #if 0
       if(!newchild)

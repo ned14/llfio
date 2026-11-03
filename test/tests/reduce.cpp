@@ -71,7 +71,7 @@ static inline void TestReduce()
       const auto dir_idx = ((v >> 8) % dirhs.size());
       const auto file_entries = (v & 255);
       const auto &dirh = dirhs[dir_idx];
-      filesystem::path::value_type buffer[10];
+      std::filesystem::path::value_type buffer[10];
       {
         auto c = (uint32_t) entries;
         buffer[0] = 'd';
@@ -100,10 +100,10 @@ static inline void TestReduce()
               << (entries_created / (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() / 1000000.0)) << " entries/sec).\n";
 
     auto summary = algorithm::summarize(dirhs.front()).value();
-    std::cout << "Summary: " << summary.types[filesystem::file_type::regular] << " files and " << summary.types[filesystem::file_type::directory]
+    std::cout << "Summary: " << summary.types[std::filesystem::file_type::regular] << " files and " << summary.types[std::filesystem::file_type::directory]
               << " directories created of " << summary.size << " bytes, " << summary.allocated << " bytes allocated in "
               << (summary.directory_blocks + summary.file_blocks) << " blocks with depth of " << summary.max_depth << "." << std::endl;
-    BOOST_CHECK(summary.types[filesystem::file_type::regular] + summary.types[filesystem::file_type::directory] == entries_created);
+    BOOST_CHECK(summary.types[std::filesystem::file_type::regular] + summary.types[std::filesystem::file_type::directory] == entries_created);
 
     std::cout << "\nCalling llfio::algorithm::reduce() on that randomised directory tree ..." << std::endl;
     begin = std::chrono::high_resolution_clock::now();

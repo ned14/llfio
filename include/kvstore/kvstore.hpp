@@ -27,7 +27,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../llfio/v2.0/file_handle.hpp"
 
-#include "quickcpplib/memory_resource.hpp"
+#include <memory_resource>  // C++17 provides it; quickcpplib's polyfill is gone
 
 //! \file kvstore.hpp Provides the abstract interface for a key-value store.
 

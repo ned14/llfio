@@ -24,7 +24,7 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "../include/llfio.hpp"
 #include "llfio/v2.0/path_view.hpp"
-#include "quickcpplib/string_view.hpp"
+#include <string_view>  // C++17 provides it; quickcpplib's polyfill is gone
 
 #if __cplusplus >= 202000L || _HAS_CXX20
 #include <filesystem>

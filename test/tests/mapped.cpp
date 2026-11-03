@@ -74,7 +74,7 @@ static inline void TestMappedView2()
 #endif
   {
     std::error_code ec;
-    filesystem::remove("testfile", ec);
+    std::filesystem::remove("testfile", ec);
   }
   mapped_file_handle mfh = mapped_file_handle::mapped_file(1024 * 1024, {}, "testfile", file_handle::mode::write, file_handle::creation::if_needed,
                                                            file_handle::caching::all, file_handle::flag::unlink_on_first_close)

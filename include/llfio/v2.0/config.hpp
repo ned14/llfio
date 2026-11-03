@@ -348,10 +348,11 @@ LLFIO_V2_NAMESPACE_BEGIN
 using spinlock = QUICKCPPLIB_NAMESPACE::configurable_spinlock::spinlock<uintptr_t>;
 using QUICKCPPLIB_NAMESPACE::configurable_spinlock::lock_guard;
 LLFIO_V2_NAMESPACE_END
-// Bring in a memory resource implementation
-#include "quickcpplib/memory_resource.hpp"
+// Bring in a memory resource implementation: C++17 has <memory_resource>, so
+// quickcpplib's polyfill is gone and the alias is the standard one.
+#include <memory_resource>
 LLFIO_V2_NAMESPACE_BEGIN
-namespace pmr = QUICKCPPLIB_NAMESPACE::pmr;
+namespace pmr = std::pmr;
 LLFIO_V2_NAMESPACE_END
 
 

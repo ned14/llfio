@@ -23,8 +23,10 @@
 
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
-set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
-set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "develop" CACHE STRING "Which git tag to use for the Outcome dependency")
+# Both dependencies come from their llm-fixes branches: that is where quickcpplib's
+# C++17 floor, its CDash/CI fixes and Outcome's C ABI and status-code fixes live.
+set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "llm-fixes" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
+set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "llm-fixes" CACHE STRING "Which git tag to use for the Outcome dependency")
 if(NOT LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
   # Don't reuse the bootstrapped git clone as the dependency itself
   if(CMAKE_BINARY_DIR)
@@ -256,8 +258,11 @@ if(NOT llfio_IS_DEPENDENCY AND (NOT DEFINED BUILD_TESTING OR BUILD_TESTING))
   foreach(target ${llfio_COMPILE_TEST_TARGETS} ${llfio_TEST_TARGETS})
     target_compile_definitions(${target} PRIVATE LLFIO_INCLUDE_STORAGE_PROFILE=1)
   endforeach()
+  # kerneltest's llm-fixes branch is the C++17-only one, which is what LLFIO's test
+  # kernels are built with.
   find_quickcpplib_library(kerneltest
     GIT_REPOSITORY "https://github.com/ned14/kerneltest.git"
+    GIT_TAG "llm-fixes"
     REQUIRED
     IS_HEADER_ONLY
   )

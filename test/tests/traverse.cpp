@@ -141,7 +141,7 @@ static inline void TestTraverse()
       const auto dir_idx = ((v >> 8) % dirhs.size());
       const auto file_entries = (v & 255);
       const auto &dirh = dirhs[dir_idx];
-      filesystem::path::value_type buffer[10];
+      std::filesystem::path::value_type buffer[10];
       {
         auto c = (uint32_t) entries;
         buffer[0] = 'd';
