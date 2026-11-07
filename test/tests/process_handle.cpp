@@ -88,6 +88,25 @@ static inline void TestProcessHandle(bool with_redirection)
   }
 }
 
+static inline void TestProcessHandleCloseWaits()
+{
+  namespace llfio = LLFIO_V2_NAMESPACE;
+  auto &self = llfio::process_handle::current();
+  auto myexepath = self.current_path().value();
+  char buffer[64];
+  snprintf(buffer, 64, "--testchild,%u", (unsigned) 0);
+  llfio::path_view_component arg(buffer);
+  // The child sleeps for three seconds before exiting, and flag::wait_on_close is
+  // documented as the default: close() must not return until the child has gone,
+  // or the child is left unreaped.
+  llfio::process_handle child = llfio::process_handle::launch_process(myexepath, {&arg, 1}, llfio::process_handle::flag::wait_on_close | llfio::process_handle::flag::no_redirect).value();
+  auto begin = std::chrono::steady_clock::now();
+  child.close().value();
+  auto elapsed = std::chrono::steady_clock::now() - begin;
+  std::cout << "close() of a child which sleeps three seconds took " << std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count() << "ms" << std::endl;
+  BOOST_CHECK(elapsed >= std::chrono::seconds(2));
+}
+
 KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, no_redirect, "Tests that llfio::process_handle without redirection works as expected",
                        TestProcessHandle(false))
 KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, redirect, "Tests that llfio::process_handle with redirection works as expected",
@@ -110,3 +129,5 @@ int main(int argc, char *argv[])
   int result = QUICKCPPLIB_BOOST_UNIT_TEST_RUN_TESTS(argc, argv);
   return result;
 }
+KERNELTEST_TEST_KERNEL(integration, llfio, process_handle, close_waits, "Tests that llfio::process_handle::close() waits for the child when asked",
+                       TestProcessHandleCloseWaits())

@@ -103,7 +103,7 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<process_handle::path_type> process_handle
 LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<void> process_handle::close() noexcept
 {
   OUTCOME_TRY(close_pipes());
-  if(_.flags & flag::wait_on_close)
+  if(_flags & flag::wait_on_close)
   {
 #if LLFIO_LOGGING_LEVEL
     log_level_guard g(log_level::fatal);
