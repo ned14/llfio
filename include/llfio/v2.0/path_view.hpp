@@ -1106,7 +1106,11 @@ public:
             _bytes_to_delete = required_bytes;
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
-            _base::_ref = typename _base::_view_type(_buffer, view._length);
+            // The view must refer to the ALLOCATION, not to the internal stack
+            // buffer: reset() frees whatever the view refers to, so binding it
+            // to _buffer handed out uninitialised stack bytes as the path and
+            // then freed a stack address.
+            _base::_ref = typename _base::_view_type(buffer_, view._length);
           }
         }
         if(needs_slash_translation)

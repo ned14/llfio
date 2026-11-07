@@ -278,6 +278,42 @@ static inline void TestPathView()
     BOOST_CHECK(zbuff.deleter().called == 1);
     BOOST_CHECK(zbuff.deleter().sig == 5);
   }
+  // A rendered path which has to allocate must VIEW and FREE the allocation it
+  // made. It used to bind the view to its own internal stack buffer, so the
+  // path handed out was uninitialised stack bytes, and reset() then freed a
+  // stack address.
+  {
+    static char allocation[4096];
+    struct custom_allocate
+    {
+      mutable int called{0};
+      char *operator()(size_t /*unused*/) const
+      {
+        called++;
+        return allocation;
+      }
+    } allocator;
+    struct custom_delete
+    {
+      mutable int called{0};
+      mutable const char *freed{nullptr};
+      void operator()(char *p) const
+      {
+        called++;
+        freed = p;
+      }
+    } deleter;
+    const std::string longpath(2000, 'x');  // longer than the internal 1024 char buffer
+    llfio::path_view v(longpath.data(), longpath.size(), llfio::path_view::not_zero_terminated);
+    llfio::path_view::zero_terminated_rendered_path<char, custom_delete, 0> zbuff(v, allocator, deleter);
+    BOOST_REQUIRE(allocator.called == 1);
+    BOOST_REQUIRE(zbuff.size() == longpath.size());
+    BOOST_CHECK(zbuff.data() == allocation);  // the allocation, not the internal buffer
+    BOOST_CHECK(0 == memcmp(zbuff.data(), longpath.data(), longpath.size()));
+    zbuff.reset();
+    BOOST_CHECK(zbuff.deleter().called == 1);
+    BOOST_CHECK(zbuff.deleter().freed == allocation);  // freed the allocation, and only that
+  }
   // Custom memory_resource
   {
     struct custom_memory_resource final : llfio::pmr::memory_resource
