@@ -62,7 +62,8 @@ namespace algorithm
 
     traversal_summary() {}
     traversal_summary(const traversal_summary &o)
-        : directory_opens_failed(o.directory_opens_failed)
+        : stats_failed(o.stats_failed)
+        , directory_opens_failed(o.directory_opens_failed)
         , want(o.want)
         , devs(o.devs)
         , types(o.types)
@@ -75,7 +76,8 @@ namespace algorithm
       assert(!is_lockable_locked(o._lock));
     }
     traversal_summary(traversal_summary &&o) noexcept
-        : directory_opens_failed(o.directory_opens_failed)
+        : stats_failed(o.stats_failed)
+        , directory_opens_failed(o.directory_opens_failed)
         , want(o.want)
         , devs(std::move(o.devs))
         , types(std::move(o.types))
@@ -91,6 +93,7 @@ namespace algorithm
     {
       if(this != &o)
       {
+        stats_failed = o.stats_failed;
         directory_opens_failed = o.directory_opens_failed;
         want = o.want;
         devs = o.devs;
@@ -107,6 +110,7 @@ namespace algorithm
     {
       if(this != &o)
       {
+        stats_failed = o.stats_failed;
         directory_opens_failed = o.directory_opens_failed;
         want = o.want;
         devs = std::move(o.devs);
@@ -123,6 +127,7 @@ namespace algorithm
     traversal_summary &operator+=(const traversal_summary &o)
     {
       lock_guard<spinlock> g(_lock);
+      stats_failed += o.stats_failed;
       directory_opens_failed += o.directory_opens_failed;
       for(auto &i : o.devs)
       {
