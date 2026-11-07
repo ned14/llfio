@@ -128,6 +128,26 @@ public:
 private:
   section_handle _sectionh;
   map_handle _maph;
+  //! Whether `in_place_attach<T>()` was performed on this instance, and so `in_place_detach<T>()` is owed before the map dies.
+  bool _attached{false};
+
+  //! Attach the mapped region as an array of `T`.
+  /*! A read-only mapping can never be attached in place, as attaching writes into the region. It must still be viewed
+  though: leaving the span empty made a read-only `mapped<T>` indistinguishable from a genuinely empty file.
+  */
+  void _attach_view(byte *addr, size_t len)
+  {
+    if(_maph.is_writable())
+    {
+      static_cast<span<T> &>(*this) = detail::attach_or_reinterpret<T>::attach({addr, len});
+      _attached = true;
+    }
+    else
+    {
+      static_cast<span<T> &>(*this) = span<T>(reinterpret_cast<T *>(addr), len / sizeof(T));  // NOLINT
+    }
+  }
+
   mapped(file_handle *backing, size_type maximum_size, extent_type page_offset, extent_type offset, section_handle *sh, size_type bytes, section_handle::flag _flag)  // NOLINT
       : _sectionh((backing != nullptr) ? section_handle::section(*backing, maximum_size, _flag).value() : section_handle())
       ,  //
@@ -144,10 +164,7 @@ private:
     {
       len = bytes;
     }
-    if(_maph.is_writable())
-    {
-      static_cast<span<T> &>(*this) = detail::attach_or_reinterpret<T>::attach({addr, len});
-    }
+    _attach_view(addr, len);
   }
 
 public:
@@ -159,8 +176,10 @@ public:
       : span<T>(std::move(o))
       , _sectionh(std::move(o._sectionh))
       , _maph(std::move(o._maph))
+      , _attached(std::move(o._attached))
   {
     static_cast<span<T> &>(o) = {};
+    o._attached = false;
   }
   mapped &operator=(const mapped &) = delete;
   mapped &operator=(mapped &&o) noexcept
@@ -177,7 +196,7 @@ public:
   //! Detaches the array of `T`, before tearing down the map
   ~mapped()
   {
-    if(!this->empty() && _maph.is_writable())
+    if(_attached && !this->empty())
     {
       detail::attach_or_reinterpret<T>::detach(*this);
     }
@@ -222,7 +241,7 @@ public:
       : _maph(map_handle::map(length * sizeof(T), zeroed, _flag).value())
   {
     byte *addr = _maph.address();
-    static_cast<span<T> &>(*this) = detail::attach_or_reinterpret<T>::attach({addr, length * sizeof(T)});
+    _attach_view(addr, length * sizeof(T));
   }
   /*! Construct a mapped view of the given section handle.
 

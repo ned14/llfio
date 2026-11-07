@@ -156,5 +156,31 @@ static inline void TestMappedView2()
   BOOST_CHECK(mfh.address() == nullptr);
 }
 
+static inline void TestMappedView3()
+{
+  using namespace LLFIO_V2_NAMESPACE;
+  using LLFIO_V2_NAMESPACE::file_handle;
+  file_handle fh = file_handle::file({}, "testfile", file_handle::mode::write, file_handle::creation::if_needed, file_handle::caching::all,
+                                     file_handle::flag::unlink_on_first_close)
+                   .value();
+  fh.truncate(10000 * sizeof(int)).value();
+  {
+    mapped<int> w(fh, 10000);
+    w[0] = 78;
+    w[9999] = 79;
+  }
+  // A read-only mapping cannot be attached in place, but it must still describe
+  // the memory which was mapped. It used to be left empty, which made it
+  // indistinguishable from a genuinely empty file: the caller read nothing and
+  // was told nothing.
+  section_handle sh(section_handle::section(fh, 0, section_handle::flag::read).value());
+  mapped<int> v(sh, 10000, 0, section_handle::flag::read);
+  BOOST_REQUIRE(v.size() == 10000);
+  BOOST_CHECK(v.data() != nullptr);
+  BOOST_CHECK(v[0] == 78);
+  BOOST_CHECK(v[9999] == 79);
+}
+
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span1, "Tests that llfio::mapped works as expected", TestMappedView1())
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span2, "Tests that llfio::attached works as expected", TestMappedView2())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, mapped_span3, "Tests that llfio::mapped works as expected with read-only mappings", TestMappedView3())
