@@ -2116,7 +2116,12 @@ inline result<void> do_clone_handle(native_handle_type &dest, const native_handl
     access &= ~DELETE;
   }
   OUTCOME_TRY(auto &&ntflags, ntflags_from_handle_caching_and_flags(dest, caching_, _flags));
-  ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
+  if(!isdir)
+  {
+    ntflags |= 0x040 /*FILE_NON_DIRECTORY_FILE*/;  // do not open a directory
+  }
+  // For a directory this flag must be absent: setting it made every reopen of a
+  // directory handle with a changed mode or caching fail with STATUS_NOT_A_DIRECTORY.
   OBJECT_ATTRIBUTES oa{};
   memset(&oa, 0, sizeof(oa));
   oa.Length = sizeof(OBJECT_ATTRIBUTES);
