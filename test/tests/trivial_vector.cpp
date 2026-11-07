@@ -112,6 +112,47 @@ static inline void TestTrivialVector()
   BOOST_CHECK(it == v.end());
 }
 
+static inline void TestTrivialVectorLargeInsert()
+{
+  using LLFIO_V2_NAMESPACE::algorithm::trivial_vector;
+  struct udt
+  {
+    uint64_t v, _space[7];  // 64 bytes total
+    udt() = delete;
+    explicit udt(uint64_t _v)
+        : v(_v)
+    {
+    }
+  };
+  using udt_vector = trivial_vector<udt>;
+  udt_vector v;
+  v.push_back(udt(1));
+  const auto initial_capacity = v.capacity();
+  // The count is larger than the initial capacity, so insert() has to grow the
+  // mapping. Its growth loop was inverted, so it reserved the capacity it
+  // already had and then memmoved past the end of the mapping.
+  BOOST_REQUIRE(initial_capacity < 2001);
+  v.insert(v.begin(), 2000, udt(2));
+  BOOST_CHECK(v.size() == 2001);
+  BOOST_CHECK(v.capacity() >= 2001);
+  BOOST_CHECK(v[0].v == 2);
+  BOOST_CHECK(v[1999].v == 2);
+  BOOST_CHECK(v[2000].v == 1);
+  // emplace() and both erase() overloads carried the same retired-iterator
+  // leftover (a `_v` member which a raw pointer does not have), so they did not
+  // compile at all: this is the only test which instantiates them.
+  v.emplace(v.begin() + 1, 3);
+  BOOST_CHECK(v.size() == 2002);
+  BOOST_CHECK(v[1].v == 3);
+  v.erase(v.begin() + 1);
+  BOOST_CHECK(v.size() == 2001);
+  BOOST_CHECK(v[1].v == 2);
+  v.erase(v.begin(), v.begin() + 1000);
+  BOOST_CHECK(v.size() == 1001);
+  BOOST_CHECK(v[0].v == 2);
+  BOOST_CHECK(v[1000].v == 1);
+}
+
 inline std::string printKb(size_t bytes)
 {
   if(bytes >= 1024 * 1024 * 1024)
@@ -245,5 +286,6 @@ static inline void BenchmarkTrivialVector2()
 }
 
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector, "Tests that llfio::algorithm::trivial_vector works as expected", TestTrivialVector())
+KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector_large_insert, "Tests that llfio::algorithm::trivial_vector::insert() grows its mapping", TestTrivialVectorLargeInsert())
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector2, "Benchmarks llfio::algorithm::trivial_vector against std::vector with push_back()", BenchmarkTrivialVector1())
 KERNELTEST_TEST_KERNEL(integration, llfio, algorithm, trivial_vector3, "Benchmarks llfio::algorithm::trivial_vector against std::vector with resize()", BenchmarkTrivialVector2())

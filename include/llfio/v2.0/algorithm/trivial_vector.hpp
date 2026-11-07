@@ -385,84 +385,103 @@ namespace algorithm
       //! Inserts items
       iterator insert(const_iterator pos, size_type count, const value_type &v)
       {
+        // reserve() may remap, which invalidates pos, so remember where it was
+        const auto offset = pos - _begin;
         {
           size_type cap = capacity();
-          while(size() + count < cap)
+          // Grow until the current capacity can hold everything. This test was
+          // inverted: it grew while there was already enough room, so an insert
+          // larger than the spare capacity reserved the capacity it already had
+          // and then memmoved past the end of the mapping.
+          while(size() + count > cap)
           {
             cap = _scale_capacity(cap);
           }
           reserve(cap);
         }
+        value_type *p = _begin + offset;
         // Trivially copyable, so memmove and we know copy construction can't fail
-        memmove(pos._v + count, pos._v, (_end - pos._v) * sizeof(value_type));
+        memmove(p + count, p, (_end - p) * sizeof(value_type));
         for(size_type n = 0; n < count; n++)
         {
-          new(pos._v + n) value_type(v);
+          new(p + n) value_type(v);
         }
         _end += count;
-        return iterator(pos._v);
+        return iterator(p);
       }
       //! Inserts items
       template <class InputIt> iterator insert(const_iterator pos, InputIt first, InputIt last)
       {
         size_type count = std::distance(first, last);
+        const auto offset = pos - _begin;
         {
           size_type cap = capacity();
-          while(size() + count < cap)
+          // Grow until the current capacity can hold everything. This test was
+          // inverted: it grew while there was already enough room, so an insert
+          // larger than the spare capacity reserved the capacity it already had
+          // and then memmoved past the end of the mapping.
+          while(size() + count > cap)
           {
             cap = _scale_capacity(cap);
           }
           reserve(cap);
         }
+        value_type *p = _begin + offset;
         // Trivially copyable, so memmove and we know copy construction can't fail
-        memmove(pos._v + count, pos._v, (_end - pos._v) * sizeof(value_type));
+        memmove(p + count, p, (_end - p) * sizeof(value_type));
         for(size_type n = 0; n < count; n++)
         {
-          new(pos._v + n) value_type(*first++);
+          new(p + n) value_type(*first++);
         }
         _end += count;
-        return iterator(pos._v);
+        return iterator(p);
       }
       //! Inserts items
       iterator insert(const_iterator pos, std::initializer_list<value_type> il) { return insert(pos, il.begin(), il.end()); }
       //! Emplace item
       template <class... Args> iterator emplace(const_iterator pos, Args &&... args)
       {
+        // reserve() may remap, which invalidates pos, so remember where it was
+        const auto offset = pos - _begin;
         if(capacity() == size())
         {
           reserve(_scale_capacity(capacity()));
         }
+        value_type *p = _begin + offset;
         // Trivially copyable, so memmove
-        memmove(pos._v + 1, pos._v, (_end - pos._v) * sizeof(value_type));
+        memmove(p + 1, p, (_end - p) * sizeof(value_type));
         // BUT complex constructors may throw!
         LLFIO_EXCEPTION_TRY
         {
-          new(pos._v) value_type(std::forward<Args>(args)...);
+          new(p) value_type(std::forward<Args>(args)...);
         }
         LLFIO_EXCEPTION_CATCH_ALL
         {
-          memmove(pos._v, pos._v + 1, (_end - pos._v) * sizeof(value_type));
+          memmove(p, p + 1, (_end - p) * sizeof(value_type));
           LLFIO_EXCEPTION_RETHROW;
         }
         ++_end;
-        return iterator(pos._v);
+        return iterator(p);
       }
 
       //! Erases item
       iterator erase(const_iterator pos)
       {
+        // The iterator types are raw pointers, so there is no _v member to use
+        value_type *p = const_cast<value_type *>(pos);
         // Trivially copyable
-        memmove(pos._v, pos._v + 1, ((_end - 1) - pos._v) * sizeof(value_type));
+        memmove(p, p + 1, ((_end - 1) - p) * sizeof(value_type));
         --_end;
-        return iterator(pos._v);
+        return iterator(p);
       }
       //! Erases items
       iterator erase(const_iterator first, const_iterator last)
       {
+        value_type *f = const_cast<value_type *>(first), *l = const_cast<value_type *>(last);
         // Trivially copyable
-        memmove(first._v, last._v, (_end - last._v) * sizeof(value_type));
-        _end -= last._v - first._v;
-        return iterator(first._v);
+        memmove(f, l, (_end - l) * sizeof(value_type));
+        _end -= l - f;
+        return iterator(f);
       }
       //! Appends item
       void push_back(const value_type &v)
