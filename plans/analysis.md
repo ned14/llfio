@@ -398,3 +398,131 @@ Other:
 - `clone_to_path_handle()` correctly avoids double-close on the `DuplicateHandle` failure
   path and matches POSIX behaviour.
 - The `filter::fastdeleted` skip does not corrupt `entries_parsed` or the buffer walk.
+
+---
+
+## Inbound from GitHub — triaged 2026-11-08
+
+Not review findings: these are the open issues and pull requests in `ned14/llfio` as at
+2026-11-08, triaged into this register so that the tree's open work is tracked in one place. Each
+entry is the reporter's claim plus what closing it would take; nothing here has been investigated
+to the depth of the sections above. Identifiers are `GH` plus the six-digit GitHub number.
+
+`REOPNDIR` above is fixed by commit 22689479 (`FILE_NON_DIRECTORY_FILE` is now conditional on
+`isdir`); remove that entry once the commit lands.
+
+### High
+
+### `GH000020` — async i/o partial buffer fills do not follow P1031
+`async_file_handle` everywhere, and `file_handle` on Windows, do not truncate a completed buffer
+fill at the first partially filled buffer as P1031 requires. Action: implement the truncation and
+a test which asserts it.
+
+### `GH000121` — `llfio::map(section, reserve)` does not work on Windows
+Documented as being able to reserve more address space than the section length so the section can
+later grow without moving; on Windows it fails with `0xC00000...`. Action: reproduce, then either
+implement the reservation or document the Windows limitation honestly.
+
+### `GH000129` — `fs_handle::parent_path_handle()` always fails on ReFS/DevDrive
+`detail/impl/windows/fs_handle.ipp:111-119` identifies the containing directory by comparing
+`FileInternalInformation.IndexNumber` against `_inode`; on ReFS/DevDrives the values differ, so the
+search never matches. Verified still present. Action: compare by file id path (`FILE_ID_INFO`) or
+fall back to the final opened candidate.
+
+### `GH000092` — Win32 / Clang-14 / libc++: `in6addr_loopback` undeclared
+Build failure in the MinGW/libc++ header interaction. Action: reproduce in the mingw lane, guard
+the use.
+
+### `GH000087` — fs-probe segfaults on macOS
+`fs-probe` crashes after writing 17Gb of temporary test files. Action: reproduce with a debugger
+on macOS; it exercises the same code paths as `clone_extents`/`copy_file`.
+
+### Medium
+
+### `GH000160` — `mapped_temp_inode` leaks space on Windows
+Reported by a third party: the space is not released until reboot on some machines. Action: needs
+a reproduction; `mapped_temp_inode` is implemented in `detail/impl/windows/mapped_temp_inode.ipp`.
+
+### `GH000152` — `traverse` unit test fails on some Windows machines
+The test does not pass `permit_racy_reads` to directory enumeration, which some filesystems
+require. Verified: `permit_racy_reads` does not appear in `test/tests/traverse.cpp`.
+
+### `GH000146` — prebuilt binaries put their dependencies whole inside `include`
+Release packaging should install, then distribute the install tree. Related to `SGLHDRPR` above
+and to the review's finding that prebuilt packaging silently no-ops when the library filename does
+not match.
+
+### `GH000136` — `example/mapped_file.cpp` does not work against a real build
+Followed Build.md, every command succeeded, then the example fails. Action: turn the examples into
+something CI runs.
+
+### `GH000111` — Build.md gives inaccurate build instructions on POSIX
+Reports the `quickcpplib not found, cloning ...` path and a subsequent failure from a clean build
+on Fedora. Action: rewrite the section against a clean container, as a `ci.yml` job would.
+
+### `GH000120` — many C++ warnings and errors
+Large number of warnings (and at least one error) building the dynamic library on Fedora 37 with
+current GCC/Clang. Action: triage the paste into warning classes; the ones which are real defects
+become their own entries.
+
+### `GH000098` — `algorithm::traverse` uses `vector<list<move-only-type>>`, which is not guaranteed to compile
+MSVC's container-of-move-only workaround. PR #177 (`GH000177`) is the proposed fix; land it.
+
+### `GH000175` (PR) — Fix the `system_code` default argument in `error_from_exception`
+Open since 2026-05 with review discussion. Action: decide, then land or close.
+
+### `GH000179` (PR) — `traverse()`: enumerate directories larger than one `NtQueryDirectoryFile()` call
+Long-running PR with discussion. Action: decide whether to take it as-is or fold it into the
+rewrite of the enumeration buffers.
+
+### `GH000182` (PR) — Use a global `proc_fs` path handle
+Action: review and land, or close with a reason.
+
+### Low
+
+### `GH000010` — CI test that the header-only edition does not collide symbols
+Easy to slip up; PR #181 (`GH000181`) implements it. Action: land the PR.
+
+### `GH000016` — address or document the racy nature of the Windows `unlink()` emulation
+Documentation task for `fs_handle.ipp:243-279` (pre-1709 rename-then-delete emulation). Related to
+`UNLNKOLD` above.
+
+### `GH000074` — force unlinking of read-only/immutable files
+Feature request: allow unlinking entries with `FILE_ATTRIBUTE_READONLY`, and make `reduce()`
+report the specific error rather than a generic failure.
+
+### `GH000125` — no tests for copying files with holes
+`clone_extents.cpp` is the only related test and it does not create holes. Action: add a hole
+punching test (also on the SEEK_HOLE/SEEK_DATA and `fallocate(PUNCH_HOLE)` paths).
+
+### `GH000132` — suggestion for a `mapped` `relink()` fallback on Windows
+The documented guarantee lists `relink()` as the only way to get a new address; the suggestion is
+to make `relink()` a no-op fallback where the map cannot be renamed.
+
+### `GH000135` — Windows does not like the default `llfio::open` arguments
+Default `flag::none` opens successfully but a subsequent read returns "not supported";
+`flag::multiplexable` fixes it. Either change the default on Windows or document it.
+
+### `GH000029` — how to portably detect EOF on `file_handle`
+Sequential reads do not report EOF in a way the reporter could find. Documentation answer, or add
+an EOF-returning helper.
+
+### `GH000106` — documentation improvements from Reddit
+Feature list on the Readme, and so on. Docs-only.
+
+### `GH000180` (PR) — NOTICE/CONTRIBUTING/SECURITY/CODE_OF_CONDUCT plus Readme navigation
+Docs-only; review and land.
+
+### Unprioritised (architectural / roadmap)
+
+### `GH000023` — use io_uring on Linux where available (>= 5.1)
+Backend work with a large payoff for O_DIRECT i/o; needs a design pass before it can be scheduled.
+
+### `GH000036` — modularise LLFIO facilities
+Make the memory-mapping parts (and others) excludable from a build.
+
+### `GH000040` — an i/o handle constructor taking a `path_handle` must take its implementation from it
+Would allow KV hardware (SNIA KV, NTFS kv lookup) to be surfaced as a `file_handle`.
+
+### `GH000183` (PR) — `llfio::atomic_file`, a safe-save transaction which atomically replaces a file's contents
+New facility rather than a fix; needs a design review before it can land.
