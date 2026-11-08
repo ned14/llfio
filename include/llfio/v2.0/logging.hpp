@@ -382,7 +382,7 @@ namespace detail
       if(log().valid(src._log_id))
       {
         ret.append(" [location = ");
-        ret.append(location(log()[src._log_id]));
+        ret.append(location(log().snapshot_by_id(log_implementation_type::unique_id(src._log_id))));
         ret.append("]");
       }
     }
