@@ -257,10 +257,10 @@ namespace algorithm
           auto _bytes = (bytes + 63) & ~63;
           OUTCOME_TRY(auto &&_, map_handle::map(_bytes * (1 + _have_source)));
           buffersh = std::move(_);
-          buffers[0] = buffer_type{buffers[0].data(), bytes};
+          buffers[0] = buffer_type{buffersh.address(), bytes};
           if(_have_source)
           {
-            buffers[1] = buffer_type{buffers[1].data() + _bytes, bytes};
+            buffers[1] = buffer_type{buffersh.address() + _bytes, bytes};
           }
         }
         buffer_type tempbuffers[2] = {buffers[0], buffers[1]};
