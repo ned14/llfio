@@ -109,11 +109,23 @@ byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type
   if(is_seekable())
   {
 #if LLFIO_MISSING_PIOV
+    // preadv() is missing here, so emulate it. Each result must be checked before it is
+    // accumulated: adding a -1 from a failed call to a positive running total used to yield a
+    // plausible byte count and report a partly uninitialised read as success.
     off_t offset = reqs.offset;
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
-      bytesread += ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
-      offset += iov[n].iov_len;
+      ssize_t bytes;
+      do
+      {
+        bytes = ::pread(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+      } while(bytes < 0 && EINTR == errno);
+      if(bytes < 0)
+      {
+        return posix_error();
+      }
+      bytesread += bytes;
+      offset += bytes;
     }
 #else
     bytesread = ::preadv(_v.fd, iov, reqs.buffers.size(), reqs.offset);
@@ -214,11 +226,21 @@ byte_io_handle::_do_write(byte_io_handle::io_request<byte_io_handle::const_buffe
   if(is_seekable())
   {
 #if LLFIO_MISSING_PIOV
+    // As for the emulated preadv() above, check each result before accumulating it.
     off_t offset = reqs.offset;
     for(size_t n = 0; n < reqs.buffers.size(); n++)
     {
-      byteswritten += ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
-      offset += iov[n].iov_len;
+      ssize_t bytes;
+      do
+      {
+        bytes = ::pwrite(_v.fd, iov[n].iov_base, iov[n].iov_len, offset);
+      } while(bytes < 0 && EINTR == errno);
+      if(bytes < 0)
+      {
+        return posix_error();
+      }
+      byteswritten += bytes;
+      offset += bytes;
     }
 #else
     byteswritten = ::pwritev(_v.fd, iov, reqs.buffers.size(), reqs.offset);
