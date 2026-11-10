@@ -568,15 +568,24 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         // std::cout << "SEEK_DATA from " << end << " finds " << start << std::endl;
         if(static_cast<extent_type>(-1) == start)
         {
-          if(ENXIO == errno)
+          const int lseek_errno = errno;
+          if(ENXIO == lseek_errno)
           {
             // There is no data between end, and the file length
             start = mycurrentlength;
           }
-          else if(start == 0)
+          else
           {
-            // extents enumeration is not supported
-            todo.push_back(workitem{extent_pair(0, mycurrentlength), workitem::clone_extents});
+            /* Extents enumeration is not supported by this file system: SEEK_DATA returns
+            -1/EINVAL or EOPNOTSUPP rather than -1/ENXIO on NFS, FUSE and some older local file
+            systems. Not knowing where the holes are must not mean "it is all hole" - that
+            punches or zeroes the destination - so clone everything from here to the end of the
+            requested extent instead. */
+            const extent_type clampedstart = std::max(end, extent.offset);
+            if(clampedstart < extent.offset + extent.length)
+            {
+              todo.push_back(workitem{extent_pair(clampedstart, extent.offset + extent.length - clampedstart), workitem::clone_extents});
+            }
             break;
           }
         }
@@ -605,15 +614,21 @@ result<file_handle::extent_pair> file_handle::clone_extents_to(file_handle::exte
         // std::cout << "SEEK_HOLE from " << start << " finds " << end << std::endl;
         if(static_cast<extent_type>(-1) == end)
         {
-          if(ENXIO == errno)
+          const int lseek_errno = errno;
+          if(ENXIO == lseek_errno)
           {
             // There is no data between start, and the file length
             end = mycurrentlength;
           }
-          else if(start == 0)
+          else
           {
-            // extents enumeration is not supported
-            todo.push_back(workitem{extent_pair(0, mycurrentlength), workitem::clone_extents});
+            /* As above: SEEK_HOLE not being supported is not a hole. Data runs from start to the
+            end of the requested extent, so clone that. */
+            const extent_type clampedstart = std::max(start, extent.offset);
+            if(clampedstart < extent.offset + extent.length)
+            {
+              todo.push_back(workitem{extent_pair(clampedstart, extent.offset + extent.length - clampedstart), workitem::clone_extents});
+            }
             break;
           }
         }
