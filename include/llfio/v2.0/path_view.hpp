@@ -1100,10 +1100,13 @@ public:
         }
         else
         {
-          auto *buffer_ = allocate(required_length);
+          // +1 element: the terminator is written at index required_length below, and every
+          // allocate() adapter here takes an element count (the memory_resource one used to treat
+          // it as a byte count, which under-allocated by sizeof(value_type)).
+          auto *buffer_ = allocate(required_length + 1);
           if(nullptr != buffer_)
           {
-            _bytes_to_delete = required_bytes;
+            _bytes_to_delete = (required_length + 1) * sizeof(value_type);
             memcpy(buffer_, source, required_bytes);
             buffer_[required_length] = 0;
             // The view must refer to the ALLOCATION, not to the internal stack
@@ -1282,7 +1285,9 @@ public:
     struct _memory_resource_allocate
     {
       pmr::memory_resource *mr{nullptr};
-      value_type *operator()(size_t bytes) const { return static_cast<value_type *>(mr->allocate(bytes)); }
+      // Takes a count of value_type, like the other two allocate adapters; the memory resource
+      // itself allocates in bytes, and _memory_resouce_deallocate() is handed byte counts.
+      value_type *operator()(size_t count) const { return static_cast<value_type *>(mr->allocate(count * sizeof(value_type))); }
     };
     template <class Alloc> struct _stl_allocator_allocate
     {
