@@ -130,9 +130,12 @@ byte_io_handle::_do_read(byte_io_handle::io_request<byte_io_handle::buffers_type
       bytesread = ::readv(_v.fd, iov, reqs.buffers.size());
       if(bytesread <= 0)
       {
-        if(bytesread == 0 && is_socket())
+        if(bytesread == 0)
         {
-          // Sockets read zero if the remote has shutdown
+          // Sockets read zero if the remote has shutdown, and pipes, FIFOs and character devices
+          // read zero at end of file. A zero is a completed short read, not a reason to wait for
+          // more: poll() on a pipe read end whose writer has gone returns POLLHUP immediately, so
+          // retrying here spins for ever at 100% CPU.
           break;
         }
         if(bytesread < 0 && EWOULDBLOCK != errno && EAGAIN != errno)
