@@ -279,7 +279,15 @@ template <> struct construct<process_handle>
 {
   path_view _path;
   span<path_view_component> _args;
-  span<path_view_component> _env = *process_handle::current().environment();
+  /* environment() owns the span, the path view components and the environment strings in one
+  block. Keeping only the span (as this used to) left it dangling as soon as the member initialiser
+  finished, so launch_process() was handed a freed environment. Hold the owner here instead, and
+  have _env default to it: _env stays assignable, so a caller can still launch with an environment
+  of their own. The deleter is protected, so the owner is named by decltype rather than by
+  widening process_handle's public API.
+  */
+  decltype(process_handle::current().environment()) _env_owner{process_handle::current().environment()};
+  span<path_view_component> _env = (_env_owner != nullptr) ? *_env_owner : span<path_view_component>();
   process_handle::flag _flags = process_handle::flag::wait_on_close;
   result<process_handle> operator()() const noexcept { return process_handle::launch_process(_path, _args, _env, _flags); }
 };
