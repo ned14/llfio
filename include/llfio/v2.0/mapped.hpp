@@ -168,6 +168,14 @@ private:
     }
     byte *addr = _maph.address() + offset;
     size_t len = sectionlen - offset;  // use section length, not mapped length as mapped length is rounded up to page size
+    /* Unlike `len`, `_maph.length()` is counted from the page-aligned map offset, whereas `addr`
+    already starts `offset` bytes into that - so only `_maph.length() - offset` bytes exist from
+    here. Clamping to it keeps the view inside the mapping for any non-zero byteoffset. */
+    const size_t mappable = (_maph.length() > offset) ? static_cast<size_t>(_maph.length() - offset) : 0;
+    if(len > mappable)
+    {
+      len = mappable;
+    }
     if(bytes != 0 && bytes < len)
     {
       len = bytes;
