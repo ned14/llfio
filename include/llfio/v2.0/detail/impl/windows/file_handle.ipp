@@ -906,7 +906,9 @@ result<file_handle::extent_type> file_handle::zero(file_handle::extent_pair exte
       return win32_error();
     }
   }
-  return success();
+  // Report the bytes zeroed, as the POSIX implementation does: `return success()` here
+  // default-constructed the value, so a successful zero() claimed to have zeroed nothing.
+  return extent.length;
 }
 
 
