@@ -91,7 +91,11 @@ namespace detail
     handle *current_handle{nullptr};  // The current handle for this thread. Changed via RAII via LLFIO_LOG_FUNCTION_CALL, see below.
     bool reentering_self{false};      // Prevents any failed call to current_path() by us reentering ourselves
 
-    char paths[190][16]{};  // Last 190 chars of path
+    // 16 slots, each holding the last 190 characters of a path plus a terminator. This used to
+    // be declared char[190][16] - 190 slots of 16 characters - while next() hands out
+    // `paths[idx % 16]` and callers strncpy() 190 bytes into it, so every stored path was
+    // truncated to 15 characters and clobbered a dozen neighbouring slots.
+    char paths[16][191]{};
     uint16_t pathidx{0};
     char *next(uint16_t &idx)
     {

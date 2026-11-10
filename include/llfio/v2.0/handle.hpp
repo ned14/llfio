@@ -569,18 +569,13 @@ namespace detail
 #pragma warning(push)
 #pragma warning(disable : 4996)  // the function may be unsafe
 #endif
-#if (__GNUC__ >= 8) && !defined(__clang__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
-          // The type in TLS is char paths[190][16]{};
-          // If I index that by paths[x], I get back a type of char(&)[190].
-          // See https://godbolt.org/z/d69xzd for proof.
-          // So I don't know why there is a warning here about overflowing a buffer of 16!
-          strncpy(tls.next(dest._tls_path_id1), QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), 190);
-#if (__GNUC__ >= 8) && !defined(__clang__)
-#pragma GCC diagnostic pop
-#endif
+          // The type in TLS is char paths[16][191]{}, so this writes into a 190 character row.
+          // Bound the copy by the row size rather than a literal so the two cannot drift apart,
+          // and terminate explicitly: last190() hands back a 190 character window which need not
+          // contain a NUL when the path is longer than that.
+          char *const tlsrow = tls.next(dest._tls_path_id1);
+          strncpy(tlsrow, QUICKCPPLIB_NAMESPACE::ringbuffer_log::last190(currentpath), sizeof(tls.paths[0]) - 1);
+          tlsrow[sizeof(tls.paths[0]) - 1] = '\0';
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
