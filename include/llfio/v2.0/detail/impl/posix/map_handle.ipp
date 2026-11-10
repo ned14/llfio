@@ -775,7 +775,11 @@ map_handle::io_result<map_handle::const_buffers_type> map_handle::_do_write(io_r
     {
       return std::move(r).error();
     }
-    reqs.offset += _offset;
+    // Restore the map-relative offset: the length check below compares against _length, which is
+    // map-relative. Adding _offset a second time (as this line used to) made that test compare a
+    // file-absolute offset with a map-relative length, so it fired when the write had not grown
+    // the map. The Windows implementation of this function has always subtracted here.
+    reqs.offset -= _offset;
     if(reqs.offset + r.bytes_transferred() > _length)
     {
       OUTCOME_TRY(update_map());
