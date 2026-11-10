@@ -285,16 +285,18 @@ namespace algorithm
             tempbuffers[1] = buffer_type{tempbuffers[1].data() + _b.size(), tempbuffers[1].size() - _b.size()};
           }
         }
-        // Resize buffers to what was written
+        // Resize buffers to what was actually combined (which a short source read can shorten)
         buffers[0] = buffer_type(buffers[0].data(), tempbuffers[0].data() - buffers[0].data());
         buffers[1] = buffer_type(buffers[1].data(), tempbuffers[1].data() - buffers[1].data());
 
-        // Write the temporary buffer, and adjust the buffers written we return to match
+        // Write the temporary buffer, and adjust the buffers written we return to match. The third argument
+        // to adjust_written_buffers is only compared by size against what the write reported, so it has to be
+        // the size of the whole request, not of the possibly shortened temporary buffer.
         {
           const_buffer_type b(buffers[0]);
           io_request<const_buffers_type> req({&b, 1}, reqs.offset);
           OUTCOME_TRY(auto &&_, _target->write(req, d));
-          OUTCOME_TRY((Op<target_handle_type, source_handle_type>::adjust_written_buffers(reqs.buffers, _[0], buffers[0])));
+          OUTCOME_TRY((Op<target_handle_type, source_handle_type>::adjust_written_buffers(reqs.buffers, _[0], const_buffer_type(buffers[0].data(), bytes))));
         }
         return {std::move(reqs.buffers)};
       }

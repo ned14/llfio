@@ -113,8 +113,19 @@ namespace algorithm
 
       static result<const_buffer_type> do_write(buffer_type t, buffer_type s, const_buffer_type in) noexcept
       {
-        // in is the constraint here
-        for(size_t idx = 0; idx < in.size();)
+        // Whichever of the three is smallest is the constraint here: `s` holds the source read, which is
+        // legitimately short at end of file, and must not be read past its end as if it were uninitialised
+        // scratch (its temporary buffer is uninitialised beyond what was read).
+        size_t to_write = in.size();
+        if(t.size() < to_write)
+        {
+          to_write = t.size();
+        }
+        if(s.size() < to_write)
+        {
+          to_write = s.size();
+        }
+        for(size_t idx = 0; idx < to_write;)
         {
           {
             // If addresses happen to align to SIMD, hint very strongly to use SIMD
@@ -123,7 +134,7 @@ namespace algorithm
             uintptr_t remain3 = ((uintptr_t) in.data() + idx) & 63;
             if(remain1 == 0 && remain2 == 0 && remain3 == 0)
             {
-              while(in.size() - idx >= 64)
+              while(to_write - idx >= 64)
               {
                 uint64_t *a = (uint64_t *) (t.data() + idx);
                 const uint64_t *b = (const uint64_t *) (s.data() + idx);
@@ -147,7 +158,7 @@ namespace algorithm
             uintptr_t remain3 = ((uintptr_t) in.data() + idx) & (sizeof(uintptr_t) - 1);
             if(remain1 == 0 && remain2 == 0 && remain3 == 0)
             {
-              while(in.size() - idx >= sizeof(uintptr_t))
+              while(to_write - idx >= sizeof(uintptr_t))
               {
                 uintptr_t *a = (uintptr_t *) (t.data() + idx);
                 const uintptr_t *b = (const uintptr_t *) (s.data() + idx);
@@ -158,7 +169,7 @@ namespace algorithm
             }
           }
           // Otherwise byte work
-          while(in.size() - idx > 0)
+          while(to_write - idx > 0)
           {
             uint8_t *a = (uint8_t *) (t.data() + idx);
             const uint8_t *b = (const uint8_t *) (s.data() + idx);
@@ -167,8 +178,8 @@ namespace algorithm
             idx += 1;
           }
         }
-        // Adjust buffers returned to bytes read from in!
-        t = {t.data(), in.size()};
+        // Adjust buffers returned to bytes actually combined
+        t = {t.data(), to_write};
         return t;
       }
 
@@ -179,7 +190,10 @@ namespace algorithm
           auto byteswritten = twritten.size();
           for(auto &buffer : out)
           {
-            if(buffer.size() >= byteswritten)
+            // Buffers wholly covered by the bytes written are left alone; the first one only partially
+            // covered is shortened, and everything after it is emptied. The comparison must therefore be
+            // `<=`, not `>=`, or the first buffer's size is subtracted from a smaller running total.
+            if(buffer.size() <= byteswritten)
             {
               byteswritten -= buffer.size();
             }
