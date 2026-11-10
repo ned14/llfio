@@ -242,7 +242,7 @@ protected:
         if(log().valid(v.value()._log_id))
         {
           ret.append(" [location = ");
-          ret.append(location(log().snapshot_by_id(log_implementation_type::unique_id(v.value()._log_id))));
+          ret.append(location(detail::log_record_by_id(log(), log_implementation_type::unique_id(v.value()._log_id))));
           ret.append("]");
         }
       }

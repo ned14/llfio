@@ -356,6 +356,44 @@ LLFIO_V2_NAMESPACE_END
 #endif
 
 
+LLFIO_V2_NAMESPACE_BEGIN
+namespace detail
+{
+  /* quickcpplib's ringbuffer_log gained its tear-free `snapshot_by_id()` accessor after the last
+  release, and LLFIO must keep building against a quickcpplib which does not have it (a packaged
+  copy, an older pin, or an explicit LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG=master). Detect the
+  accessor and fall back to the older valid() + operator[](unique_id) pair where it is absent.
+  */
+  template <class Log, class = void> struct log_by_id
+  {
+    using value_type = typename Log::value_type;
+    static value_type get(const Log &log, typename Log::unique_id id) noexcept
+    {
+      /* This fallback copies the record out through a reference into the ring, so a writer which
+      wraps the ring can rewrite that slot while the copy is being taken: the record returned here
+      can be torn, i.e. a mixture of two records, unlike the snapshot_by_id() path above. Raising
+      the quickcpplib requirement removes that race; until then it is the best a release offers. */
+      if(!log.valid(id))
+      {
+        return value_type();
+      }
+      return log[id];
+    }
+  };
+  template <class Log>
+  struct log_by_id<Log, decltype(void(std::declval<const Log &>().snapshot_by_id(std::declval<typename Log::unique_id>())))>
+  {
+    using value_type = typename Log::value_type;
+    static value_type get(const Log &log, typename Log::unique_id id) noexcept { return log.snapshot_by_id(id); }
+  };
+  //! Returns a copy of the log record with the given unique id, or a default constructed record.
+  template <class Log> inline typename Log::value_type log_record_by_id(const Log &log, typename Log::unique_id id) noexcept
+  {
+    return log_by_id<Log>::get(log, id);
+  }
+}  // namespace detail
+LLFIO_V2_NAMESPACE_END
+
 #if !LLFIO_EXPERIMENTAL_STATUS_CODE
 #ifndef LLFIO_DISABLE_PATHS_IN_FAILURE_INFO
 LLFIO_V2_NAMESPACE_BEGIN
@@ -386,7 +424,7 @@ namespace detail
       if(log().valid(src._log_id))
       {
         ret.append(" [location = ");
-        ret.append(location(log().snapshot_by_id(log_implementation_type::unique_id(src._log_id))));
+        ret.append(location(log_record_by_id(log(), log_implementation_type::unique_id(src._log_id))));
         ret.append("]");
       }
     }
