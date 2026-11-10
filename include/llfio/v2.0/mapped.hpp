@@ -158,8 +158,16 @@ private:
       sh = &_sectionh;
     }
     offset -= page_offset;
+    const size_t sectionlen = sh->length().value();
+    if(offset > sectionlen)
+    {
+      // The requested byte offset is beyond the end of the section. Subtracting the intra-page
+      // part of it from the section length below would wrap, and hand back a span claiming to be
+      // ~SIZE_MAX bytes long. This constructor is not noexcept.
+      throw std::system_error(std::make_error_code(std::errc::argument_out_of_domain));
+    }
     byte *addr = _maph.address() + offset;
-    size_t len = sh->length().value() - offset;  // use section length, not mapped length as mapped length is rounded up to page size
+    size_t len = sectionlen - offset;  // use section length, not mapped length as mapped length is rounded up to page size
     if(bytes != 0 && bytes < len)
     {
       len = bytes;
