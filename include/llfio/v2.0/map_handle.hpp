@@ -740,10 +740,11 @@ public:
   LLFIO_MAKE_FREE_FUNCTION
   size_type length() const noexcept { return _length; }
 
-  //! The memory map as a span of bytes.
-  span<byte> as_span() noexcept { return {_addr, _length}; }
+  //! The memory map as a span of bytes. Note that `address()`, not the page aligned base pointer,
+  //! is the start of the usable bytes when the map offset is not page aligned.
+  span<byte> as_span() noexcept { return {address(), _length}; }
   //! \overload
-  span<const byte> as_span() const noexcept { return {_addr, _length}; }
+  span<const byte> as_span() const noexcept { return {address(), _length}; }
 
   //! The page size used by the map, in bytes.
   size_type page_size() const noexcept { return _pagesize; }
