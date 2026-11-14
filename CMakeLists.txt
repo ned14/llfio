@@ -23,10 +23,12 @@
 
 cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
 
-# Both dependencies come from their llm-fixes branches: that is where quickcpplib's
-# C++17 floor, its CDash/CI fixes and Outcome's C ABI and status-code fixes live.
-set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "llm-fixes" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
-set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "llm-fixes" CACHE STRING "Which git tag to use for the Outcome dependency")
+# quickcpplib's C++17 floor and CDash/CI fixes now live on its master branch, and
+# Outcome's C ABI and status-code fixes on its develop branch. Both llm-fixes
+# branches those came from have been merged and deleted upstream, so a fresh
+# configure could no longer clone them at all.
+set(LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG "master" CACHE STRING "Which git tag to use for the QuickCppLib dependency")
+set(LLFIO_DEPENDENCY_OUTCOME_GIT_TAG "develop" CACHE STRING "Which git tag to use for the Outcome dependency")
 if(NOT LLFIO_DEPENDENCY_QUICKCPPLIB_GIT_TAG STREQUAL "master")
   # Don't reuse the bootstrapped git clone as the dependency itself
   if(CMAKE_BINARY_DIR)
