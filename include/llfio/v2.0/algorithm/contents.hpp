@@ -125,22 +125,57 @@ namespace algorithm
           contents_type toadd;
           toadd.reserve(contents.size());
           filesystem::path dirhpath;
-          for(;;)
+          // Compute the path of `dirh` relative to the root handle. `rootdirpathlen`
+          // caches the length of the root handle's current path, which is stale if the
+          // root was relocated after it was cached, so a mismatch refreshes it and
+          // retries. There is no progress guarantee across a concurrent relocation, and
+          // the retry used to be unbounded, so it is now bounded at two attempts: if the
+          // refreshed length still does not resolve, the entries are reported against
+          // `dirh`'s absolute path, which is still correct.
+          for(size_t attempt = 0;; attempt++)
           {
             OUTCOME_TRY(dirhpath, dirh.current_path());
-            auto rootdirpathlen = state->rootdirpathlen.load(std::memory_order_relaxed);
-            if(dirhpath.native().size() <= rootdirpathlen)
+            const size_t dirhpathlen = dirhpath.native().size();
+            const size_t rootdirpathlen = state->rootdirpathlen.load(std::memory_order_relaxed);
+            if(dirhpathlen >= rootdirpathlen)
+            {
+              // Strip the cached root path, then the separator joining it to the
+              // remainder. A filesystem root's current path ("/" or "C:\\") ends in a
+              // separator already, so the cached length deliberately excludes one:
+              // stripping a fixed length + 1 ate the first character of every relative
+              // path under such a root, which neither resolved nor ever converged.
+              filesystem::path relpath = dirhpath.native().substr(rootdirpathlen);
+              while(!relpath.native().empty() && (relpath.native()[0] == '/' || relpath.native()[0] == '\\'))
+              {
+                relpath = filesystem::path(relpath.native().substr(1));
+              }
+              if(relpath.native().empty())
+              {
+                // `dirh` is at or above the root: only treat it as the root itself if it
+                // is the same inode, in which case its entries are directly within it.
+                auto r = directory_handle::directory(state->rootdirh, filesystem::path("."));
+                if(r && r.value().unique_id() == dirh.unique_id())
+                {
+                  dirhpath = filesystem::path();
+                  break;
+                }
+              }
+              else
+              {
+                auto r = directory_handle::directory(state->rootdirh, relpath);
+                if(r && r.value().unique_id() == dirh.unique_id())
+                {
+                  dirhpath = std::move(relpath);
+                  break;
+                }
+              }
+            }
+            if(attempt > 0)
             {
               break;
             }
-            dirhpath = dirhpath.native().substr(rootdirpathlen);
-            auto r = directory_handle::directory(state->rootdirh, dirhpath);
-            if(r && r.value().unique_id() == dirh.unique_id())
-            {
-              break;
-            }
-            OUTCOME_TRY(dirhpath, state->rootdirh.current_path());
-            state->rootdirpathlen.store(dirhpath.native().size() + 1, std::memory_order_relaxed);
+            OUTCOME_TRY(auto &&rootpath, state->rootdirh.current_path());
+            state->rootdirpathlen.store(rootpath.native().size(), std::memory_order_relaxed);
           }
           auto _metadata_ = state->metadata.load(std::memory_order_relaxed);
           if((_metadata_ & (contents_include_metadata | contents.metadata())) != _metadata_)
@@ -212,6 +247,8 @@ namespace algorithm
   /*! \brief Calculate the contents of everything within and under `dirh`. What
   is returned is unordered.
 
+  The paths returned are relative to `dirh`, never absolute.
+
   This is a very thin veneer over `traverse()` which came out of the fact that
   I kept writing "get me the contents" traversal visitors again and again, so
   eventually I just wrote a library edition. Its only "clever" bit is that it
@@ -230,7 +267,7 @@ namespace algorithm
     }
     contents_visitor::_state_type state(dirh);
     OUTCOME_TRY(auto &&dirhpath, dirh.current_path());
-    state.rootdirpathlen.store(dirhpath.native().size() + 1, std::memory_order_relaxed);
+    state.rootdirpathlen.store(dirhpath.native().size(), std::memory_order_relaxed);
     OUTCOME_TRY(traverse(dirh, visitor, threads, &state, force_slow_path));
     return {std::move(state.contents)};
   }

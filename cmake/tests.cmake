@@ -2,6 +2,7 @@
 set(llfio_TESTS
   "test/test_kernel_decl.hpp"
   "test/tests/clone_extents.cpp"
+  "test/tests/contents.cpp"
   "test/tests/current_path.cpp"
   "test/tests/directory_handle_create_close/kernel_directory_handle.cpp.hpp"
   "test/tests/directory_handle_create_close/runner.cpp"
