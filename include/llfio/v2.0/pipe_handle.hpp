@@ -62,6 +62,14 @@ block in `read()`, unless its deadline is zero. Opening pipes for write
 in nonblocking mode will now fail if there is no reader present on the
 other side of the pipe.
 
+A `read()` from a pipe which has no writer to read from is *end of file*,
+and is reported as a zero byte short read on every platform. POSIX gives
+this for a FIFO with no writer by returning 0, and Windows reports the
+same zero byte read rather than a timeout, whether no client has ever
+connected or every client has gone away. Callers therefore loop on a
+zero byte read rather than waiting on the kernel for a writer to appear,
+and a pipe handle never spins waiting for a writer which cannot return.
+
 \warning On POSIX neither `creation::only_if_not_exist` nor
 `creation::always_new` is atomic due to lack of kernel API support.
 

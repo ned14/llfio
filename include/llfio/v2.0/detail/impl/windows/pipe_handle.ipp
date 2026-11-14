@@ -228,8 +228,11 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
       }
       if(STATUS_TIMEOUT == ntwait(_v.h, ol, d))
       {
-        // ntwait cancels timed out i/o
-        return errc::timed_out;
+        // ntwait cancels timed out i/o. No client ever arrived, which on POSIX is a pipe
+        // with no writer at all, and POSIX reports that as end of file. Both platforms
+        // therefore hand the caller the same zero byte short read and leave the looping
+        // to it, rather than one reporting end of file and the other a timeout.
+        return pipe_handle::buffers_type(reqs.buffers.data(), 0);
       }
       // It seems the NT kernel is guilty of casting bugs sometimes
       ol.Internal = ol.Internal & 0xffffffff;
@@ -249,7 +252,17 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
     }
     _v.behaviour |= native_handle_type::disposition::_is_connected;
   }
-  return byte_io_handle::_do_read(reqs, d);
+  auto ret = byte_io_handle::_do_read(reqs, d);
+  if(ret.has_error())
+  {
+    // Every writer has gone. POSIX read() returns 0 there, which is the same zero byte
+    // short read as above, so report that rather than a Windows specific broken pipe.
+    if(ret.error() == errc::broken_pipe || ret.error() == errc::not_connected)
+    {
+      return pipe_handle::buffers_type(reqs.buffers.data(), 0);
+    }
+  }
+  return ret;
 }
 
 pipe_handle::io_result<pipe_handle::const_buffers_type> pipe_handle::_do_write(pipe_handle::io_request<pipe_handle::const_buffers_type> reqs, deadline d) noexcept
