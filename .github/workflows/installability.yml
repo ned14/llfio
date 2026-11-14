@@ -23,7 +23,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]  # windows-2022
+        # ubuntu-latest is Ubuntu 26.04 now, which never had a Python 3.8 build, and this lane
+        # exists to prove installability on the oldest Python we support. Pin the image rather
+        # than raising the Python floor.
+        os: [ubuntu-22.04, macos-latest]  # windows-2022
         configuration: [error_code, status_code]
     env:
       NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
