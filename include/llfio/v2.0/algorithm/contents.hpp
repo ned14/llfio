@@ -151,8 +151,19 @@ namespace algorithm
               }
               if(relpath.native().empty())
               {
-                // `dirh` is at or above the root: only treat it as the root itself if it
-                // is the same inode, in which case its entries are directly within it.
+                // `dirh` is at or above the root. Treat it as the root itself when the two
+                // handles name the same directory. Comparing the root handle's own current
+                // path needs no new handle and is what works on Windows, where enumerating
+                // reports /!!/Device/... paths: opening "." relative to the root handle and
+                // comparing unique ids there always failed, so every top level entry was
+                // reported with its absolute path instead of its leafname. The id check is
+                // kept for the case of two differently spelled handles onto one directory.
+                OUTCOME_TRY(auto &&rootnow, state->rootdirh.current_path());
+                if(rootnow.native() == dirhpath.native())
+                {
+                  dirhpath = filesystem::path();
+                  break;
+                }
                 auto r = directory_handle::directory(state->rootdirh, filesystem::path("."));
                 if(r && r.value().unique_id() == dirh.unique_id())
                 {
