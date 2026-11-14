@@ -118,16 +118,11 @@ Todo:
 |   | ✔ | ✔ | Retrieving the current path of an open file irrespective of where it has been renamed to by third parties.
 |   | ✔ | ✔ | statfs_t ported over from LLFIO v1.
 |   | ✔ | ✔ | utils namespace ported over from LLFIO v1.
-| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on lock files
 | ✔ | ✔ | ✔ | Byte range shared/exclusive locking.
-| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on byte ranges
-| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on atomic append
 |   | ✔ | ✔ | Memory mapped files and virtual memory management (`section_handle`, `map_handle` and `mapped_file_handle`)
-| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on memory maps
 | ✔ | ✔ | ✔ | Universal portable UTF-8 path views.
 |   | ✔ | ✔ | "Hole punching" and hole enumeration ported over from LLFIO v1.
 |   | ✔ | ✔ | Directory handles and very fast directory enumeration ported over from LLFIO v1.
-| ✔ | ✔ | ✔ | `shared_fs_mutex` shared/exclusive entities locking based on safe byte ranges
 |   | ✔ | ✔ | Set random or sequential i/o (prefetch).
 | ✔ | ✔ | ✔ | `llfio::algorithm::trivial_vector<T>` with constant time reallocation if `T` is trivially copyable.
 |   | ✔ | ✔ | `symlink_handle`.

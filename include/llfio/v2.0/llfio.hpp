@@ -76,15 +76,10 @@ import LLFIO_MODULE_NAME;
 #include "algorithm/contents.hpp"
 #include "algorithm/handle_adapter/cached_parent.hpp"
 #include "algorithm/reduce.hpp"
-#include "algorithm/shared_fs_mutex/atomic_append.hpp"
-#include "algorithm/shared_fs_mutex/byte_ranges.hpp"
-#include "algorithm/shared_fs_mutex/lock_files.hpp"
-#include "algorithm/shared_fs_mutex/safe_byte_ranges.hpp"
 #include "algorithm/summarize.hpp"
 
 #ifndef LLFIO_EXCLUDE_MAPPED_FILE_HANDLE
 #include "algorithm/handle_adapter/xor.hpp"
-#include "algorithm/shared_fs_mutex/memory_map.hpp"
 #include "algorithm/trivial_vector.hpp"
 #include "mapped.hpp"
 #endif

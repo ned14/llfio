@@ -239,17 +239,15 @@ public:
   `flag::byte_lock_insanity` will be set in flags() after the first call to this function.
   - Threads replace each other's locks, indeed locks replace each other's locks.
 
-  You almost cetainly should use your choice of an `algorithm::shared_fs_mutex::*` instead of this
-  as those are more portable and performant, or use the `SharedMutex` modelling member functions
-  which lock the whole inode for exclusive or shared access.
+  You almost cetainly should use the `SharedMutex` modelling member functions, which lock the
+  whole inode for exclusive or shared access, rather than this low-level API.
 
   \warning This is a low-level API which you should not use directly in portable code. Another
   issue is that atomic lock upgrade/downgrade, if your platform implements that (you should assume
   it does not in portable code), means that on POSIX you need to *release* the old `extent_guard`
   after creating a new one over the same byte range, otherwise the old `extent_guard`'s destructor
   will simply unlock the range entirely. On Windows however upgrade/downgrade locks overlay, so on
-  that platform you must *not* release the old `extent_guard`. Look into
-  `algorithm::shared_fs_mutex::safe_byte_ranges` for a portable solution.
+  that platform you must *not* release the old `extent_guard`.
 
   \return An extent guard, the destruction of which will call unlock().
   \param offset The offset to lock. Note that on POSIX the top bit is always cleared before use

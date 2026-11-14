@@ -10,7 +10,6 @@
 - [x] Single include generation now we're on `status_code` and it's safe.
 - [x] Implement `SIGBUS`/`EXCEPTION_IN_PAGE_ERROR` RAII catcher.
 - [x] Implement `symlink_handle` already!
-- [ ] `atomic_append` isn't actually being tested in shared_fs_mutex
 - [ ] Implement a non-toy ACID key-value BLOB store and send it to Boost for peer review.
   - [ ] For this need to implement a file-based B+ tree. And for that, need to
   implement a page allocator out of a single file. Some notes:
