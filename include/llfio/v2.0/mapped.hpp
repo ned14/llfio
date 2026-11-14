@@ -163,8 +163,9 @@ private:
     {
       // The requested byte offset is beyond the end of the section. Subtracting the intra-page
       // part of it from the section length below would wrap, and hand back a span claiming to be
-      // ~SIZE_MAX bytes long. This constructor is not noexcept.
-      throw std::system_error(std::make_error_code(std::errc::argument_out_of_domain));
+      // ~SIZE_MAX bytes long. This constructor is not noexcept, so throwing is the correct
+      // report; in a -fno-exceptions translation unit LLFIO_EXCEPTION_THROW aborts instead.
+      LLFIO_EXCEPTION_THROW(std::system_error(std::make_error_code(std::errc::argument_out_of_domain)));  // NOLINT
     }
     byte *addr = _maph.address() + offset;
     size_t len = sectionlen - offset;  // use section length, not mapped length as mapped length is rounded up to page size
