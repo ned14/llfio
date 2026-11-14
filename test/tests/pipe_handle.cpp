@@ -71,16 +71,35 @@ static inline void TestNonBlockingPipeHandle()
   namespace llfio = LLFIO_V2_NAMESPACE;
   llfio::pipe_handle reader = llfio::pipe_handle::pipe_create("llfio-pipe-handle-test", llfio::pipe_handle::caching::all, llfio::pipe_handle::flag::multiplexable).value();
   llfio::byte buffer[64];
-  {  // no writer, so non-blocking read should time out
+  {  // no writer has ever been attached. POSIX says read() of an empty FIFO with no writer
+     // returns 0, and the blocking-read loop now reports that zero-byte short read instead
+     // of polling a POLLHUP for ever. A Windows pipe which has never been connected is a
+     // different animal: connecting it is what a read does first, and that times out.
+#ifdef _WIN32
     auto read = reader.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
     BOOST_REQUIRE(read.has_error());
     BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
+#else
+    auto read = reader.read(0, {{buffer, 64}}, std::chrono::milliseconds(0));
+    BOOST_REQUIRE(read.has_value());
+    BOOST_REQUIRE(read.value() == 0);
+#endif
   }
+#ifdef _WIN32
   {  // no writer, so blocking read should time out
     auto read = reader.read(0, {{buffer, 64}}, std::chrono::seconds(1));
     BOOST_REQUIRE(read.has_error());
     BOOST_REQUIRE(read.error() == llfio::errc::timed_out);
   }
+#else
+  {  // ... and a blocking read must return at once rather than spin to its deadline
+    auto start = std::chrono::steady_clock::now();
+    auto read = reader.read(0, {{buffer, 64}}, std::chrono::seconds(1));
+    BOOST_REQUIRE(read.has_value());
+    BOOST_REQUIRE(read.value() == 0);
+    BOOST_REQUIRE(std::chrono::steady_clock::now() - start < std::chrono::milliseconds(900));
+  }
+#endif
   llfio::pipe_handle writer = llfio::pipe_handle::pipe_open("llfio-pipe-handle-test", llfio::pipe_handle::caching::all, llfio::pipe_handle::flag::multiplexable).value();
   auto written = writer.write(0, {{(const llfio::byte *) "hello", 5}}).value();
   BOOST_REQUIRE(written == 5);
@@ -91,6 +110,15 @@ static inline void TestNonBlockingPipeHandle()
   BOOST_CHECK(0 == memcmp(buffer, "hello", 5));
   writer.barrier().value();  // must not block nor fail
   writer.close().value();
+  {  // the writer is gone, so a POSIX reader is at end of file: the read must report a zero-byte
+     // short read and never spin waiting for a writer which cannot come back. On Windows a read
+     // of a pipe whose writer closed reports a broken pipe instead, which it already did.
+#ifndef _WIN32
+    auto eof = reader.read(0, {{buffer, 64}}, std::chrono::seconds(1));
+    BOOST_REQUIRE(eof.has_value());
+    BOOST_REQUIRE(eof.value() == 0);
+#endif
+  }
   reader.close().value();
 }
 
