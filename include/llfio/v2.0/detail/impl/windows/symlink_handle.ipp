@@ -248,7 +248,11 @@ result<symlink_handle::const_buffers_type> symlink_handle::write(symlink_handle:
   using windows_nt_kernel::REPARSE_DATA_BUFFER;
   size_t destpathbytes = req.buffers.path().native_size() * sizeof(wchar_t);
   size_t buffersize = sizeof(REPARSE_DATA_BUFFER) + destpathbytes * 2 + 256;
-  if(buffersize < req.kernelbuffer.size())
+  // If the caller supplied a kernel buffer, it must be large enough for the reparse
+  // point we are about to write into it. The comparison used to be the other way round,
+  // which rejected a caller buffer larger than needed and then filled a too small one
+  // past its end.
+  if(!req.kernelbuffer.empty() && req.kernelbuffer.size() < buffersize)
   {
     return errc::not_enough_memory;
   }
