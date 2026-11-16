@@ -34,6 +34,14 @@ Distributed under the Boost Software License, Version 1.0.
 
 //! \file utils.hpp Provides namespace utils
 
+/*! \defgroup utils Utilities
+
+\brief Miscellaneous utility functions and classes which do not belong to any of the other modules.
+
+The members of this group are declared in namespace `utils`, but they are grouped here so that the
+reference documentation lists them together rather than burying them in the namespace listing.
+*/
+
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 namespace utils
