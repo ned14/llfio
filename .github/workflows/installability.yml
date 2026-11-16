@@ -31,6 +31,13 @@ jobs:
         configuration: [error_code, status_code]
     env:
       NAME: Install-${{ matrix.os }}-${{ matrix.configuration }}
+      # The library this lane installs is the ref under review: the head branch of a pull
+      # request, cloned from the PR's own repository so a fork works, and otherwise the branch
+      # that was pushed. Asking for 'develop' unconditionally meant a pull request re-tested
+      # develop, so this lane could never be green for a change that fixes something develop
+      # has not got yet - which is precisely what it is there to catch.
+      LLFIO_REPO: ${{ github.event.pull_request.head.repo.clone_url || 'https://github.com/ned14/llfio' }}
+      LLFIO_BRANCH: ${{ github.head_ref || github.ref_name }}
     runs-on: ${{ matrix.os }}
           
     steps:
@@ -54,7 +61,7 @@ jobs:
        fi
        git clone --depth 1 https://github.com/ned14/quickcpplib.git
        pip install --user gitpython
-       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome master "" llfio llfio::sl https://github.com/ned14/llfio develop "$CMAKE_CONFIGURE_OPTIONS"
+       python quickcpplib/scripts/test_cpp-pm_install.py test-packaging/example.cpp quickcpplib quickcpplib::hl https://github.com/ned14/quickcpplib master "" outcome outcome::hl https://github.com/ned14/outcome master "" llfio llfio::sl "$LLFIO_REPO" "$LLFIO_BRANCH" "$CMAKE_CONFIGURE_OPTIONS"
        cd test_cpp-pm_install
        cat cmake/Hunter/config.cmake
        cat CMakeLists.txt
