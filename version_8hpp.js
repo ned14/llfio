@@ -1,6 +1,6 @@
 var version_8hpp =
 [
-    [ "LLFIO_NAMESPACE_VERSION", "version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160", null ],
+    [ "LLFIO_NAMESPACE_VERSION", "version_8hpp.html#ad17582bd9a5aa0893d1ce27bfd2f7dd9", null ],
     [ "LLFIO_NAMESPACE_VERSION", "version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160", null ],
     [ "LLFIO_UNSTABLE_VERSION", "group__config.html#gaadd4f1f9d1a5c77c3b40d9e1b759b706", null ],
     [ "LLFIO_VERSION_MAJOR", "group__config.html#gacac3045524a50876c1bc6068bd6237f0", null ],

@@ -8,11 +8,9 @@ var classllfio__v2__xxx_1_1process__handle =
       [ "no_redirect_error_pipe", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baab00ed909286f3e1fa82c3ea67456e7c2", null ],
       [ "wait_on_close", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa69505a6c4e1b3a76379a824e3304980a", null ],
       [ "release_pipes_on_close", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baab7d8c9e4d283821c3ed56f564ad2386e", null ],
-      [ "no_multiplexable_pipes", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa444ff0b62ce7ddec9f1136a8e2d85b1f", null ],
-      [ "no_redirect", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa3d0bed028d6b38449497a08b4fbafe10", null ]
+      [ "no_multiplexable_pipes", "classllfio__v2__xxx_1_1process__handle.html#adbdaefb199aea3066cbd0b70118091baa444ff0b62ce7ddec9f1136a8e2d85b1f", null ]
     ] ],
     [ "caching", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852", [
-      [ "unchanged", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "only_metadata", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852ab8a61dd00ce6fc5888706bda8fab2e98", null ],
       [ "reads", "classllfio__v2__xxx_1_1process__handle.html#aecd3a7db6cee3aec07d32fe6f99e6852a0fb9cf5f04f61bb6f1151da57ceb1ca1", null ],
@@ -29,7 +27,6 @@ var classllfio__v2__xxx_1_1process__handle =
       [ "always_new", "classllfio__v2__xxx_1_1process__handle.html#af0b352d0f273ba6fa70c178b2c2fee42af7cf95e0f43dc8f79e39ae628c85a11d", null ]
     ] ],
     [ "mode", "classllfio__v2__xxx_1_1process__handle.html#aa3930273a2d4cabbac309e0b75701dca", [
-      [ "unchanged", "classllfio__v2__xxx_1_1process__handle.html#aa3930273a2d4cabbac309e0b75701dcaa8d7b3d6b83c0a517eac07e1aac94b773", null ],
       [ "none", "classllfio__v2__xxx_1_1process__handle.html#aa3930273a2d4cabbac309e0b75701dcaa334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "attr_read", "classllfio__v2__xxx_1_1process__handle.html#aa3930273a2d4cabbac309e0b75701dcaaa4daf6d1e8da35af49c33bbe9ee91d79", null ],
       [ "attr_write", "classllfio__v2__xxx_1_1process__handle.html#aa3930273a2d4cabbac309e0b75701dcaa9f56aff64cb748e078ab221474132d19", null ],

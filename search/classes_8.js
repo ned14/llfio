@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['io_5frequest_0',['io_request',['../structllfio__v2__xxx_1_1directory__handle_1_1io__request.html',1,'llfio_v2_xxx::directory_handle::io_request&lt; class &gt;'],['../structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html',1,'llfio_v2_xxx::symlink_handle::io_request&lt; T, bool &gt;'],['../structllfio__v2__xxx_1_1byte__io__handle_1_1io__request.html',1,'llfio_v2_xxx::byte_io_handle::io_request&lt; T &gt;']]],
+  ['io_5frequest_0',['io_request',['../structllfio__v2__xxx_1_1byte__io__handle_1_1io__request.html',1,'llfio_v2_xxx::byte_io_handle::io_request&lt; T &gt;'],['../structllfio__v2__xxx_1_1directory__handle_1_1io__request.html',1,'llfio_v2_xxx::directory_handle::io_request&lt; class &gt;'],['../structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html',1,'llfio_v2_xxx::symlink_handle::io_request&lt; T, bool &gt;']]],
   ['io_5frequest_3c_20buffers_5ftype_2c_20_5f_5f_5f_5f_20_3e_1',['io_request&lt; buffers_type, ____ &gt;',['../structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html',1,'llfio_v2_xxx::symlink_handle']]],
   ['io_5frequest_3c_20const_5fbuffers_5ftype_2c_20_5f_5f_5f_5f_20_3e_2',['io_request&lt; const_buffers_type, ____ &gt;',['../structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html',1,'llfio_v2_xxx::symlink_handle']]],
   ['io_5fresult_3',['io_result',['../structllfio__v2__xxx_1_1byte__io__handle_1_1io__result.html',1,'llfio_v2_xxx::byte_io_handle']]],

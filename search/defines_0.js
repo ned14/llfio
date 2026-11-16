@@ -9,5 +9,5 @@ var searchData=
   ['llfio_5fheaders_5fpath_6',['LLFIO_HEADERS_PATH',['../llfio_8hpp.html#aa86b9d7f8bd243de24fa7077a1f31a65',1,'llfio.hpp']]],
   ['llfio_5flog_5fto_5fostream_7',['LLFIO_LOG_TO_OSTREAM',['../config_8hpp.html#a796b217a9d73a890d3a05de85bb1120d',1,'config.hpp']]],
   ['llfio_5fmodule_5fname_8',['LLFIO_MODULE_NAME',['../v2_80_2llfio_8hpp.html#a71266556cd079007ccdcd8225f115d87',1,'llfio.hpp']]],
-  ['llfio_5fnamespace_5fversion_9',['llfio_namespace_version',['../version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160',1,'LLFIO_NAMESPACE_VERSION:&#160;version.hpp'],['../version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160',1,'LLFIO_NAMESPACE_VERSION:&#160;version.hpp'],['../v2_80_2llfio_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160',1,'LLFIO_NAMESPACE_VERSION:&#160;llfio.hpp']]]
+  ['llfio_5fnamespace_5fversion_9',['LLFIO_NAMESPACE_VERSION',['../version_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160',1,'LLFIO_NAMESPACE_VERSION:&#160;version.hpp'],['../version_8hpp.html#ad17582bd9a5aa0893d1ce27bfd2f7dd9',1,'LLFIO_NAMESPACE_VERSION:&#160;version.hpp'],['../v2_80_2llfio_8hpp.html#a7b08237a3cfed4832068a4daa6d6e160',1,'LLFIO_NAMESPACE_VERSION:&#160;llfio.hpp']]]
 ];

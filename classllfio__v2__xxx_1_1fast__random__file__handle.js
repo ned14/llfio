@@ -94,6 +94,6 @@ var classllfio__v2__xxx_1_1fast__random__file__handle =
     [ "unlock_file_shared", "classllfio__v2__xxx_1_1fast__random__file__handle.html#af602902938a870b66efcae2283197038", null ],
     [ "write", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a40b582d6e889b270830689e0b298efd6", null ],
     [ "write", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a0938630d13cd68ba4c69cdbaf7b7c513", null ],
-    [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a4eddd7efdccda238f4c738293303ad78", null ],
-    [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a5f764a6374f0f804da007675f7dee162", null ]
+    [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a5f764a6374f0f804da007675f7dee162", null ],
+    [ "zero", "classllfio__v2__xxx_1_1fast__random__file__handle.html#a4eddd7efdccda238f4c738293303ad78", null ]
 ];

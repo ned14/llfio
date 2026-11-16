@@ -1,7 +1,6 @@
 var hierarchy =
 [
     [ "llfio_v2_xxx::process_handle::_byte_array_deleter", "structllfio__v2__xxx_1_1process__handle_1_1__byte__array__deleter.html", null ],
-    [ "llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >::_entity_idx", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map_1_1__entity__idx.html", null ],
     [ "llfio_v2_xxx::algorithm::contents_visitor::_state_type", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1__state__type.html", null ],
     [ "llfio_v2_xxx::handle::alignas", "unionllfio__v2__xxx_1_1handle_1_1alignas.html", null ],
     [ "kvstore_v1_xxx::basic_key_value_store", "classkvstore__v1__xxx_1_1basic__key__value__store.html", [
@@ -14,32 +13,30 @@ var hierarchy =
     [ "llfio_v2_xxx::algorithm::comparison_summary", "structllfio__v2__xxx_1_1algorithm_1_1comparison__summary.html", null ],
     [ "llfio_v2_xxx::byte_io_handle::const_buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1const__buffer__type.html", null ],
     [ "llfio_v2_xxx::symlink_handle::const_buffers_type", "structllfio__v2__xxx_1_1symlink__handle_1_1const__buffers__type.html", null ],
-    [ "llfio_v2_xxx::construct< T >", "structllfio__v2__xxx_1_1construct.html", null ],
-    [ "llfio_v2_xxx::construct< algorithm::cached_parent_handle_adapter< T > >", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< directory_handle >", "structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< fast_random_file_handle >", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< file_handle >", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< map_handle >", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< mapped_file_handle >", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< path_handle >", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< pipe_handle >", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< process_handle >", "structllfio__v2__xxx_1_1construct_3_01process__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< section_handle >", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
-    [ "llfio_v2_xxx::construct< symlink_handle >", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; T &gt;", "structllfio__v2__xxx_1_1construct.html", null ],
+    [ "llfio_v2_xxx::construct&lt; algorithm::cached_parent_handle_adapter&lt; T &gt; &gt;", "structllfio__v2__xxx_1_1construct_3_01algorithm_1_1cached__parent__handle__adapter_3_01_t_01_4_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; directory_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01directory__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; fast_random_file_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01fast__random__file__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; file_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01file__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; map_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01map__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; mapped_file_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01mapped__file__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; path_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01path__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; pipe_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01pipe__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; process_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01process__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; section_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01section__handle_01_4.html", null ],
+    [ "llfio_v2_xxx::construct&lt; symlink_handle &gt;", "structllfio__v2__xxx_1_1construct_3_01symlink__handle_01_4.html", null ],
     [ "llfio_v2_xxx::deadline", "structllfio__v2__xxx_1_1deadline.html", null ],
     [ "llfio_v2_xxx::directory_entry", "structllfio__v2__xxx_1_1directory__entry.html", null ],
     [ "llfio_v2_xxx::path_discovery::discovered_path", "structllfio__v2__xxx_1_1path__discovery_1_1discovered__path.html", null ],
     [ "std::enable_shared_from_this", null, [
       [ "llfio_v2_xxx::byte_io_handle::_registered_buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1__registered__buffer__type.html", null ]
     ] ],
-    [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entities_guard", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entities__guard.html", null ],
-    [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex::entity_type", "structllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex_1_1entity__type.html", null ],
     [ "llfio_v2_xxx::error_info", "structllfio__v2__xxx_1_1error__info.html", null ],
     [ "llfio_v2_xxx::executor", "classllfio__v2__xxx_1_1executor.html", null ],
     [ "llfio_v2_xxx::lockable_byte_io_handle::extent_guard", "classllfio__v2__xxx_1_1lockable__byte__io__handle_1_1extent__guard.html", null ],
     [ "llfio_v2_xxx::file_handle::extent_pair", "structllfio__v2__xxx_1_1file__handle_1_1extent__pair.html", null ],
     [ "llfio_v2_xxx::statfs_t::f_flags_t", "structllfio__v2__xxx_1_1statfs__t_1_1f__flags__t.html", null ],
-    [ "std::filesystem::filesystem_error", null, [
+    [ "filesystem::filesystem_error", null, [
       [ "llfio_v2_xxx::error", "classllfio__v2__xxx_1_1error.html", null ]
     ] ],
     [ "llfio_v2_xxx::fs_handle", "classllfio__v2__xxx_1_1fs__handle.html", [
@@ -67,15 +64,15 @@ var hierarchy =
       [ "llfio_v2_xxx::section_handle", "classllfio__v2__xxx_1_1section__handle.html", null ],
       [ "llfio_v2_xxx::symlink_handle", "classllfio__v2__xxx_1_1symlink__handle.html", null ]
     ] ],
-    [ "llfio_v2_xxx::byte_io_handle::io_request< T >", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__request.html", null ],
-    [ "llfio_v2_xxx::directory_handle::io_request< class >", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
-    [ "llfio_v2_xxx::symlink_handle::io_request< T, bool >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
-    [ "llfio_v2_xxx::symlink_handle::io_request< buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html", null ],
-    [ "llfio_v2_xxx::symlink_handle::io_request< const_buffers_type, ____ >", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html", null ],
-    [ "kvstore_v1_xxx::traits::is_attachable< T, AttachResultType >", "structkvstore__v1__xxx_1_1traits_1_1is__attachable.html", null ],
-    [ "kvstore_v1_xxx::traits::is_detachable< T, DetachResultType >", "structkvstore__v1__xxx_1_1traits_1_1is__detachable.html", null ],
-    [ "kvstore_v1_xxx::traits::is_trivially_attachable< T >", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__attachable.html", null ],
-    [ "kvstore_v1_xxx::traits::is_trivially_detachable< T >", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__detachable.html", null ],
+    [ "llfio_v2_xxx::byte_io_handle::io_request&lt; T &gt;", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::directory_handle::io_request&lt; class &gt;", "structllfio__v2__xxx_1_1directory__handle_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request&lt; T, bool &gt;", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request&lt; buffers_type, ____ &gt;", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01buffers__type_00_01_________01_4.html", null ],
+    [ "llfio_v2_xxx::symlink_handle::io_request&lt; const_buffers_type, ____ &gt;", "structllfio__v2__xxx_1_1symlink__handle_1_1io__request_3_01const__buffers__type_00_01_________01_4.html", null ],
+    [ "kvstore_v1_xxx::traits::is_attachable&lt; T, AttachResultType &gt;", "structkvstore__v1__xxx_1_1traits_1_1is__attachable.html", null ],
+    [ "kvstore_v1_xxx::traits::is_detachable&lt; T, DetachResultType &gt;", "structkvstore__v1__xxx_1_1traits_1_1is__detachable.html", null ],
+    [ "kvstore_v1_xxx::traits::is_trivially_attachable&lt; T &gt;", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__attachable.html", null ],
+    [ "kvstore_v1_xxx::traits::is_trivially_detachable&lt; T &gt;", "structkvstore__v1__xxx_1_1traits_1_1is__trivially__detachable.html", null ],
     [ "llfio_v2_xxx::storage_profile::item_base", "structllfio__v2__xxx_1_1storage__profile_1_1item__base.html", [
       [ "llfio_v2_xxx::storage_profile::item< std::string >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
       [ "llfio_v2_xxx::storage_profile::item< unsigned >", "structllfio__v2__xxx_1_1storage__profile_1_1item.html", null ],
@@ -86,27 +83,22 @@ var hierarchy =
       [ "llfio_v2_xxx::storage_profile::item_erased", "structllfio__v2__xxx_1_1storage__profile_1_1item__erased.html", null ]
     ] ],
     [ "llfio_v2_xxx::native_handle_type", "structllfio__v2__xxx_1_1native__handle__type.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >", "classllfio__v2__xxx_1_1utils_1_1page__allocator.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< void >", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator&lt; T &gt;", "classllfio__v2__xxx_1_1utils_1_1page__allocator.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator&lt; void &gt;", "classllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4.html", null ],
     [ "llfio_v2_xxx::path_hasher", "structllfio__v2__xxx_1_1path__hasher.html", null ],
     [ "llfio_v2_xxx::path_view_component", "classllfio__v2__xxx_1_1path__view__component.html", [
       [ "llfio_v2_xxx::path_view", "classllfio__v2__xxx_1_1path__view.html", null ]
     ] ],
     [ "llfio_v2_xxx::utils::process_cpu_usage", "structllfio__v2__xxx_1_1utils_1_1process__cpu__usage.html", null ],
     [ "llfio_v2_xxx::utils::process_memory_usage", "structllfio__v2__xxx_1_1utils_1_1process__memory__usage.html", null ],
-    [ "llfio_v2_xxx::read_receiver< IoHandleType >", "classllfio__v2__xxx_1_1read__receiver.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< T >::rebind< U >", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
-    [ "llfio_v2_xxx::utils::page_allocator< void >::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
-    [ "llfio_v2_xxx::path_view_component::rendered_path< ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size, type >", "classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html", null ],
-    [ "llfio_v2_xxx ::result", null, [
+    [ "llfio_v2_xxx::read_receiver&lt; IoHandleType &gt;", "classllfio__v2__xxx_1_1read__receiver.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator&lt; T &gt;::rebind&lt; U &gt;", "structllfio__v2__xxx_1_1utils_1_1page__allocator_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::utils::page_allocator&lt; void &gt;::rebind", "structllfio__v2__xxx_1_1utils_1_1page__allocator_3_01void_01_4_1_1rebind.html", null ],
+    [ "llfio_v2_xxx::path_view_component::rendered_path&lt; ZeroTermination, T, AllocatorOrDeleter, _internal_buffer_size, type &gt;", "classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html", null ],
+    [ "llfio_v2_xxx::path_view_component::rendered_path&lt; termination::not_zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size &gt;", "classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html", null ],
+    [ "llfio_v2_xxx::path_view_component::rendered_path&lt; termination::zero_terminated, T, AllocatorOrDeleter, _internal_buffer_size &gt;", "classllfio__v2__xxx_1_1path__view__component_1_1rendered__path.html", null ],
+    [ "llfio_v2_xxx::result", null, [
       [ "llfio_v2_xxx::byte_io_handle::io_result< T >", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__result.html", null ]
-    ] ],
-    [ "llfio_v2_xxx::algorithm::shared_fs_mutex::shared_fs_mutex", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1shared__fs__mutex.html", [
-      [ "llfio_v2_xxx::algorithm::shared_fs_mutex::atomic_append", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1atomic__append.html", null ],
-      [ "llfio_v2_xxx::algorithm::shared_fs_mutex::byte_ranges", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1byte__ranges.html", null ],
-      [ "llfio_v2_xxx::algorithm::shared_fs_mutex::lock_files", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1lock__files.html", null ],
-      [ "llfio_v2_xxx::algorithm::shared_fs_mutex::memory_map< Hasher, HashIndexSize, SpinlockType >", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1memory__map.html", null ],
-      [ "llfio_v2_xxx::algorithm::shared_fs_mutex::safe_byte_ranges", "classllfio__v2__xxx_1_1algorithm_1_1shared__fs__mutex_1_1safe__byte__ranges.html", null ]
     ] ],
     [ "QUICKCPPLIB_NAMESPACE::algorithm::small_prng::small_prng", null, [
       [ "llfio_v2_xxx::fast_random_file_handle::prng", "structllfio__v2__xxx_1_1fast__random__file__handle_1_1prng.html", null ]
@@ -135,20 +127,20 @@ var hierarchy =
         [ "llfio_v2_xxx::algorithm::compare_visitor", "structllfio__v2__xxx_1_1algorithm_1_1compare__visitor.html", null ]
       ] ]
     ] ],
-    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< has_default_construction, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
-    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< false, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [
+    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; has_default_construction, T &gt;", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", null ],
+    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl&lt; false, T &gt;", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl.html", [
       [ "llfio_v2_xxx::algorithm::impl::trivial_vector_impl< true, T >", "structllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__impl_3_01true_00_01_t_01_4.html", [
         [ "llfio_v2_xxx::algorithm::trivial_vector< T >", "classllfio__v2__xxx_1_1algorithm_1_1trivial__vector.html", null ]
       ] ]
     ] ],
-    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_iterator< T >", "classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
+    [ "llfio_v2_xxx::algorithm::impl::trivial_vector_iterator&lt; T &gt;", "classllfio__v2__xxx_1_1algorithm_1_1impl_1_1trivial__vector__iterator.html", null ],
     [ "std::true_type", null, [
-      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx ::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_01_1_1map__handle_01_4.html", null ],
-      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx ::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_01_1_1mapped__file__handle_01_4.html", null ]
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::map_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1map__handle_01_4.html", null ],
+      [ "in_place_attach_detach::traits::disable_attached_for< llfio_v2_xxx::mapped_file_handle >", "structin__place__attach__detach_1_1traits_1_1disable__attached__for_3_01llfio__v2__xxx_1_1mapped__file__handle_01_4.html", null ]
     ] ],
     [ "llfio_v2_xxx::unique_file_lock", "classllfio__v2__xxx_1_1unique__file__lock.html", null ],
-    [ "std::vector< T >", null, [
+    [ "std::vector&lt; T &gt;", null, [
       [ "llfio_v2_xxx::algorithm::contents_visitor::contents_type", "structllfio__v2__xxx_1_1algorithm_1_1contents__visitor_1_1contents__type.html", null ]
     ] ],
-    [ "llfio_v2_xxx::write_receiver< IoHandleType >", "classllfio__v2__xxx_1_1write__receiver.html", null ]
+    [ "llfio_v2_xxx::write_receiver&lt; IoHandleType &gt;", "classllfio__v2__xxx_1_1write__receiver.html", null ]
 ];

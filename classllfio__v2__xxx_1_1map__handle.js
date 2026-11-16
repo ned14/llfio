@@ -11,7 +11,6 @@ var classllfio__v2__xxx_1_1map__handle =
       [ "wait_all", "classllfio__v2__xxx_1_1map__handle.html#aa1f6b20b423d0bc0001e38f6e06fc98ca4e1789381cf8c976ec7a7118b3529345", null ]
     ] ],
     [ "memory_accounting_kind", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8b", [
-      [ "unknown", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8baad921d60486366258809553a3db49a4a", null ],
       [ "commit_charge", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba55677e6eb6d6c52c6f69d98b1905903f", null ],
       [ "over_commit", "classllfio__v2__xxx_1_1map__handle.html#a22f9cba517e54e36ef80a788af737b8ba10cae1239f2f367d8bfa752a29811e9e", null ]
     ] ],
@@ -74,8 +73,8 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "operator=", "classllfio__v2__xxx_1_1map__handle.html#ae86f220907a861c7159062de1b469fa1", null ],
     [ "page_size", "classllfio__v2__xxx_1_1map__handle.html#a7224b586e457183ebcb0a694e282d0fc", null ],
     [ "QUICKCPPLIB_BITFIELD_BEGIN_T", "classllfio__v2__xxx_1_1map__handle.html#af6ae214241d075f68c3df8cfb377f135", null ],
-    [ "read", "classllfio__v2__xxx_1_1map__handle.html#af4235f45416b0531a1bbaf88e0630623", null ],
     [ "read", "classllfio__v2__xxx_1_1map__handle.html#a9ae9076c36c184895786566ba8eaa072", null ],
+    [ "read", "classllfio__v2__xxx_1_1map__handle.html#af4235f45416b0531a1bbaf88e0630623", null ],
     [ "read", "classllfio__v2__xxx_1_1map__handle.html#a9ae9076c36c184895786566ba8eaa072", null ],
     [ "release", "classllfio__v2__xxx_1_1map__handle.html#a06cfd3521ff08782a848821951510f11", null ],
     [ "requires_aligned_io", "classllfio__v2__xxx_1_1map__handle.html#a751e912d8dab755ea969a418c1d544eb", null ],
@@ -91,8 +90,8 @@ var classllfio__v2__xxx_1_1map__handle =
     [ "unlock_file_range", "classllfio__v2__xxx_1_1map__handle.html#a24ce92f853d847b5bb4e342b6cc05ca1", null ],
     [ "unlock_file_shared", "classllfio__v2__xxx_1_1map__handle.html#af602902938a870b66efcae2283197038", null ],
     [ "update_map", "classllfio__v2__xxx_1_1map__handle.html#a791f66aebe6ad583bce4bf5f899a2b75", null ],
-    [ "write", "classllfio__v2__xxx_1_1map__handle.html#a40b582d6e889b270830689e0b298efd6", null ],
     [ "write", "classllfio__v2__xxx_1_1map__handle.html#a0938630d13cd68ba4c69cdbaf7b7c513", null ],
+    [ "write", "classllfio__v2__xxx_1_1map__handle.html#a40b582d6e889b270830689e0b298efd6", null ],
     [ "write", "classllfio__v2__xxx_1_1map__handle.html#a0938630d13cd68ba4c69cdbaf7b7c513", null ],
     [ "zero_memory", "classllfio__v2__xxx_1_1map__handle.html#a4f39b100b01a627c39acd1585842d5cc", null ]
 ];

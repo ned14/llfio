@@ -9,7 +9,7 @@ var classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction =
     [ "const_buffers_type", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#ae3623a6180482b7133aeab3a1a8719ac", null ],
     [ "creation", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a77a90d11f98460cc0ff2765e5a479d4e", null ],
     [ "extent_type", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a3f0f14256e9107576781f55b8dfd2751", null ],
-    [ "features", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#af5c9a4bac46c1773b3e52d1de22dddde", null ],
+    [ "features", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#afe5e5864b92a51c0ef3ef75f803c2f61", null ],
     [ "filter_state_type", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a574141e5360bc634bd7528378fe56a3c", null ],
     [ "handle_type", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#af19ad33ae6cebe248028231d917ff4c1", null ],
     [ "io_request", "classkvstore__v1__xxx_1_1basic__key__value__store_1_1transaction.html#a2cea87068cef2cd35b2aec15a5130761", null ],

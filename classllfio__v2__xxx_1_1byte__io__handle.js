@@ -1,8 +1,8 @@
 var classllfio__v2__xxx_1_1byte__io__handle =
 [
-    [ "_registered_buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1__registered__buffer__type.html", null ],
     [ "buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1buffer__type.html", "structllfio__v2__xxx_1_1byte__io__handle_1_1buffer__type" ],
     [ "const_buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1const__buffer__type.html", "structllfio__v2__xxx_1_1byte__io__handle_1_1const__buffer__type" ],
+    [ "_registered_buffer_type", "structllfio__v2__xxx_1_1byte__io__handle_1_1__registered__buffer__type.html", null ],
     [ "io_request", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__request.html", null ],
     [ "io_result", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__result.html", "structllfio__v2__xxx_1_1byte__io__handle_1_1io__result" ],
     [ "buffers_type", "classllfio__v2__xxx_1_1byte__io__handle.html#a35247a1dd524bc8b7c07f4374d7f1578", null ],

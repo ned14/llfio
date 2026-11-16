@@ -1,4 +1,4 @@
 var xor_8hpp =
 [
-    [ "xor_handle_adapter", "xor_8hpp.html#a27450e894b5dab6c18a01350670fa0dc", null ]
+    [ "llfio_v2_xxx::algorithm::xor_handle_adapter", "namespacellfio__v2__xxx_1_1algorithm.html#a773545d8ade1efe22ada649895788f4d", null ]
 ];
