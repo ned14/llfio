@@ -25,6 +25,7 @@ Distributed under the Boost Software License, Version 1.0.
 #include <atomic>
 #include <chrono>
 #include <cstdio>
+#include <iostream>
 #include <thread>
 #include <vector>
 
@@ -318,6 +319,37 @@ static inline void TestDirectoryHandleReadSnapshot()
       {std::move(req), flags::permit_racy_reads, {}, filter::none, span<char>(userbuf.data(), userbuf.size())},
       std::chrono::seconds(30));
       BOOST_REQUIRE(r);
+      if(!r.value().done())
+      {
+        // A directory holding exactly SMALL_ENTRIES entries must never exhaust SMALL_ENTRIES
+        // buffers, so an incomplete fill here means the kernel reported something the test did not
+        // create. Re-enumerate the same directory with plenty of buffers and name everything the
+        // kernel reports, so a CI failure names the unexpected entry instead of only reporting an
+        // incomplete fill.
+        std::vector<buffer_type> dbgbuf(SMALL_ENTRIES + 64);
+        std::vector<char> dbgkb(256 * 1024);
+        buffers_type dbgreq(dbgbuf);
+        auto dbg = smalldirh.read(
+        {std::move(dbgreq), flags::permit_racy_reads, {}, filter::none, span<char>(dbgkb.data(), dbgkb.size())},
+        std::chrono::seconds(30));
+        fprintf(stderr, "3c: incomplete fill: %zu buffers were not enough for '%s'\n", (size_t) SMALL_ENTRIES,
+                SMALL_DIR_NAME);
+        if(dbg)
+        {
+          fprintf(stderr, "3c: re-enumeration with %zu buffers: done=%d is_snapshot=%d size=%zu\n",
+                  (size_t) dbgbuf.size(), (int) dbg.value().done(), (int) dbg.value().is_snapshot(),
+                  dbg.value().size());
+          for(auto &entry : dbg.value())
+          {
+            std::cerr << "3c:   entry '" << entry.leafname << "' ino=" << entry.stat.st_ino << "\n";
+          }
+        }
+        else
+        {
+          fprintf(stderr, "3c: re-enumeration failed: %s\n", dbg.error().message().c_str());
+        }
+        fflush(stderr);
+      }
       BOOST_CHECK(r.value().done());
       BOOST_CHECK(r.value().is_snapshot());
       BOOST_CHECK_EQUAL(r.value().size(), SMALL_ENTRIES);
