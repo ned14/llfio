@@ -182,7 +182,7 @@ template <class F, class H> inline auto signal_guard(const sigset_t *guarded, F 
 
 class signal_guard_installation_holder
 {
-  void *_h;
+  WG14_SIGNALS_PREFIX(sig_handlers_t) _h;
 
 public:
   explicit signal_guard_installation_holder(const sigset_t *set)
