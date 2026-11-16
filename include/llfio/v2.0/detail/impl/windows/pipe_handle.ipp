@@ -257,6 +257,8 @@ pipe_handle::io_result<pipe_handle::buffers_type> pipe_handle::_do_read(pipe_han
   {
     // Every writer has gone. POSIX read() returns 0 there, which is the same zero byte
     // short read as above, so report that rather than a Windows specific broken pipe.
+    // ntkernel-error-category maps STATUS_PIPE_BROKEN and STATUS_PIPE_CLOSING onto EPIPE,
+    // and STATUS_PIPE_DISCONNECTED onto ENOTCONN, so these compare semantically.
     if(ret.error() == errc::broken_pipe || ret.error() == errc::not_connected)
     {
       return pipe_handle::buffers_type(reqs.buffers.data(), 0);
