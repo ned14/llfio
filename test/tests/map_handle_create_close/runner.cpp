@@ -32,8 +32,10 @@ template <class U> inline void map_handle_create_close_(U &&f)
   using LLFIO_V2_NAMESPACE::result;
   using LLFIO_V2_NAMESPACE::section_handle;
 
-  // Create a temporary file and put some text into it
-  file_handle temph;
+  // Create a temporary file and put some text into it. This has static storage duration
+  // because the permuter below is a function local static whose hooks capture it by
+  // reference, so it must outlive this frame.
+  static file_handle temph;
   auto boundf = [&](auto... pars) { return f(temph, pars...); };
 
   // clang-format off
