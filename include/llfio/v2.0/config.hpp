@@ -210,6 +210,18 @@ LLFIO_V2_NAMESPACE_END
 #include "quickcpplib/ringbuffer_log.hpp"
 #endif
 #include "quickcpplib/utils/thread.hpp"
+// wg14_signals' POSIX backend captures the calling stack frame with getcontext(),
+// unless the embedding library says its libc has no usable one (config.h gates that
+// on WG14_SIGNALS_HAVE_GETCONTEXT, defaulting to 1 everywhere except Apple).
+// Android's bionic has <ucontext.h> and the ucontext_t type but no getcontext() at
+// all, so that default is wrong for Android and the backend fails to compile there:
+// "use of undeclared identifier 'getcontext'". wg14_signals' documented contract is
+// that an embedding libc without getcontext() defines this to 0 instead, which takes
+// the same stack-frame fallback path musl uses - so do it here, before any
+// wg14_signals header is reached.
+#if defined(__ANDROID__) && !defined(WG14_SIGNALS_HAVE_GETCONTEXT)
+#define WG14_SIGNALS_HAVE_GETCONTEXT 0
+#endif
 // Bring in filesystem
 #define LLFIO_USING_STD_FILESYSTEM 1
 #include <filesystem>
