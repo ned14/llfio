@@ -284,11 +284,11 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><b>llfio_v2_xxx::detai
 <div class="line">    fprintf(stderr, <span class="stringliteral">&quot;FATAL: throw &quot;</span> #__VA_ARGS__ <span class="stringliteral">&quot; at &quot;</span> __FILE__ <span class="stringliteral">&quot;:%d\n&quot;</span>, __LINE__);                                   \</div>
 <div class="line">    abort();                                                                                                           \</div>
 <div class="line">  }</div>
-</div><!-- fragment --><div class="fragment"><div class="line"><span class="lineno">  452</span><span class="preprocessor">#define LLFIO_EXCEPTION_THROW(...)                                                                                     \</span></div>
-<div class="line"><span class="lineno">  453</span><span class="preprocessor">  {                                                                                                                    \</span></div>
-<div class="line"><span class="lineno">  454</span><span class="preprocessor">    fprintf(stderr, &quot;FATAL: throw &quot; #__VA_ARGS__ &quot; at &quot; __FILE__ &quot;:%d\n&quot;, __LINE__);                                   \</span></div>
-<div class="line"><span class="lineno">  455</span><span class="preprocessor">    abort();                                                                                                           \</span></div>
-<div class="line"><span class="lineno">  456</span><span class="preprocessor">  }</span></div>
+</div><!-- fragment --><div class="fragment"><div class="line"><span class="lineno">  464</span><span class="preprocessor">#define LLFIO_EXCEPTION_THROW(...)                                                                                     \</span></div>
+<div class="line"><span class="lineno">  465</span><span class="preprocessor">  {                                                                                                                    \</span></div>
+<div class="line"><span class="lineno">  466</span><span class="preprocessor">    fprintf(stderr, &quot;FATAL: throw &quot; #__VA_ARGS__ &quot; at &quot; __FILE__ &quot;:%d\n&quot;, __LINE__);                                   \</span></div>
+<div class="line"><span class="lineno">  467</span><span class="preprocessor">    abort();                                                                                                           \</span></div>
+<div class="line"><span class="lineno">  468</span><span class="preprocessor">  }</span></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -433,9 +433,9 @@ template&lt;class T, typename std::enable_if&lt;(std::is_unsigned&lt; T &gt;::va
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  373</span>  {</div>
-<div class="line"><span class="lineno">  374</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(0);</div>
-<div class="line"><span class="lineno">  375</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  385</span>  {</div>
+<div class="line"><span class="lineno">  386</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(0);</div>
+<div class="line"><span class="lineno">  387</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -463,9 +463,9 @@ template&lt;class T, class U, typename std::enable_if&lt;(std::is_unsigned&lt; T
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  367</span>  {</div>
-<div class="line"><span class="lineno">  368</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(v);</div>
-<div class="line"><span class="lineno">  369</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  379</span>  {</div>
+<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(v);</div>
+<div class="line"><span class="lineno">  381</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -493,9 +493,9 @@ template&lt;class T, class U, typename std::enable_if&lt;(std::is_unsigned&lt; T
   </tr>
 </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">  379</span>  {</div>
-<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(<span class="keyword">reinterpret_cast&lt;</span>uintptr_t<span class="keyword">&gt;</span>(v));</div>
-<div class="line"><span class="lineno">  381</span>  }</div>
+<div class="fragment"><div class="line"><span class="lineno">  391</span>  {</div>
+<div class="line"><span class="lineno">  392</span>    <span class="keywordflow">return</span> <span class="keyword">static_cast&lt;</span>T<span class="keyword">&gt;</span>(<span class="keyword">reinterpret_cast&lt;</span>uintptr_t<span class="keyword">&gt;</span>(v));</div>
+<div class="line"><span class="lineno">  393</span>  }</div>
 </div><!-- fragment -->
 </div>
 </div>
