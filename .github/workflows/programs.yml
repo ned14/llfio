@@ -31,3 +31,10 @@ jobs:
        cd build
        cmake ..  $CMAKE_CONFIGURE_OPTIONS -DCMAKE_BUILD_TYPE=Release
        cmake --build .
+
+    - name: Run collision-check
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+       cd programs/build
+       ctest -R llfio-collision-check --output-on-failure
