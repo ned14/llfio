@@ -596,4 +596,40 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   }
 }
 
+result<void> directory_handle::barrier() noexcept
+{
+  windows_nt_kernel::init();
+  using namespace windows_nt_kernel;
+  LLFIO_LOG_FUNCTION_CALL(this);
+  if(!_v)
+  {
+    return errc::invalid_argument;
+  }
+  IO_STATUS_BLOCK ol = make_iostatus();
+  NTSTATUS ntstat;
+  if(NtFlushBuffersFileEx != nullptr)
+  {
+    // flags == 0 flushes the data and the metadata needed to retrieve it.
+    ntstat = NtFlushBuffersFileEx(_v.h, 0, nullptr, 0, &ol);
+  }
+  else
+  {
+    ntstat = NtFlushBuffersFile(_v.h, &ol);
+  }
+  if(STATUS_PENDING == ntstat)
+  {
+    /* The flush was queued rather than completed synchronously (normal for an overlapped handle, so
+    very much the normal case here). It must be waited for, exactly as `byte_io_handle::_do_barrier()`
+    does for a file: `STATUS_PENDING` is a positive value, so returning success here would tell the
+    caller their directory entry was durable while the flush was still in flight. There is no
+    deadline parameter on this API, so wait indefinitely. */
+    ntstat = ntwait(_v.h, ol, deadline());
+  }
+  if(ntstat < 0)
+  {
+    return ntkernel_error(ntstat);
+  }
+  return success();
+}
+
 LLFIO_V2_NAMESPACE_END

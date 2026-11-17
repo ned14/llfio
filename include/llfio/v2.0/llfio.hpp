@@ -62,6 +62,7 @@ import LLFIO_MODULE_NAME;
 #include "stat.hpp"
 #include "utils.hpp"
 
+#include "atomic_file.hpp"
 #include "directory_handle.hpp"
 #include "fast_random_file_handle.hpp"
 #include "file_handle.hpp"

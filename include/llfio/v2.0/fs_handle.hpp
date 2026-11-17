@@ -260,6 +260,11 @@ public:
   operation is both atomic and matching POSIX behaviour even on Microsoft Windows where
   no Win32 API can match POSIX semantics.
 
+  \note The rename is not by itself durable, as it is a change to the containing directory's
+  metadata, and nothing here flushes that. If the new name needs to survive a power loss - the usual
+  reason for renaming a file into place - follow this with a `directory_handle::barrier()` of the
+  containing directory, reopening it as a `directory_handle` if you hold only a `path_handle` for it.
+
   Note that if `atomic_replace` is false, the operation *may* be implemented as creating a hard
   link to the destination (which fails if the destination exists), opening a new file descriptor
   to the destination, closing the existing file descriptor, replacing the existing file descriptor
