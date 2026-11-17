@@ -62,7 +62,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   // clang-format off
   auto &entries = static_buffers();
   auto &info = static_info();
-  static const auto permuter(mt_permute_parameters< 
+  static const auto permuter(st_permute_parameters< 
     il_result<void>,                              
     parameters<                                
       typename directory_handle::mode,

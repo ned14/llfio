@@ -49,7 +49,7 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
   auto &entries = static_directory_entries();
 
   // clang-format off
-  static const auto permuter(mt_permute_parameters<
+  static const auto permuter(st_permute_parameters<
     il_result<void>,
     parameters<                              
       LLFIO_V2_NAMESPACE::span<directory_entry> *,
