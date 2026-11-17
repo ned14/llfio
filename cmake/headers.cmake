@@ -113,6 +113,7 @@ set(llfio_HEADERS
   "include/llfio/wg14_signals/include/wg14_signals/detail/impl/verstable.h"
   "include/llfio/wg14_signals/include/wg14_signals/thrd_signal_handle.h"
   "include/llfio/wg14_signals/include/wg14_signals/tss_async_signal_safe.h"
+  "include/llfio/wg14_signals/test/override_probe.h"
   "include/llfio/wg14_signals/test/test_common.h"
   "include/llfio/wg14_signals/test/ticks_clock.h"
 )
