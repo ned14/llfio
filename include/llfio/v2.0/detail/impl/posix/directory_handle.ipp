@@ -467,6 +467,12 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
   }
   (void) LLFIO_VALGRIND_MAKE_MEM_DEFINED_IF_ADDRESSABLE(buffer, bytes);  // NOLINT
   size_t n = 0;
+  // Set once every buffer the caller supplied has been filled. The scan then continues over the
+  // remaining records rather than returning immediately: a kernel may report records after the
+  // last entry worth returning - dot entries, or a tombstone for a deleted name - and stopping at
+  // the moment the buffers filled would report done()==false for a directory whose every entry
+  // was in fact returned. Only a further entry we have no buffer for makes the fill incomplete.
+  bool buffers_full = false;
   for(dirent *dent = buffer;; dent = reinterpret_cast<dirent *>(reinterpret_cast<uintptr_t>(dent) + dent->d_reclen))
   {
     if(dent->d_ino != 0u)
@@ -482,6 +488,13 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
       if(!req.glob.empty() && fnmatch(zglob.c_str(), dent->d_name, 0) != 0)
       {
         goto cont;
+      }
+      if(buffers_full)
+      {
+        // Fill is incomplete: an entry we have no buffer for
+        req.buffers._metadata = default_stat_contents;
+        req.buffers._done = false;
+        return {std::move(req.buffers)};
       }
       directory_entry &item = req.buffers[n];
       item.leafname = path_view(dent->d_name, length, path_view::zero_terminated);
@@ -517,21 +530,16 @@ result<directory_handle::buffers_type> directory_handle::read(io_request<buffers
         break;
       }
       n++;
+      buffers_full = n >= req.buffers.size();
     }
   cont:
     if((bytes -= dent->d_reclen) <= 0)
     {
-      // Fill is complete
+      // Fill is complete: every entry the kernel reported was stored, even when the last of them
+      // exhausted the caller's buffers.
       req.buffers._resize(n);
       req.buffers._metadata = default_stat_contents;
       req.buffers._done = true;
-      return {std::move(req.buffers)};
-    }
-    if(n >= req.buffers.size())
-    {
-      // Fill is incomplete
-      req.buffers._metadata = default_stat_contents;
-      req.buffers._done = false;
       return {std::move(req.buffers)};
     }
   }
