@@ -43,7 +43,24 @@ Distributed under the Boost Software License, Version 1.0.
 LLFIO_V2_NAMESPACE_EXPORT_BEGIN
 
 class fs_handle;
+class handle;
 class io_context;
+
+#ifdef __linux__
+
+/*! @brief THREADSAFE Get an unmanaged path handle pointing to the base of a procfs mount point.
+If not already set, attempts to open a new handle to "/proc".
+The handle has static storage duration.
+*/
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<native_handle_type> get_proc_base() noexcept;
+
+/*! @brief THREADSAFE Set a global path handle pointing to the base of a procfs mount point.
+Has no effect if the handle is already set.
+Returns the new value of get_proc_base().
+*/
+LLFIO_HEADERS_ONLY_FUNC_SPEC result<native_handle_type> set_proc_base(handle &&proc_handle) noexcept;
+
+#endif  // __linux__
 
 #pragma pack(push, 4)
 
@@ -283,10 +300,10 @@ public:
   correctly however, and see `algorithm::cached_parent_handle_adapter<T>` for a handle
   adapter which makes use of that.
 
-  On Linux if `/proc` is not mounted, this call fails with an error. All APIs in LLFIO
-  which require the use of `current_path()` can be told to not use it e.g. `flag::disable_safety_unlinks`.
-  It is up to you to detect if `current_path()` is not working, and to change how you
-  call LLFIO appropriately.
+  On Linux if `/proc` is not mounted, and `set_proc_base()` has not been called with an appropriate handle,
+  this call fails with an error. All APIs in LLFIO which require the use of `current_path()` can be told to not use it
+  e.g. `flag::disable_safety_unlinks`. It is up to you to detect if `current_path()` is not working, and to change how
+  you call LLFIO appropriately.
 
   On Windows, you will almost certainly get back a path of the form `\!!\Device\HarddiskVolume10\Users\ned\...`.
   See `path_view` for what all the path prefix sequences mean, but to summarise the `\!!\`

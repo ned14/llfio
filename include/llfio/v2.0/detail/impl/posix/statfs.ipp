@@ -134,11 +134,26 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<size_t> statfs_t::fill(const handle &h, s
           FILE *mtab = setmntent("/etc/mtab", "r");
           if(mtab == nullptr)
           {
-            mtab = setmntent("/proc/mounts", "r");
-          }
-          if(mtab == nullptr)
-          {
-            return posix_error();
+            OUTCOME_TRY(const native_handle_type& proc_base, get_proc_base());
+            int mtab_fd{::openat(proc_base.fd, "thread-self/mounts", O_RDONLY | O_CLOEXEC)};
+            if (mtab_fd < 0)
+            {
+              return posix_error();
+            }
+            // In glibc, setmntent is fopen with cloexec and mode "c" to disable cancellation points.
+            // It doesn't looks like "c" has any meaning in musl, and musl passes through to fopen directly.
+            mtab = fdopen(mtab_fd,
+#ifdef __GLIBC__
+              "rc"
+#else
+              "r"
+#endif
+              );
+            if(mtab == nullptr)
+            {
+              ::close(mtab_fd);
+              return posix_error();
+            }
           }
           auto unmtab = make_scope_exit([mtab]() noexcept { endmntent(mtab); });
           struct mntent m
@@ -417,7 +432,11 @@ LLFIO_HEADERS_ONLY_MEMFUNC_SPEC result<std::pair<uint32_t, float>> statfs_t::_fi
     }
     LLFIO_EXCEPTION_TRY
     {
-      int fd = ::open("/proc/diskstats", O_RDONLY);
+      int fd{-1};
+      if (auto proc_base = get_proc_base())
+      {
+        fd = ::openat(proc_base.assume_value().fd, "diskstats", O_RDONLY);
+      }
       if(fd >= 0)
       {
         std::string diskstats;
