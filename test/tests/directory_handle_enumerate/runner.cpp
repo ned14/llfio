@@ -24,15 +24,17 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "kernel_directory_handle_enumerate.cpp.hpp"
 
-inline LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> static_directory_entries()
+inline LLFIO_V2_NAMESPACE::span<LLFIO_V2_NAMESPACE::directory_entry> &static_directory_entries()
 {
   using LLFIO_V2_NAMESPACE::directory_entry;
   static directory_entry _entries[5];
+  static LLFIO_V2_NAMESPACE::span<directory_entry> _span{_entries};
   for(auto &i : _entries)
   {
     i = directory_entry();
   }
-  return {_entries};
+  _span = LLFIO_V2_NAMESPACE::span<directory_entry>{_entries};
+  return _span;
 }
 
 template <class U> inline void directory_handle_enumerate_(U &&f)
@@ -44,7 +46,7 @@ template <class U> inline void directory_handle_enumerate_(U &&f)
   using LLFIO_V2_NAMESPACE::result;
   using filter = LLFIO_V2_NAMESPACE::directory_handle::filter;
 
-  auto entries = static_directory_entries();
+  auto &entries = static_directory_entries();
 
   // clang-format off
   static const auto permuter(mt_permute_parameters<

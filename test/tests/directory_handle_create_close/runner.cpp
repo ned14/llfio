@@ -24,16 +24,18 @@ Distributed under the Boost Software License, Version 1.0.
 
 #include "kernel_directory_handle.cpp.hpp"
 
-inline LLFIO_V2_NAMESPACE::directory_handle::buffers_type static_buffers()
+inline LLFIO_V2_NAMESPACE::directory_handle::buffers_type &static_buffers()
 {
   using directory_handle = LLFIO_V2_NAMESPACE::directory_handle;
   static typename directory_handle::buffer_type _entries[5];
+  static typename directory_handle::buffers_type _buffers{_entries};
   // Reset enumeration entries
   for(auto &i : _entries)
   {
     i = typename directory_handle::buffer_type();
   }
-  return {_entries};
+  _buffers = typename directory_handle::buffers_type{_entries};
+  return _buffers;
 }
 
 inline LLFIO_V2_NAMESPACE::result<typename LLFIO_V2_NAMESPACE::directory_handle::buffers_type> &static_info()
@@ -58,7 +60,7 @@ template <class U> inline void directory_handle_create_close_creation(U &&f)
   static const il_result<void> permission_denied = LLFIO_V2_NAMESPACE::errc::permission_denied;
 
   // clang-format off
-  auto entries = static_buffers();
+  auto &entries = static_buffers();
   auto &info = static_info();
   static const auto permuter(mt_permute_parameters< 
     il_result<void>,                              
